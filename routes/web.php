@@ -1,6 +1,14 @@
 <?php
 
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\MobileController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +36,14 @@ Route::group(['middleware' => ['role:Admin']], function () {
         ->middleware(['auth', 'role:Admin']);
 
     Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
+    Route::resource('customers', CustomerController::class)->middleware(['auth', 'permission:manage customers']);
+    Route::resource('brands', BrandController::class)->middleware(['auth', 'permission:manage brands']);
+    Route::resource('categories', CategoryController::class)->middleware(['auth', 'permission:manage categories']);
+    Route::resource('products', ProductController::class)->middleware(['auth', 'permission:manage products']);
+    Route::resource('mobiles', MobileController::class)->middleware(['auth', 'permission:manage mobiles']);
+    Route::resource('purchases', PurchaseController::class)->middleware(['auth', 'permission:manage purchases']);
+    Route::resource('sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
+    Route::resource('transactions', TransactionController::class)->middleware(['auth', 'permission:manage accounts']);
 });
 
 Route::group(['middleware' => ['role:Salesperson']], function () {
