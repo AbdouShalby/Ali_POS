@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
-            $table->string('qr_code')->nullable();
+            $table->text('qr_code')->nullable();
             $table->timestamps();
 
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');

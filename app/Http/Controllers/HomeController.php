@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +26,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $totalSales = Sale::sum('total_amount');
+        $totalCustomers = Customer::count();
+        $totalProducts = Product::count();
+        $lowStockProducts = Product::where('quantity', '<', 10)->get();
+
+        return view('admin.dashboard', compact('totalSales', 'totalCustomers', 'totalProducts', 'lowStockProducts'));
     }
 }

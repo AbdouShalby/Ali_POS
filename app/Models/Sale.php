@@ -9,6 +9,14 @@ class Sale extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'invoice_number',
+        'customer_id',
+        'sale_date',
+        'total_amount',
+        'notes',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);

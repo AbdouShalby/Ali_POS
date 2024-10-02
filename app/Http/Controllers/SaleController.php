@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Product;
-use App\Models\Sale;
 use App\Models\SaleItem;
-use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:manage sales');
+    }
+
     public function index()
     {
         $sales = Sale::with('customer')->get();
         return view('sales.index', compact('sales'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $customers = Customer::all();
@@ -29,9 +29,6 @@ class SaleController extends Controller
         return view('sales.create', compact('customers', 'products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -41,13 +38,14 @@ class SaleController extends Controller
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|numeric|min:0',
+            'notes' => 'nullable|string',
         ]);
 
         $sale = Sale::create([
             'invoice_number' => $request->invoice_number,
             'customer_id' => $request->customer_id,
             'sale_date' => $request->sale_date,
-            'total_amount' => 0, // سنحسبها لاحقًا
+            'total_amount' => 0,
             'notes' => $request->notes,
         ]);
 
@@ -57,11 +55,12 @@ class SaleController extends Controller
             $product = Product::find($item['product_id']);
             $quantity = $item['quantity'];
             $price = $item['price'];
-            $totalAmount += $price * $quantity;
 
             if ($product->quantity < $quantity) {
-                return redirect()->back()->withErrors(['message' => 'الكمية المطلوبة للمنتج ' . $product->name . ' غير متوفرة.']);
+                return redirect()->back()->withErrors(['error' => 'الكمية المتوفرة من المنتج ' . $product->name . ' غير كافية']);
             }
+
+            $totalAmount += $price * $quantity;
 
             SaleItem::create([
                 'sale_id' => $sale->id,
@@ -70,7 +69,6 @@ class SaleController extends Controller
                 'price' => $price,
             ]);
 
-            // تحديث كمية المنتج في المخزون
             $product->quantity -= $quantity;
             $product->save();
         }
@@ -81,38 +79,17 @@ class SaleController extends Controller
         return redirect()->route('sales.index')->with('success', 'تم إضافة فاتورة البيع بنجاح');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $sale = Sale::with(['customer', 'saleItems.product'])->findOrFail($id);
         return view('sales.show', compact('sale'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Sale $sale)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Sale $sale)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $sale = Sale::findOrFail($id);
 
+        // قبل الحذف، يجب تحديث كميات المنتجات
         foreach ($sale->saleItems as $item) {
             $product = $item->product;
             $product->quantity += $item->quantity;

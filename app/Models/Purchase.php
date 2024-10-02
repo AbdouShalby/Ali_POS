@@ -9,6 +9,14 @@ class Purchase extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'invoice_number',
+        'supplier_id',
+        'purchase_date',
+        'total_amount',
+        'notes',
+    ];
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);

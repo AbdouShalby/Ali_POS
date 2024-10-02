@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
@@ -22,27 +23,30 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::group(['middleware' => ['role:Admin']], function () {
-    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-        ->name('admin.dashboard')
+Route::group(['middleware' => ['auth', 'role:Admin']], function () {
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard')
         ->middleware(['auth', 'role:Admin']);
 
     Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
+
     Route::resource('customers', CustomerController::class)->middleware(['auth', 'permission:manage customers']);
+
     Route::resource('brands', BrandController::class)->middleware(['auth', 'permission:manage brands']);
+
     Route::resource('categories', CategoryController::class)->middleware(['auth', 'permission:manage categories']);
+
     Route::resource('products', ProductController::class)->middleware(['auth', 'permission:manage products']);
+
     Route::resource('mobiles', MobileController::class)->middleware(['auth', 'permission:manage mobiles']);
+
     Route::resource('purchases', PurchaseController::class)->middleware(['auth', 'permission:manage purchases']);
+
     Route::resource('sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
+
     Route::resource('transactions', TransactionController::class)->middleware(['auth', 'permission:manage accounts']);
 });
 

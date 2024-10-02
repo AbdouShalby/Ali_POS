@@ -2,38 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Models\Customer;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:manage customers');
+    }
+
     public function index()
     {
         $customers = Customer::all();
         return view('customers.index', compact('customers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('customers.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
+            'email' => 'nullable|email|max:255|unique:customers,email',
+            'phone' => 'nullable|string|max:20|unique:customers,phone',
+            'address' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
         ]);
 
         Customer::create($validated);
@@ -41,44 +39,34 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('success', 'تم إضافة العميل بنجاح');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Customer $customer)
+    public function show($id)
     {
-        //
+        $customer = Customer::findOrFail($id);
+        return view('customers.show', compact('customer'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $customer = Customer::findOrFail($id);
         return view('customers.edit', compact('customer'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
+            'email' => 'nullable|email|max:255|unique:customers,email,' . $id,
+            'phone' => 'nullable|string|max:20|unique:customers,phone,' . $id,
+            'address' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
         ]);
 
         $customer = Customer::findOrFail($id);
         $customer->update($validated);
 
-        return redirect()->route('customers.index')->with('success', 'تم تحديث العميل بنجاح');
+        return redirect()->route('customers.index')->with('success', 'تم تحديث بيانات العميل بنجاح');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $customer = Customer::findOrFail($id);

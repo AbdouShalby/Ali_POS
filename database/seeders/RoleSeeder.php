@@ -10,6 +10,9 @@ class RoleSeeder extends Seeder
 {
     public function run()
     {
+        Role::create(['name' => 'Admin']);
+        Role::create(['name' => 'User']);
+
         $permissions = [
             'manage users',
             'manage suppliers',

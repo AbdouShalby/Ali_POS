@@ -8,4 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Mobile extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'product_id',
+        'imei',
+        'status',
+        'specifications',
+    ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

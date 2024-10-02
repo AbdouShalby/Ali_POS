@@ -1,31 +1,47 @@
 @extends('layouts.app')
 
+@section('title', 'إضافة مورد جديد')
+
 @section('content')
     <div class="container">
-        <h1>إضافة مورد جديد</h1>
+        <h1 class="mb-4">إضافة مورد جديد</h1>
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>خطأ!</strong> يرجى تصحيح الأخطاء التالية:
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="إغلاق"></button>
+            </div>
+        @endif
+
         <form action="{{ route('suppliers.store') }}" method="POST">
             @csrf
-            <div class="form-group">
-                <label>اسم المورد</label>
-                <input type="text" name="name" class="form-control" required>
+            <div class="mb-3">
+                <label for="name" class="form-label">اسم المورد</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
             </div>
-            <div class="form-group">
-                <label>الشخص المسؤول</label>
-                <input type="text" name="contact_person" class="form-control">
+            <div class="mb-3">
+                <label for="email" class="form-label">البريد الإلكتروني</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}">
             </div>
-            <div class="form-group">
-                <label>رقم الهاتف</label>
-                <input type="text" name="phone" class="form-control">
+            <div class="mb-3">
+                <label for="phone" class="form-label">رقم الهاتف</label>
+                <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone') }}">
             </div>
-            <div class="form-group">
-                <label>البريد الإلكتروني</label>
-                <input type="email" name="email" class="form-control">
+            <div class="mb-3">
+                <label for="address" class="form-label">العنوان</label>
+                <textarea class="form-control" id="address" name="address" rows="2">{{ old('address') }}</textarea>
             </div>
-            <div class="form-group">
-                <label>العنوان</label>
-                <textarea name="address" class="form-control"></textarea>
-            </div>
-            <button type="submit" class="btn btn-success">حفظ</button>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> حفظ
+            </button>
+            <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> إلغاء
+            </a>
         </form>
     </div>
 @endsection
