@@ -15,13 +15,22 @@ class UsersTableSeeder extends Seeder
         $permissions = [
             'manage users',
             'manage roles',
-            'manage products',
-            'manage categories',
-            'manage brands',
-            'manage purchases',
-            'manage sales',
             'manage suppliers',
             'manage customers',
+            'manage brands',
+            'manage categories',
+            'manage products',
+            'manage mobiles',
+            'manage purchases',
+            'manage sales',
+            'manage accounts',
+            'manage units',
+            'manage users',
+            'manage settings',
+            'manage crypto_gateways',
+            'manage crypto_transactions',
+            'manage maintenances',
+            'manage devices',
         ];
 
         foreach ($permissions as $permission) {

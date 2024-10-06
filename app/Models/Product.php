@@ -11,37 +11,76 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'code',
         'description',
+        'image',
+        'cost',
         'price',
+        'wholesale_price',
+        'min_sale_price',
         'quantity',
+        'min_sale_quantity',
+        'stock_alert',
+        'unit_id',
+        'sale_unit_id',
+        'purchase_unit_id',
         'brand_id',
         'category_id',
-        'qr_code',
+        'is_device',
+        'color',
+        'storage',
+        'battery_health',
+        'ram',
+        'gpu',
+        'cpu',
+        'condition',
+        'device_description',
+        'has_box',
+        'customer_type',
+        'customer_id',
+        'supplier_id',
+        'payment_method',
+        'seller_name',
     ];
 
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
-    }
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function mobiles()
+    public function brand()
     {
-        return $this->hasMany(Mobile::class);
+        return $this->belongsTo(Brand::class);
     }
 
-    public function purchaseItems()
+    public function unit()
     {
-        return $this->hasMany(PurchaseItem::class);
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 
-    public function saleItems()
+    public function saleUnit()
     {
-        return $this->hasMany(SaleItem::class);
+        return $this->belongsTo(Unit::class, 'sale_unit_id');
     }
 
+    public function purchaseUnit()
+    {
+        return $this->belongsTo(Unit::class, 'purchase_unit_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function mobileDetail()
+    {
+        return $this->hasOne(MobileDetail::class);
+    }
 }

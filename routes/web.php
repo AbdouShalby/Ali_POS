@@ -3,13 +3,20 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CryptoGatewayController;
+use App\Http\Controllers\CryptoTransactionController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MobileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +55,26 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::resource('sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
 
     Route::resource('transactions', TransactionController::class)->middleware(['auth', 'permission:manage accounts']);
+
+    Route::resource('units', UnitController::class)->middleware(['auth', 'permission:manage units']);
+
+    Route::resource('users', UserController::class)->middleware(['auth', 'permission:manage users']);
+
+    Route::resource('settings', SettingsController::class)->except(['show'])->middleware(['auth', 'permission:manage settings']);
+
+    Route::resource('crypto_gateways', CryptoGatewayController::class)->middleware(['auth', 'permission:manage crypto_gateways']);
+
+    Route::get('crypto_transactions', [CryptoTransactionController::class, 'index'])->name('crypto_transactions.index')
+        ->middleware(['auth', 'permission:manage crypto_transactions']);
+    Route::get('crypto_transactions/{gatewayId}/transactions/create', [CryptoTransactionController::class, 'create'])->name('crypto_transactions.create')
+        ->middleware(['auth', 'permission:manage crypto_transactions']);
+    Route::post('crypto_transactions/{gatewayId}/transactions', [CryptoTransactionController::class, 'store'])->name('crypto_transactions.store')
+        ->middleware(['auth', 'permission:manage crypto_transactions']);
+
+    Route::resource('maintenances', MaintenanceController::class)->except(['show', 'edit', 'destroy'])
+        ->middleware(['auth', 'permission:manage maintenances']);
+
+    Route::resource('devices', DeviceController::class)->middleware(['auth', 'permission:manage devices']);
 });
 
 Route::group(['middleware' => ['role:Salesperson']], function () {

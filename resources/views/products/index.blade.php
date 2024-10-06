@@ -22,11 +22,15 @@
                 <thead class="table-light">
                 <tr>
                     <th>اسم المنتج</th>
-                    <th>الوصف</th>
-                    <th>السعر</th>
-                    <th>الكمية</th>
-                    <th>العلامة التجارية</th>
+                    <th>كود المنتج</th>
                     <th>القسم</th>
+                    <th>العلامة التجارية</th>
+                    <th>الكمية</th>
+                    <th>التكلفة</th>
+                    <th>سعر البيع</th>
+                    <th>سعر الجملة</th>
+                    <th>أقل سعر للبيع</th>
+                    <th>موبايل؟</th>
                     <th>الإجراءات</th>
                 </tr>
                 </thead>
@@ -34,11 +38,15 @@
                 @foreach($products as $product)
                     <tr>
                         <td>{{ $product->name }}</td>
-                        <td>{{ Str::limit($product->description, 50) }}</td>
-                        <td>{{ number_format($product->price, 2) }} جنيه</td>
-                        <td>{{ $product->quantity }}</td>
-                        <td>{{ $product->brand->name ?? 'غير محدد' }}</td>
+                        <td>{{ $product->code }}</td>
                         <td>{{ $product->category->name ?? 'غير محدد' }}</td>
+                        <td>{{ $product->brand->name ?? 'غير محدد' }}</td>
+                        <td>{{ $product->quantity }}</td>
+                        <td>{{ number_format($product->cost, 2) }} جنيه</td>
+                        <td>{{ number_format($product->price, 2) }} جنيه</td>
+                        <td>{{ number_format($product->wholesale_price, 2) }} جنيه</td>
+                        <td>{{ number_format($product->min_sale_price, 2) }} جنيه</td>
+                        <td>{{ $product->mobileDetail ? 'نعم' : 'لا' }}</td>
                         <td>
                             <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i> عرض
@@ -55,6 +63,26 @@
                             </form>
                         </td>
                     </tr>
+
+                    @if($product->mobileDetail)
+                        <tr>
+                            <td colspan="11">
+                                <strong>تفاصيل الموبايل:</strong><br>
+                                <ul>
+                                    <li><strong>اللون:</strong> {{ $product->mobileDetail->color }}</li>
+                                    <li><strong>المساحة:</strong> {{ $product->mobileDetail->storage }}</li>
+                                    <li><strong>صحة البطارية:</strong> {{ $product->mobileDetail->battery_health }}%</li>
+                                    <li><strong>الرام:</strong> {{ $product->mobileDetail->ram }}</li>
+                                    <li><strong>معالج الرسوم:</strong> {{ $product->mobileDetail->gpu }}</li>
+                                    <li><strong>المعالج:</strong> {{ $product->mobileDetail->cpu }}</li>
+                                    <li><strong>حالة الجهاز:</strong> {{ $product->mobileDetail->condition }}</li>
+                                    <li><strong>وصف الجهاز:</strong> {{ $product->mobileDetail->device_description }}</li>
+                                    <li><strong>هل توجد علبة:</strong> {{ $product->mobileDetail->has_box ? 'نعم' : 'لا' }}</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    @endif
+
                 @endforeach
                 </tbody>
             </table>

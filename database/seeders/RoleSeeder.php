@@ -15,6 +15,7 @@ class RoleSeeder extends Seeder
 
         $permissions = [
             'manage users',
+            'manage roles',
             'manage suppliers',
             'manage customers',
             'manage brands',
@@ -24,9 +25,11 @@ class RoleSeeder extends Seeder
             'manage purchases',
             'manage sales',
             'manage accounts',
-            'manage maintenance',
+            'manage units',
+            'manage users',
             'manage settings',
-            'view reports',
+            'manage crypto_gateways',
+            'manage crypto_transactions',
         ];
 
         foreach ($permissions as $permission) {

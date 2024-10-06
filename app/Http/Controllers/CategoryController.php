@@ -28,6 +28,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
+            'description' => 'nullable|string|max:255',
         ]);
 
         Category::create($validated);
@@ -51,6 +52,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'description' => 'nullable|string|max:255',
         ]);
 
         $category = Category::findOrFail($id);
