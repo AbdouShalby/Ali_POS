@@ -6,13 +6,13 @@
     <div class="container">
         <h1>بيانات الجهاز</h1>
 
-        <p><strong>اسم الجهاز:</strong> {{ $device->name ?? 'غير محدد' }}</p>
-        <p><strong>اللون:</strong> {{ $device->color ?? 'غير محدد' }}</p>
-        <p><strong>حالة البطارية:</strong> {{ $device->battery ?? 'غير محددة' }}%</p>
-        <p><strong>السعة التخزينية:</strong> {{ $device->storage ?? 'غير محددة' }} GB</p>
-        <p><strong>الحالة:</strong> {{ $device->condition ?? 'غير محددة' }}</p>
-        <p><strong>IMEI:</strong> {{ $device->imei ?? 'غير محدد' }}</p>
-        <p><strong>السعر:</strong> ${{ $device->price ?? 'غير محدد' }}</p>
+        @if($device->name)<p><strong>اسم الجهاز:</strong> {{ $device->name ?? 'غير محدد' }}</p>@endif
+        @if($device->color)<p><strong>اللون:</strong> {{ $device->color ?? 'غير محدد' }}</p>@endif
+        @if($device->battery)<p><strong>حالة البطارية:</strong> {{ $device->battery ?? 'غير محددة' }}%</p>@endif
+        @if($device->storage)<p><strong>السعة التخزينية:</strong> {{ $device->storage ?? 'غير محددة' }} GB</p>@endif
+        @if($device->condition)<p><strong>الحالة:</strong> {{ $device->condition ?? 'غير محددة' }}</p>@endif
+        @if($device->imei)<p><strong>IMEI:</strong> {{ $device->imei ?? 'غير محدد' }}</p>@endif
+        @if($device->price)<p><strong>السعر:</strong> ${{ $device->price ?? 'غير محدد' }}</p>@endif
 
         <h3>QR Code</h3>
         <img src="{{ $qrCodeDataUri }}" alt="QR Code">

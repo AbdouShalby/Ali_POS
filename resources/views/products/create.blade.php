@@ -168,7 +168,7 @@
                 <!-- نوع العميل -->
                 <div class="mb-3">
                     <label for="client_type" class="form-label">نوع العميل</label>
-                    <select class="form-select" id="client_type" name="client_type" required>
+                    <select class="form-select" id="client_type" name="client_type">
                         <option value="">اختر النوع</option>
                         <option value="customer" {{ old('client_type') == 'customer' ? 'selected' : '' }}>زبون</option>
                         <option value="supplier" {{ old('client_type') == 'supplier' ? 'selected' : '' }}>مورد</option>
