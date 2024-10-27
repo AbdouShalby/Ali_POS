@@ -13,10 +13,15 @@ class CategoryController extends Controller
         $this->middleware('permission:manage categories');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::all();
-        return view('categories.index', compact('categories'));
+        $search = $request->get('search');
+
+        $categories = Category::when($search, function ($query, $search) {
+            return $query->where('name', 'LIKE', "%$search%");
+        })->get();
+
+        return view('categories.index', compact('categories', 'search'));
     }
 
     public function create()
@@ -26,14 +31,17 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string|max:255',
         ]);
 
-        Category::create($validated);
+        $category = Category::create($request->all());
 
-        return redirect()->route('categories.index')->with('success', 'تم إضافة القسم بنجاح');
+        return response()->json([
+            'success' => true,
+            'category_id' => $category->id,
+        ]);
     }
 
     public function show($id)

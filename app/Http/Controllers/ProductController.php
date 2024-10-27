@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Unit;
 use Illuminate\Http\Request;
@@ -18,10 +19,30 @@ class ProductController extends Controller
         $this->middleware('permission:manage products');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'brand', 'mobileDetail'])->get();
-        return view('products.index', compact('products'));
+        $search = $request->get('search');
+        $category = $request->get('category');
+        $brand = $request->get('brand');
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+
+        $products = Product::when($search, function ($query, $search) {
+            return $query->where('name', 'like', '%' . $search . '%');
+        })->when($category, function ($query, $category) {
+            return $query->where('category_id', $category);
+        })->when($brand, function ($query, $brand) {
+            return $query->where('brand_id', $brand);
+        })->when($minPrice, function ($query, $minPrice) {
+            return $query->where('price', '>=', $minPrice);
+        })->when($maxPrice, function ($query, $maxPrice) {
+            return $query->where('price', '<=', $maxPrice);
+        })->orderBy('created_at', 'desc')->paginate(10);
+
+        $categories = Category::all();
+        $brands = Brand::all();
+
+        return view('products.index', compact('products', 'categories', 'brands', 'search', 'category', 'brand', 'minPrice', 'maxPrice'));
     }
 
     public function create()
@@ -63,6 +84,20 @@ class ProductController extends Controller
             $imageName = null;
         }
 
+        if ($request->hasFile('scan_id')) {
+            $scanIdName = time() . '_scan_id.' . $request->scan_id->extension();
+            $request->scan_id->move(public_path('files/scan_ids'), $scanIdName);
+        } else {
+            $scanIdName = null;
+        }
+
+        if ($request->hasFile('scan_documents')) {
+            $scanDocumentName = time() . '_scan_document.' . $request->scan_documents->extension();
+            $request->scan_documents->move(public_path('files/scan_documents'), $scanDocumentName);
+        } else {
+            $scanDocumentName = null;
+        }
+
         $product = Product::create([
             'name' => $request->name,
             'code' => $request->code,
@@ -84,6 +119,8 @@ class ProductController extends Controller
             'supplier_id' => $request->client_type == 'supplier' ? $request->supplier_id : null,
             'payment_method' => $request->payment_method,
             'seller_name' => $request->seller_name,
+            'scan_id' => $scanIdName,
+            'scan_documents' => $scanDocumentName,
         ]);
 
         if ($request->is_mobile) {
@@ -117,8 +154,8 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::with(['brand', 'category'])->findOrFail($id);
-        return view('products.show', compact('product'));
+        $purchase = Purchase::with(['supplier', 'purchaseItems.product'])->findOrFail($id);
+        return view('purchases.show', compact('purchase'));
     }
 
     public function edit($id)

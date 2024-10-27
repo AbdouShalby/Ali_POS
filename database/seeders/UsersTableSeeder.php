@@ -22,6 +22,7 @@ class UsersTableSeeder extends Seeder
             'manage products',
             'manage mobiles',
             'manage purchases',
+            'manage external_purchases',
             'manage sales',
             'manage accounts',
             'manage units',
@@ -49,13 +50,5 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $admin->assignRole($adminRole);
-
-        $user = User::create([
-            'name' => 'Standard User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('password'),
-        ]);
-
-        $user->assignRole($userRole);
     }
 }

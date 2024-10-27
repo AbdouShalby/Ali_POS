@@ -1,20 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'مبيعات اليوم')
+@section('title', 'تاريخ المبيعات')
 
 @section('content')
     <div class="container">
-        <h1 class="mb-4">مبيعات اليوم</h1>
+        <h1 class="mb-4">تاريخ المبيعات</h1>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="إغلاق"></button>
-            </div>
-        @endif
-
-        <form action="{{ route('sales.index') }}" method="GET" class="mb-4">
+        <form action="{{ route('sales.history') }}" method="GET" class="mb-4">
             <div class="row">
+                <div class="col-md-3">
+                    <input type="date" name="from_date" class="form-control" placeholder="من تاريخ" value="{{ request('from_date') }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="to_date" class="form-control" placeholder="إلى تاريخ" value="{{ request('to_date') }}">
+                </div>
                 <div class="col-md-3">
                     <input type="text" name="search" class="form-control" placeholder="ابحث برقم البيع أو اسم العميل" value="{{ request('search') }}">
                 </div>
@@ -24,10 +23,6 @@
             </div>
         </form>
 
-        <a href="{{ route('sales.create') }}" class="btn btn-primary mb-3">
-            <i class="bi bi-plus-circle"></i> إضافة عملية بيع جديدة
-        </a>
-
         <div class="table-responsive">
             <table class="table table-striped table-bordered align-middle">
                 <thead class="table-light">
@@ -36,6 +31,7 @@
                     <th>العميل</th>
                     <th>عدد المنتجات</th>
                     <th>الإجمالي</th>
+                    <th>تاريخ البيع</th>
                     <th>الإجراءات</th>
                 </tr>
                 </thead>
@@ -45,7 +41,8 @@
                         <td>{{ $sale->id }}</td>
                         <td>{{ $sale->customer ? $sale->customer->name : 'لا يوجد عميل' }}</td>
                         <td>{{ $sale->saleItems->count() }}</td>
-                        <td>{{ number_format($sale->total_amount, 2) }} </td>
+                        <td>{{ number_format($sale->total_amount, 2) }} جنيه</td>
+                        <td>{{ $sale->sale_date }}</td>
                         <td>
                             <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-info btn-sm">عرض</a>
                             <a href="{{ route('sales.edit', $sale->id) }}" class="btn btn-warning btn-sm">تعديل</a>
@@ -58,7 +55,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center">لا توجد مبيعات لليوم.</td>
+                        <td colspan="6" class="text-center">لا توجد مبيعات.</td>
                     </tr>
                 @endforelse
                 </tbody>

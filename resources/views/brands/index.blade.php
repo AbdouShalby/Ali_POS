@@ -13,6 +13,18 @@
             </div>
         @endif
 
+        <!-- نموذج البحث -->
+        <form action="{{ route('brands.index') }}" method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="ابحث بالاسم" value="{{ request('search') }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                </div>
+            </div>
+        </form>
+
         <a href="{{ route('brands.create') }}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> إضافة علامة تجارية جديدة
         </a>
@@ -27,7 +39,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($brands as $brand)
+                @forelse($brands as $brand)
                     <tr>
                         <td>{{ $brand->name }}</td>
                         <td>{{ Str::limit($brand->description, 50) }}</td>
@@ -47,7 +59,11 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="3" class="text-center">لا توجد علامات تجارية.</td>
+                    </tr>
+                @endforelse
                 </tbody>
             </table>
         </div>

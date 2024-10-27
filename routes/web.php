@@ -7,6 +7,8 @@ use App\Http\Controllers\CryptoGatewayController;
 use App\Http\Controllers\CryptoTransactionController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\ExternalPurchaseController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MobileController;
 use App\Http\Controllers\ProductController;
@@ -17,22 +19,12 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
 Auth::routes();
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard')
@@ -50,7 +42,13 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::resource('mobiles', MobileController::class)->middleware(['auth', 'permission:manage mobiles']);
 
+    Route::get('/purchases/history', [PurchaseController::class, 'history'])->name('purchases.history')->middleware(['auth', 'permission:manage purchases']);
+
     Route::resource('purchases', PurchaseController::class)->middleware(['auth', 'permission:manage purchases']);
+
+    Route::resource('external_purchases', ExternalPurchaseController::class)->middleware(['auth', 'permission:manage external_purchases']);
+
+    Route::get('/sales/history', [SaleController::class, 'history'])->name('sales.history')->middleware(['auth', 'permission:manage sales']);
 
     Route::resource('sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
 
@@ -59,6 +57,8 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::resource('units', UnitController::class)->middleware(['auth', 'permission:manage units']);
 
     Route::resource('users', UserController::class)->middleware(['auth', 'permission:manage users']);
+
+    Route::resource('maintenances', MaintenanceController::class)->middleware(['auth', 'permission:manage maintenances']);
 
     Route::resource('settings', SettingsController::class)->except(['show'])->middleware(['auth', 'permission:manage settings']);
 
@@ -70,21 +70,8 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
         ->middleware(['auth', 'permission:manage crypto_transactions']);
     Route::post('crypto_transactions/{gatewayId}/transactions', [CryptoTransactionController::class, 'store'])->name('crypto_transactions.store')
         ->middleware(['auth', 'permission:manage crypto_transactions']);
-
-    Route::resource('maintenances', MaintenanceController::class)->except(['show', 'edit', 'destroy'])
-        ->middleware(['auth', 'permission:manage maintenances']);
+    Route::get('crypto_transactions/history', [CryptoTransactionController::class, 'history'])->name('crypto_transactions.history')
+        ->middleware(['auth', 'permission:manage crypto_transactions']);
 
     Route::resource('devices', DeviceController::class)->middleware(['auth', 'permission:manage devices']);
-});
-
-Route::group(['middleware' => ['role:Salesperson']], function () {
-    // مسارات البائع
-    Route::get('/sales/dashboard', [App\Http\Controllers\Sales\DashboardController::class, 'index'])->name('sales.dashboard');
-    // المزيد من المسارات
-});
-
-Route::group(['middleware' => ['role:Technician']], function () {
-    // مسارات الفني
-    Route::get('/technician/dashboard', [App\Http\Controllers\Technician\DashboardController::class, 'index'])->name('technician.dashboard');
-    // المزيد من المسارات
 });

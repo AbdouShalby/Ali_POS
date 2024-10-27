@@ -13,6 +13,45 @@
             </div>
         @endif
 
+        <!-- نموذج البحث والفلاتر -->
+        <form action="{{ route('products.index') }}" method="GET" class="mb-4">
+            <div class="row">
+                <!-- البحث بالاسم -->
+                <div class="col-md-3 mb-3">
+                    <input type="text" name="search" class="form-control" placeholder="ابحث بالاسم" value="{{ request('search') }}">
+                </div>
+
+                <!-- الفلتر حسب التصنيف -->
+                <div class="col-md-3 mb-3">
+                    <select name="category" class="form-select">
+                        <option value="">كل الأقسام</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- الفلتر حسب العلامة التجارية -->
+                <div class="col-md-3 mb-3">
+                    <select name="brand" class="form-select">
+                        <option value="">كل العلامات التجارية</option>
+                        @foreach($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- زر البحث -->
+                <div class="col-md-1 mb-3">
+                    <button type="submit" class="btn btn-primary w-100">بحث</button>
+                </div>
+            </div>
+        </form>
+
         <a href="{{ route('products.create') }}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> إضافة منتج جديد
         </a>
@@ -35,7 +74,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($products as $product)
+                @forelse($products as $product)
                     <tr>
                         <td>{{ $product->name }}</td>
                         <td>{{ $product->code }}</td>
@@ -83,9 +122,16 @@
                         </tr>
                     @endif
 
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="11" class="text-center">لا توجد منتجات.</td>
+                    </tr>
+                @endforelse
                 </tbody>
             </table>
         </div>
+
+        <!-- روابط الصفحات -->
+        {{ $products->links() }}
     </div>
 @endsection

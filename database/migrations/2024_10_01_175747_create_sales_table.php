@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_number')->unique();
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->date('sale_date');
             $table->decimal('total_amount', 15, 2);

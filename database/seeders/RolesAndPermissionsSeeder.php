@@ -20,6 +20,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage products',
             'manage mobiles',
             'manage purchases',
+            'manage external_purchases',
             'manage sales',
             'manage accounts',
             'manage units',
@@ -37,19 +38,5 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $adminRole = Role::create(['name' => 'admin']);
         $adminRole->givePermissionTo($permissions);
-
-        $managerRole = Role::create(['name' => 'manager']);
-        $managerRole->givePermissionTo([
-            'manage products',
-            'manage crypto gateways',
-            'buy crypto',
-            'sell crypto',
-        ]);
-
-        $userRole = Role::create(['name' => 'user']);
-        $userRole->givePermissionTo([
-            'buy crypto',
-            'sell crypto',
-        ]);
     }
 }

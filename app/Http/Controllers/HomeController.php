@@ -3,34 +3,86 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\ExternalPurchase;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleItem;
+use App\Models\Category;
+use App\Models\Supplier;
+use App\Models\Purchase;
+use App\Models\Maintenance;
+use App\Models\CryptoGateway;
+use App\Models\CryptoTransaction; // إضافة النموذج الخاص بعمليات العملات المشفرة
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
+        // الإحصائيات الأساسية
         $totalSales = Sale::sum('total_amount');
         $totalCustomers = Customer::count();
         $totalProducts = Product::count();
-        $lowStockProducts = Product::where('quantity', '<', 10)->get();
+        $totalCategories = Category::count();
+        $totalSuppliers = Supplier::count();
+        $totalPurchases = Purchase::sum('total_amount');
+        $phonesInMaintenance = Maintenance::count();
+        $totalCryptoBalance = CryptoGateway::sum('balance');
+        $totalExternalPurchases = ExternalPurchase::sum('amount');
 
-        return view('admin.dashboard', compact('totalSales', 'totalCustomers', 'totalProducts', 'lowStockProducts'));
+        $cashBalance = $totalSales + $totalCryptoBalance - $totalPurchases - $totalExternalPurchases;
+
+        // الجرد
+        $lowStockProducts = Product::where('quantity', '<', 10)->get();
+        $veryLowStockProducts = Product::where('quantity', '<', 5)->get();
+
+        // استعلامات إضافية
+        $topSellingProducts = SaleItem::select('product_id')
+            ->with('product')
+            ->selectRaw('SUM(quantity) as total_quantity')
+            ->groupBy('product_id')
+            ->orderByDesc('total_quantity')
+            ->take(10)
+            ->get();
+
+        $latestMaintenances = Maintenance::latest()->take(10)->get();
+        $latestSales = Sale::latest()->take(10)->get();
+        $latestPurchases = Purchase::latest()->take(10)->get();
+        $latestCategories = Category::latest()->take(5)->get();
+        $latestCustomers = Customer::latest()->take(5)->get();
+        $latestSuppliers = Supplier::latest()->take(5)->get();
+
+        // آخر 10 عمليات شراء وبيع في العملات المشفرة
+        $latestCryptoBuys = CryptoTransaction::where('type', 'buy')->latest()->take(10)->get();
+        $latestCryptoSells = CryptoTransaction::where('type', 'sell')->latest()->take(10)->get();
+
+        return view('admin.dashboard', compact(
+            'totalSales',
+            'totalCustomers',
+            'totalProducts',
+            'totalCategories',
+            'totalSuppliers',
+            'totalPurchases',
+            'phonesInMaintenance',
+            'cashBalance',
+            'totalCryptoBalance',
+            'lowStockProducts',
+            'veryLowStockProducts',
+            'topSellingProducts',
+            'latestMaintenances',
+            'latestSales',
+            'latestPurchases',
+            'latestCategories',
+            'latestCustomers',
+            'latestSuppliers',
+            'latestCryptoBuys',
+            'latestCryptoSells',
+            'totalExternalPurchases',
+        ));
     }
 }

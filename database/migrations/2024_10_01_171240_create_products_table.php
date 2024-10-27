@@ -35,6 +35,8 @@ class CreateProductsTable extends Migration
             $table->unsignedBigInteger('supplier_id')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('seller_name')->nullable();
+            $table->string('scan_id')->nullable();
+            $table->string('scan_documents')->nullable();
 
             $table->timestamps();
 
@@ -43,8 +45,8 @@ class CreateProductsTable extends Migration
             $table->foreign('purchase_unit_id')->references('id')->on('units')->onDelete('set null');
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null'); // علاقة العميل
-            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null'); // علاقة المورد
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null');
+            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null');
         });
     }
 

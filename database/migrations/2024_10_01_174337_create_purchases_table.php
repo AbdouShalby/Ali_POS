@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('supplier_id')->nullable();
             $table->date('purchase_date');
             $table->decimal('total_amount', 15, 2);
+            $table->string('invoice_file')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
 

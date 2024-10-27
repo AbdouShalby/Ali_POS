@@ -7,10 +7,15 @@ use App\Models\Brand;
 
 class BrandController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::all();
-        return view('brands.index', compact('brands'));
+        $search = $request->get('search');
+
+        $brands = Brand::when($search, function ($query, $search) {
+            return $query->where('name', 'LIKE', "%$search%");
+        })->get();
+
+        return view('brands.index', compact('brands', 'search'));
     }
 
     public function create()
@@ -20,14 +25,17 @@ class BrandController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255|unique:brands,name',
             'description' => 'nullable|string|max:255',
         ]);
 
-        Brand::create($validated);
+        $brand = Brand::create($request->all());
 
-        return redirect()->route('brands.index')->with('success', 'تم إضافة البراند بنجاح');
+        return response()->json([
+            'success' => true,
+            'brand_id' => $brand->id,
+        ]);
     }
 
     public function show($id)

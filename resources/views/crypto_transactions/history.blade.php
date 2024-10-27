@@ -1,13 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'عمليات البيع والشراء لليوم')
+@section('title', 'تاريخ عمليات البيع والشراء')
 
 @section('content')
     <div class="container">
-        <h1 class="mb-4">عمليات البيع والشراء لليوم</h1>
+        <h1 class="mb-4">تاريخ عمليات البيع والشراء</h1>
 
-        <form action="{{ route('crypto_transactions.index') }}" method="GET" class="mb-4">
+        <form action="{{ route('crypto_transactions.history') }}" method="GET" class="mb-4">
             <div class="row">
+                <div class="col-md-3">
+                    <input type="date" name="from_date" class="form-control" placeholder="من تاريخ" value="{{ request('from_date') }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="to_date" class="form-control" placeholder="إلى تاريخ" value="{{ request('to_date') }}">
+                </div>
                 <div class="col-md-3">
                     <input type="text" name="search" class="form-control" placeholder="ابحث باسم البوابة أو الكمية" value="{{ request('search') }}">
                 </div>

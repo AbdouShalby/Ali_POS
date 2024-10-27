@@ -14,6 +14,7 @@ class Purchase extends Model
         'supplier_id',
         'purchase_date',
         'total_amount',
+        'invoice_file',
         'notes',
     ];
 
@@ -26,4 +27,5 @@ class Purchase extends Model
     {
         return $this->hasMany(PurchaseItem::class);
     }
+
 }

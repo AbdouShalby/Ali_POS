@@ -13,10 +13,17 @@ class CustomerController extends Controller
         $this->middleware('permission:manage customers');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::all();
-        return view('customers.index', compact('customers'));
+        $search = $request->get('search');
+
+        $customers = Customer::when($search, function ($query, $search) {
+            return $query->where('name', 'LIKE', "%$search%")
+                ->orWhere('email', 'LIKE', "%$search%")
+                ->orWhere('phone', 'LIKE', "%$search%");
+        })->get();
+
+        return view('customers.index', compact('customers', 'search'));
     }
 
     public function create()
@@ -34,9 +41,13 @@ class CustomerController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        Customer::create($validated);
+        $customer = Customer::create($validated);
 
-        return redirect()->route('customers.index')->with('success', 'تم إضافة العميل بنجاح');
+        if ($customer) {
+            return response()->json(['success' => true, 'message' => 'تم إضافة العميل بنجاح']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'فشل في إضافة العميل']);
+        }
     }
 
     public function show($id)

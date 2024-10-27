@@ -13,6 +13,18 @@
             </div>
         @endif
 
+        <!-- نموذج البحث -->
+        <form action="{{ route('suppliers.index') }}" method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="ابحث بالاسم، البريد الإلكتروني أو رقم الهاتف" value="{{ request('search') }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                </div>
+            </div>
+        </form>
+
         <a href="{{ route('suppliers.create') }}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> إضافة مورد جديد
         </a>
@@ -29,7 +41,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($suppliers as $supplier)
+                @forelse($suppliers as $supplier)
                     <tr>
                         <td>{{ $supplier->name }}</td>
                         <td>{{ $supplier->email }}</td>
@@ -51,7 +63,11 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center">لا توجد بيانات.</td>
+                    </tr>
+                @endforelse
                 </tbody>
             </table>
         </div>

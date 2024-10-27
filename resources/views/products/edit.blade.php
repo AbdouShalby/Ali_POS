@@ -107,12 +107,12 @@
 
             <!-- هل هذا موبايل؟ -->
             <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="is_mobile" name="is_mobile" value="1" {{ old('is_mobile', $product->mobileDetail ? true : false) ? 'checked' : '' }}>
+                <input type="checkbox" class="form-check-input" id="is_mobile" name="is_mobile" value="1" {{ old('is_mobile', $product->is_mobile) ? 'checked' : '' }}>
                 <label class="form-check-label" for="is_mobile">هل هذا موبايل؟</label>
             </div>
 
-            <!-- تفاصيل الموبايل (تظهر إذا كان المنتج موبايلًا) -->
-            <div id="mobile_details" style="display: {{ old('is_mobile', $product->mobileDetail ? true : false) ? 'block' : 'none' }};">
+            <!-- تفاصيل الموبايل -->
+            <div id="mobile_details" style="display: {{ old('is_mobile', $product->is_mobile) ? 'block' : 'none' }};">
                 <hr>
                 <h4>تفاصيل الموبايل</h4>
 
@@ -140,16 +140,16 @@
                     <input type="text" class="form-control" id="ram" name="ram" value="{{ old('ram', $product->mobileDetail->ram ?? '') }}">
                 </div>
 
-                <!-- معالج الرسوم -->
-                <div class="mb-3">
-                    <label for="gpu" class="form-label">معالج الرسوم</label>
-                    <input type="text" class="form-control" id="gpu" name="gpu" value="{{ old('gpu', $product->mobileDetail->gpu ?? '') }}">
-                </div>
-
                 <!-- المعالج -->
                 <div class="mb-3">
                     <label for="cpu" class="form-label">المعالج</label>
                     <input type="text" class="form-control" id="cpu" name="cpu" value="{{ old('cpu', $product->mobileDetail->cpu ?? '') }}">
+                </div>
+
+                <!-- معالج الرسوم -->
+                <div class="mb-3">
+                    <label for="gpu" class="form-label">معالج الرسوم</label>
+                    <input type="text" class="form-control" id="gpu" name="gpu" value="{{ old('gpu', $product->mobileDetail->gpu ?? '') }}">
                 </div>
 
                 <!-- حالة الجهاز -->
@@ -169,20 +169,22 @@
                     <input type="checkbox" class="form-check-input" id="has_box" name="has_box" {{ old('has_box', $product->mobileDetail->has_box ?? false) ? 'checked' : '' }}>
                     <label class="form-check-label" for="has_box">هل توجد علبة الجهاز؟</label>
                 </div>
+            </div>
 
-                <!-- نوع العميل -->
-                <div class="mb-3">
-                    <label for="client_type" class="form-label">نوع العميل</label>
-                    <select class="form-select" id="client_type" name="client_type" required>
-                        <option value="">اختر النوع</option>
-                        <option value="customer" {{ old('client_type', $product->client_type) == 'customer' ? 'selected' : '' }}>زبون</option>
-                        <option value="supplier" {{ old('client_type', $product->client_type) == 'supplier' ? 'selected' : '' }}>مورد</option>
-                    </select>
-                </div>
+            <!-- نوع العميل -->
+            <div class="mb-3">
+                <label for="client_type" class="form-label">نوع العميل</label>
+                <select class="form-select" id="client_type" name="client_type">
+                    <option value="">اختر النوع</option>
+                    <option value="customer" {{ old('client_type', $product->client_type) == 'customer' ? 'selected' : '' }}>زبون</option>
+                    <option value="supplier" {{ old('client_type', $product->client_type) == 'supplier' ? 'selected' : '' }}>مورد</option>
+                </select>
+            </div>
 
-                <!-- اختيار العميل (زبون أو مورد) -->
-                <div class="mb-3" id="customer_select" style="display: {{ old('client_type', $product->client_type) == 'customer' ? 'block' : 'none' }};">
-                    <label for="customer_id" class="form-label">الزبون</label>
+            <!-- اختيار العميل أو المورد -->
+            <div class="mb-3" id="customer_select" style="display: {{ old('client_type', $product->client_type) == 'customer' ? 'block' : 'none' }};">
+                <label for="customer_id" class="form-label">الزبون</label>
+                <div class="input-group">
                     <select class="form-select" id="customer_id" name="customer_id">
                         <option value="">اختر الزبون</option>
                         @foreach($customers as $customer)
@@ -191,10 +193,15 @@
                             </option>
                         @endforeach
                     </select>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                        إضافة
+                    </button>
                 </div>
+            </div>
 
-                <div class="mb-3" id="supplier_select" style="display: {{ old('client_type', $product->client_type) == 'supplier' ? 'block' : 'none' }};">
-                    <label for="supplier_id" class="form-label">المورد</label>
+            <div class="mb-3" id="supplier_select" style="display: {{ old('client_type', $product->client_type) == 'supplier' ? 'block' : 'none' }};">
+                <label for="supplier_id" class="form-label">المورد</label>
+                <div class="input-group">
                     <select class="form-select" id="supplier_id" name="supplier_id">
                         <option value="">اختر المورد</option>
                         @foreach($suppliers as $supplier)
@@ -203,33 +210,31 @@
                             </option>
                         @endforeach
                     </select>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                        إضافة
+                    </button>
                 </div>
+            </div>
 
-                <!-- طريقة الدفع -->
-                <div class="mb-3">
-                    <label for="payment_method" class="form-label">طريقة الدفع</label>
-                    <select class="form-select" id="payment_method" name="payment_method" required>
-                        <option value="cash" {{ old('payment_method', $product->payment_method) == 'cash' ? 'selected' : '' }}>كاش</option>
-                        <option value="credit" {{ old('payment_method', $product->payment_method) == 'credit' ? 'selected' : '' }}>آجل</option>
-                    </select>
-                </div>
+            <!-- طريقة الدفع -->
+            <div class="mb-3">
+                <label for="payment_method" class="form-label">طريقة الدفع</label>
+                <select class="form-select" id="payment_method" name="payment_method" required>
+                    <option value="cash" {{ old('payment_method', $product->payment_method) == 'cash' ? 'selected' : '' }}>كاش</option>
+                    <option value="credit" {{ old('payment_method', $product->payment_method) == 'credit' ? 'selected' : '' }}>آجل</option>
+                </select>
+            </div>
 
-                <!-- ID والوثائق -->
-                <div class="mb-3">
-                    <label for="scan_id" class="form-label">رقم التعريف الشخصي</label>
-                    <input type="file" class="form-control" id="scan_id" name="scan_id" accept=".pdf,.jpeg,.jpg,.png">
-                </div>
+            <!-- Scan ID File -->
+            <div class="mb-3">
+                <label for="scan_id" class="form-label">ملف Scan ID</label>
+                <input type="file" class="form-control" id="scan_id" name="scan_id" accept=".pdf,.jpeg,.jpg,.png">
+            </div>
 
-                <div class="mb-3">
-                    <label for="scan_documents" class="form-label">الوثائق الممسوحة ضوئيًا</label>
-                    <input type="file" class="form-control" id="scan_documents" name="scan_documents">
-                </div>
-
-                <!-- اسم الموظف -->
-                <div class="mb-3">
-                    <label for="seller_name" class="form-label">اسم الموظف البائع</label>
-                    <input type="text" class="form-control" id="seller_name" name="seller_name" value="{{ old('seller_name', $product->seller_name) }}">
-                </div>
+            <!-- Scan Document File -->
+            <div class="mb-3">
+                <label for="scan_documents" class="form-label">ملف Scan Document</label>
+                <input type="file" class="form-control" id="scan_documents" name="scan_documents" accept=".pdf,.jpeg,.jpg,.png">
             </div>
 
             <!-- زر الحفظ -->
@@ -240,6 +245,78 @@
                 <i class="bi bi-arrow-left"></i> إلغاء
             </a>
         </form>
+    </div>
+
+    <!-- Modal لإضافة عميل جديد -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCustomerModalLabel">إضافة زبون جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCustomerForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="customer_name" class="form-label">اسم الزبون</label>
+                            <input type="text" class="form-control" id="customer_name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="customer_email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_phone" class="form-label">رقم الهاتف</label>
+                            <input type="text" class="form-control" id="customer_phone" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_address" class="form-label">العنوان</label>
+                            <input type="text" class="form-control" id="customer_address" name="address">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_notes" class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="customer_notes" name="notes" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">إضافة</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal لإضافة مورد جديد -->
+    <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSupplierModalLabel">إضافة مورد جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSupplierForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="supplier_name" class="form-label">اسم المورد</label>
+                            <input type="text" class="form-control" id="supplier_name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="supplier_email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="supplier_email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="supplier_phone" class="form-label">رقم الهاتف</label>
+                            <input type="text" class="form-control" id="supplier_phone" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="supplier_address" class="form-label">العنوان</label>
+                            <input type="text" class="form-control" id="supplier_address" name="address">
+                        </div>
+                        <button type="submit" class="btn btn-primary">إضافة</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript لإظهار وإخفاء تفاصيل الموبايل واختيار العميل -->
@@ -255,8 +332,69 @@
                 document.getElementById('customer_select').style.display = clientType === 'customer' ? 'block' : 'none';
                 document.getElementById('supplier_select').style.display = clientType === 'supplier' ? 'block' : 'none';
             });
+
+            document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                let formData = {
+                    name: document.getElementById('customer_name').value,
+                    email: document.getElementById('customer_email').value,
+                    phone: document.getElementById('customer_phone').value,
+                    address: document.getElementById('customer_address').value,
+                };
+
+                fetch('/customers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let customerSelect = document.getElementById('customer_id');
+                            let newOption = new Option(formData.name, data.customer_id, true, true);
+                            customerSelect.add(newOption);
+                            document.getElementById('addCustomerModal').modal('hide');
+                        } else {
+                            alert('حدث خطأ أثناء إضافة العميل.');
+                        }
+                    });
+            });
+
+            document.getElementById('addSupplierForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                let formData = {
+                    name: document.getElementById('supplier_name').value,
+                    email: document.getElementById('supplier_email').value,
+                    phone: document.getElementById('supplier_phone').value,
+                    address: document.getElementById('supplier_address').value,
+                };
+
+                fetch('/suppliers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let supplierSelect = document.getElementById('supplier_id');
+                            let newOption = new Option(formData.name, data.supplier_id, true, true);
+                            supplierSelect.add(newOption);
+                            document.getElementById('addSupplierModal').modal('hide');
+                        } else {
+                            alert('حدث خطأ أثناء إضافة المورد.');
+                        }
+                    });
+            });
         </script>
     @endsection
 
 @endsection
-

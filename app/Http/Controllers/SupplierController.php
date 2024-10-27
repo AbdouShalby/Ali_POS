@@ -13,11 +13,19 @@ class SupplierController extends Controller
         $this->middleware('permission:manage suppliers');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $suppliers = Supplier::all();
-        return view('suppliers.index', compact('suppliers'));
+        $search = $request->get('search');
+
+        $suppliers = Supplier::when($search, function ($query, $search) {
+            return $query->where('name', 'LIKE', "%$search%")
+                ->orWhere('email', 'LIKE', "%$search%")
+                ->orWhere('phone', 'LIKE', "%$search%");
+        })->get();
+
+        return view('suppliers.index', compact('suppliers', 'search'));
     }
+
 
     public function create()
     {
@@ -34,9 +42,13 @@ class SupplierController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        Supplier::create($validated);
+        $supplier = Supplier::create($validated);
 
-        return redirect()->route('suppliers.index')->with('success', 'تم إضافة المورد بنجاح');
+        if ($supplier) {
+            return response()->json(['success' => true, 'message' => 'تم إضافة المورد بنجاح', 'supplier_id' => $supplier->id]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'فشل في إضافة المورد']);
+        }
     }
 
     public function show($id)

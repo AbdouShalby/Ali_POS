@@ -95,6 +95,25 @@
                 <li>
                     <a href="{{ route('purchases.create') }}">إضافة عملية شراء جديدة</a>
                 </li>
+                <li>
+                    <a href="{{ route('purchases.history') }}">سجل المشتريات</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#externalPurchaseSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                <i class="bi bi-bag-plus"></i> المشتريات الخارجية
+            </a>
+            <ul class="collapse list-unstyled" id="externalPurchaseSubmenu">
+                <li>
+                    <a href="{{ route('external_purchases.index') }}">قائمة المشتريات</a>
+                </li>
+                <li>
+                    <a href="{{ route('external_purchases.create') }}">إضافة عملية شراء جديدة</a>
+                </li>
+                <li>
+                    <a href="{{ route('purchases.history') }}">سجل المشتريات</a>
+                </li>
             </ul>
         </li>
         <li>
@@ -108,6 +127,9 @@
                 <li>
                     <a href="{{ route('sales.create') }}">إضافة عملية بيع جديدة</a>
                 </li>
+                <li>
+                    <a href="{{ route('sales.history') }}">سجل المبيعات</a>
+                </li>
             </ul>
         </li>
         <li>
@@ -119,7 +141,10 @@
                     <a href="{{ route('crypto_gateways.index') }}">البوابات</a>
                 </li>
                 <li>
-                    <a href="{{ route('crypto_transactions.index') }}">العمليات السابقة</a>
+                    <a href="{{ route('crypto_transactions.index') }}">عمليات اليوم</a>
+                </li>
+                <li>
+                    <a href="{{ route('crypto_transactions.history') }}">السجل</a>
                 </li>
             </ul>
         </li>

@@ -15,11 +15,23 @@ class DeviceController extends Controller
         $this->middleware('permission:manage devices');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $devices = Device::all();
-        return view('devices.index', compact('devices'));
+        $search = $request->get('search');
+
+        $devices = Device::when($search, function ($query, $search) {
+            return $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%$search%")
+                    ->orWhere('color', 'LIKE', "%$search%")
+                    ->orWhere('imei', 'LIKE', "%$search%");
+            });
+        })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('devices.index', compact('devices', 'search'));
     }
+
 
     public function create()
     {

@@ -13,10 +13,23 @@ class CryptoTransactionController extends Controller
         $this->middleware('permission:manage crypto_transactions');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = CryptoTransaction::with('cryptoGateway')->latest()->paginate(10);
-        return view('crypto_transactions.index', compact('transactions'));
+        $search = $request->get('search');
+        $date = $request->get('date', now()->toDateString()); // الافتراضي هو تاريخ اليوم
+
+        $transactions = CryptoTransaction::with('cryptoGateway')
+            ->whereDate('created_at', $date)
+            ->when($search, function ($query, $search) {
+                $query->where('amount', 'LIKE', "%$search%")
+                    ->orWhereHas('cryptoGateway', function ($query) use ($search) {
+                        $query->where('name', 'LIKE', "%$search%");
+                    });
+            })
+            ->latest()
+            ->paginate(10);
+
+        return view('crypto_transactions.index', compact('transactions', 'search', 'date'));
     }
 
 
@@ -62,5 +75,30 @@ class CryptoTransactionController extends Controller
         ]);
 
         return redirect()->route('crypto_gateways.index')->with('success', 'تم تنفيذ العملية بنجاح');
+    }
+
+    public function history(Request $request)
+    {
+        $search = $request->get('search');
+        $dateFrom = $request->get('from_date');
+        $dateTo = $request->get('to_date');
+
+        $transactions = CryptoTransaction::with('cryptoGateway')
+            ->when($dateFrom, function ($query, $dateFrom) {
+                return $query->whereDate('created_at', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                return $query->whereDate('created_at', '<=', $dateTo);
+            })
+            ->when($search, function ($query, $search) {
+                $query->where('amount', 'LIKE', "%$search%")
+                    ->orWhereHas('cryptoGateway', function ($query) use ($search) {
+                        $query->where('name', 'LIKE', "%$search%");
+                    });
+            })
+            ->latest()
+            ->paginate(10);
+
+        return view('crypto_transactions.history', compact('transactions', 'search', 'dateFrom', 'dateTo'));
     }
 }
