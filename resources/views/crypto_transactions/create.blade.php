@@ -44,7 +44,7 @@
                     <!-- الكمية النهائية -->
                     <div class="mb-3">
                         <label for="final_amount" class="form-label">الكمية النهائية</label>
-                        <input type="number" class="form-control" id="final_amount" name="final_amount" step="0.00000001" readonly>
+                        <input type="number" class="form-control" id="final_amount" name="final_amount" step="0.00000001">
                     </div>
 
                     <button type="submit" class="btn btn-success">تنفيذ العملية</button>
