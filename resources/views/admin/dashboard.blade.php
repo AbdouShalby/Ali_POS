@@ -6,20 +6,20 @@
 
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-            <div class="row g-5 gx-xl-10 mb-5 mb-xl-10">
-                <div class="col-xxl-8">
-                    <div class="row g-5 gx-xl-10">
-                        <div class="col-md-4">
+            <div class="row g-5 gx-xl-12 mb-5 mb-xl-12">
+                <div class="col-xxl-12">
+                    <div class="row g-5 my-5 gx-xl-12">
+                        <div class="col-md-3">
                             <div class="card card-flush h-xl-100" style="background-color: #F6E5CA">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
-                                        <a href="{{ route('products.index') }}" class="text-white text-decoration-none">
+                                        <a href="{{ route('products.index') }}" class="text-white text-decoration-none text-center">
                                             <span class="card-label fw-bold fs-4 text-gray-800">{{ __('All Products') }}</span>
                                         </a>
                                     </h3>
                                 </div>
                                 <div class="card-body text-center pt-5 m-auto">
-                                    <div id="lottieContainer" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div id="productsLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
                                         <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="productCount">{{ $totalProducts . ' ' . __('Products')}}</span>
                                         <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $totalProducts }}" title="{{ __('Copy') }}">
@@ -27,6 +27,157 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #F3D6EF">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('crypto_gateways.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Cryptocurrency Balance') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="cryptoLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="cryptoBalance">{{ number_format($totalCryptoBalance, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalCryptoBalance, 2) }}" title="{{ __('Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #BFDDE3">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('sales.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Sales') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="salesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalSales">${{ number_format($totalSales, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalSales, 2) }}" title="{{ __('Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #9deeb7">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('purchases.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Purchases') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="purchasesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalPurchases">${{ number_format($totalPurchases, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalPurchases, 2) }}" title="{{ __('Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-5 gx-xl-12">
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #F6E5CA">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('external_purchases.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total External Purchases') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="externalProductsLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="externalProductsLottie">${{ number_format($totalExternalPurchases, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalExternalPurchases, 2) }}" title="{{ __('Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #F3D6EF">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('suppliers.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Suppliers') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="totalSuppliers" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalSuppliers">{{ $totalSuppliers }} {{ __('Suppliers') }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $totalSuppliers }}" title="{{ __('Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #BFDDE3">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('maintenances.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Phones in Maintenance') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="phonesInMaintenance" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="phonesInMaintenance">{{ $phonesInMaintenance }} {{ __('Phones') }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $phonesInMaintenance }}" title="{{ __('Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #9deeb7">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Cash Balance') }}</span>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="cashBalance" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="cashBalance">${{ number_format($cashBalance, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($cashBalance, 2) }}" title="{{ __('Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                        <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    {{ __('Copy completed successfully!') }}
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
                         </div>
                     </div>
@@ -269,159 +420,6 @@
     </div>
 
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="mb-4">{{ __('Dashboard') }}</h1>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-3">
-                <div class="card text-white bg-success mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="{{ route('products.index') }}" class="text-white text-decoration-none">
-                            <i class="bi bi-box-seam me-2"></i>{{ __('All Products') }}
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="productCount">{{ $totalProducts }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ $totalProducts }}" title="{{ __('Copy') }}">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- بطاقة رصيد العملات المشفرة -->
-            <div class="col-md-3">
-                <div class="card text-white bg-dark mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="{{ route('crypto_gateways.index') }}" class="text-white text-decoration-none">
-                            <i class="bi bi-currency-bitcoin me-2"></i> إجمالي رصيد العملات المشفرة
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="cryptoBalance">{{ number_format($totalCryptoBalance, 2) }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ number_format($totalCryptoBalance, 2) }}" title="نسخ">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- بطاقة إجمالي المبيعات -->
-            <div class="col-md-3">
-                <div class="card text-white bg-info mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="{{ route('sales.index') }}" class="text-white text-decoration-none">
-                            <i class="bi bi-cash me-2"></i> إجمالي المبيعات
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="totalSales">{{ number_format($totalSales, 2) }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ number_format($totalSales, 2) }}" title="نسخ">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- بطاقة إجمالي المشتريات -->
-            <div class="col-md-3">
-                <div class="card text-white bg-danger mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="{{ route('purchases.index') }}" class="text-white text-decoration-none">
-                            <i class="bi bi-cart me-2"></i> إجمالي المشتريات
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="totalPurchases">{{ number_format($totalPurchases, 2) }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ number_format($totalPurchases, 2) }}" title="نسخ">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- بطاقة إجمالي المشتريات -->
-            <div class="col-md-3">
-                <div class="card text-white bg-danger mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="{{ route('external_purchases.index') }}" class="text-white text-decoration-none">
-                            <i class="bi bi-cart me-2"></i> إجمالي المشتريات الخارجية
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="totalPurchases">{{ number_format($totalExternalPurchases, 2) }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ number_format($totalExternalPurchases, 2) }}" title="نسخ">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- بطاقة الأقسام -->
-            <div class="col-md-3">
-                <div class="card text-white bg-secondary mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="{{ route('categories.index') }}" class="text-white text-decoration-none">
-                            <i class="bi bi-list-ul me-2"></i> عدد الأقسام
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="totalCategories">{{ $totalCategories }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ $totalCategories }}" title="نسخ">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- بطاقة الهواتف في الصيانة -->
-            <div class="col-md-3">
-                <div class="card text-white bg-warning mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="{{ route('maintenances.index') }}" class="text-white text-decoration-none">
-                            <i class="bi bi-tools me-2"></i> عدد الهواتف في الصيانة
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="phonesInMaintenance">{{ $phonesInMaintenance }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ $phonesInMaintenance }}" title="نسخ">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- بطاقة رصيد الخزنة -->
-            <div class="col-md-3">
-                <div class="card text-white bg-dark mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <i class="bi bi-piggy-bank me-2"></i> رصيد الخزنة
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <h5 class="card-title mb-0" id="cashBalance">{{ number_format($cashBalance, 2) }}</h5>
-                        <button class="btn btn-sm btn-light copy-btn" data-clipboard-text="{{ number_format($cashBalance, 2) }}" title="نسخ">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Toast للنسخ -->
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-            <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        تم النسخ بنجاح!
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
-
         <!-- أكثر 10 منتجات مبيعًا -->
         <div class="row mt-4">
             <div class="col-md-12">
@@ -642,14 +640,76 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 lottie.loadAnimation({
-                    container: document.getElementById('lottieContainer'),
+                    container: document.getElementById('productsLottie'),
                     renderer: 'svg',
                     loop: true,
                     autoplay: true,
                     path: "{{ asset('media/lottie/products.json') }}"
                 });
             });
-
+            document.addEventListener('DOMContentLoaded', function() {
+                lottie.loadAnimation({
+                    container: document.getElementById('cryptoLottie'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/crypto.json') }}"
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                lottie.loadAnimation({
+                    container: document.getElementById('salesLottie'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/sales.json') }}"
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                lottie.loadAnimation({
+                    container: document.getElementById('purchasesLottie'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/purchases.json') }}"
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                lottie.loadAnimation({
+                    container: document.getElementById('externalProductsLottie'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/external_purchases.json') }}"
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                lottie.loadAnimation({
+                    container: document.getElementById('totalSuppliers'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/suppliers.json') }}"
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                lottie.loadAnimation({
+                    container: document.getElementById('phonesInMaintenance'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/maintenances.json') }}"
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                lottie.loadAnimation({
+                    container: document.getElementById('cashBalance'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/cash.json') }}"
+                });
+            });
         </script>
         <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script>
         <script>
@@ -658,14 +718,13 @@
 
                 clipboard.on('success', function(e) {
                     e.clearSelection();
-                    // عرض Toast عند النسخ
                     var toastEl = document.getElementById('copyToast');
                     var toast = new bootstrap.Toast(toastEl);
                     toast.show();
                 });
 
                 clipboard.on('error', function(e) {
-                    console.error('فشل النسخ:', e);
+                    console.error('{{ __('Copy failed') }}:', e);
                 });
             });
         </script>

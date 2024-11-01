@@ -12,7 +12,7 @@ use App\Models\Supplier;
 use App\Models\Purchase;
 use App\Models\Maintenance;
 use App\Models\CryptoGateway;
-use App\Models\CryptoTransaction; // إضافة النموذج الخاص بعمليات العملات المشفرة
+use App\Models\CryptoTransaction;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -24,7 +24,6 @@ class HomeController extends Controller
 
     public function index()
     {
-        // الإحصائيات الأساسية
         $totalSales = Sale::sum('total_amount');
         $totalCustomers = Customer::count();
         $totalProducts = Product::count();
