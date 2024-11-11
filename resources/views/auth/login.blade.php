@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Login'))
+@section('title', '- ' . __('Login'))
 
 @section('content')
     <style>body { background-image: url('media/auth/bg9.jpg'); } [data-bs-theme="dark"] body { background-image: url('media/auth/bg9-dark.jpg'); }</style>

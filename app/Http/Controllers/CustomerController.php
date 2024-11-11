@@ -23,12 +23,12 @@ class CustomerController extends Controller
                 ->orWhere('phone', 'LIKE', "%$search%");
         })->get();
 
-        return view('customers.index', compact('customers', 'search'));
+        return view('customers.index', compact('customers', 'search'))->with('activePage', 'customers');
     }
 
     public function create()
     {
-        return view('customers.create');
+        return view('customers.create')->with('activePage', 'customers.create');
     }
 
     public function store(Request $request)
@@ -53,13 +53,13 @@ class CustomerController extends Controller
     public function show($id)
     {
         $customer = Customer::findOrFail($id);
-        return view('customers.show', compact('customer'));
+        return view('customers.show', compact('customer'))->with('activePage', 'customers');
     }
 
     public function edit($id)
     {
         $customer = Customer::findOrFail($id);
-        return view('customers.edit', compact('customer'));
+        return view('customers.edit', compact('customer'))->with('activePage', 'customers');
     }
 
     public function update(Request $request, $id)

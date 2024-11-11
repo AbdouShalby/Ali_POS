@@ -15,12 +15,12 @@ class CryptoGatewayController extends Controller
     public function index()
     {
         $gateways = CryptoGateway::all();
-        return view('crypto_gateways.index', compact('gateways'));
+        return view('crypto_gateways.index', compact('gateways'))->with('activePage', 'crypto_gateways');
     }
 
     public function create()
     {
-        return view('crypto_gateways.create');
+        return view('crypto_gateways.create')->with('activePage', 'crypto_gateways.create');
     }
 
     public function store(Request $request)
@@ -40,7 +40,7 @@ class CryptoGatewayController extends Controller
     public function edit($id)
     {
         $gateway = CryptoGateway::findOrFail($id);
-        return view('crypto_gateways.edit', compact('gateway'));
+        return view('crypto_gateways.edit', compact('gateway'))->with('activePage', 'crypto_gateways');
     }
 
     public function update(Request $request, $id)
@@ -61,7 +61,7 @@ class CryptoGatewayController extends Controller
     public function show($id)
     {
         $gateway = CryptoGateway::with('transactions')->findOrFail($id);
-        return view('crypto_gateways.show', compact('gateway'));
+        return view('crypto_gateways.show', compact('gateway'))->with('activePage', 'crypto_gateways');
     }
 
     public function destroy($id)

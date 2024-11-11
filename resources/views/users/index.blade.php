@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'إدارة المستخدمين')
+@section('title', '- ' . __('Users Management'))
 
 @section('content')
     <div class="container">

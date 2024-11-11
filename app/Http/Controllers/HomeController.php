@@ -33,14 +33,9 @@ class HomeController extends Controller
         $phonesInMaintenance = Maintenance::count();
         $totalCryptoBalance = CryptoGateway::sum('balance');
         $totalExternalPurchases = ExternalPurchase::sum('amount');
-
         $cashBalance = $totalSales + $totalCryptoBalance - $totalPurchases - $totalExternalPurchases;
-
-        // الجرد
         $lowStockProducts = Product::where('quantity', '<', 10)->get();
         $veryLowStockProducts = Product::where('quantity', '<', 5)->get();
-
-        // استعلامات إضافية
         $topSellingProducts = SaleItem::select('product_id')
             ->with('product')
             ->selectRaw('SUM(quantity) as total_quantity')
@@ -48,18 +43,14 @@ class HomeController extends Controller
             ->orderByDesc('total_quantity')
             ->take(10)
             ->get();
-
         $latestMaintenances = Maintenance::latest()->take(10)->get();
         $latestSales = Sale::latest()->take(10)->get();
         $latestPurchases = Purchase::latest()->take(10)->get();
         $latestCategories = Category::latest()->take(5)->get();
         $latestCustomers = Customer::latest()->take(5)->get();
         $latestSuppliers = Supplier::latest()->take(5)->get();
-
-        // آخر 10 عمليات شراء وبيع في العملات المشفرة
         $latestCryptoBuys = CryptoTransaction::where('type', 'buy')->latest()->take(10)->get();
         $latestCryptoSells = CryptoTransaction::where('type', 'sell')->latest()->take(10)->get();
-
         return view('admin.dashboard', compact(
             'totalSales',
             'totalCustomers',
@@ -82,6 +73,6 @@ class HomeController extends Controller
             'latestCryptoBuys',
             'latestCryptoSells',
             'totalExternalPurchases',
-        ));
+        ))->with('activePage', 'dashboard');
     }
 }

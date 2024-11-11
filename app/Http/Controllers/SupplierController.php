@@ -23,13 +23,13 @@ class SupplierController extends Controller
                 ->orWhere('phone', 'LIKE', "%$search%");
         })->get();
 
-        return view('suppliers.index', compact('suppliers', 'search'));
+        return view('suppliers.index', compact('suppliers', 'search'))->with('activePage', 'suppliers');
     }
 
 
     public function create()
     {
-        return view('suppliers.create');
+        return view('suppliers.create')->with('activePage', 'suppliers.create');
     }
 
     public function store(Request $request)
@@ -54,13 +54,13 @@ class SupplierController extends Controller
     public function show($id)
     {
         $supplier = Supplier::findOrFail($id);
-        return view('suppliers.show', compact('supplier'));
+        return view('suppliers.show', compact('supplier'))->with('activePage', 'suppliers');
     }
 
     public function edit($id)
     {
         $supplier = Supplier::findOrFail($id);
-        return view('suppliers.edit', compact('supplier'));
+        return view('suppliers.edit', compact('supplier'))->with('activePage', 'suppliers');
     }
 
     public function update(Request $request, $id)

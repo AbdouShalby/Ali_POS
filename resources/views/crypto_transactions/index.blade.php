@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'عمليات البيع والشراء لليوم')
+@section('title', '- ' . __('Today Buying and Selling Transactions'))
 
 @section('content')
     <div class="container">

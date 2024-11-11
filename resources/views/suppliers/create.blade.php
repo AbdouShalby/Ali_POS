@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة مورد جديد')
+@section('title', '- ' . __('Create Supplier'))
 
 @section('content')
     <div class="container">

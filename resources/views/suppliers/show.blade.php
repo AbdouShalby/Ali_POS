@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تفاصيل المورد')
+@section('title', '- ' . __('Supplier Details'))
 
 @section('content')
     <div class="container">

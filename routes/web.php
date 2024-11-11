@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CryptoGatewayController;
@@ -17,18 +16,14 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
 Route::group(['middleware' => ['auth', 'role:Admin']], function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard')
-        ->middleware(['auth', 'role:Admin']);
+    Route::get('/', [HomeController::class, 'index'])->name('home')->middleware(['auth', 'role:Admin']);
 
     Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 
@@ -38,11 +33,15 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::resource('categories', CategoryController::class)->middleware(['auth', 'permission:manage categories']);
 
+    Route::get('/products/generate-barcode', [ProductController::class, 'generateBarcode'])->name('products.generateBarcode');
+
     Route::resource('products', ProductController::class)->middleware(['auth', 'permission:manage products']);
 
     Route::resource('mobiles', MobileController::class)->middleware(['auth', 'permission:manage mobiles']);
 
     Route::get('/purchases/history', [PurchaseController::class, 'history'])->name('purchases.history')->middleware(['auth', 'permission:manage purchases']);
+
+    Route::get('/products-by-category/{categoryId}', [PurchaseController::class, 'getProductsByCategory']);
 
     Route::resource('purchases', PurchaseController::class)->middleware(['auth', 'permission:manage purchases']);
 
@@ -54,9 +53,9 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::resource('transactions', TransactionController::class)->middleware(['auth', 'permission:manage accounts']);
 
-    Route::resource('units', UnitController::class)->middleware(['auth', 'permission:manage units']);
-
     Route::resource('users', UserController::class)->middleware(['auth', 'permission:manage users']);
+
+    Route::get('/maintenances/{id}/print', [MaintenanceController::class, 'print'])->name('maintenances.print');
 
     Route::resource('maintenances', MaintenanceController::class)->middleware(['auth', 'permission:manage maintenances']);
 

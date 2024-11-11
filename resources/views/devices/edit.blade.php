@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تعديل جهاز')
+@section('title', '- ' . __('Edit Phone'))
 
 @section('content')
     <div class="container">

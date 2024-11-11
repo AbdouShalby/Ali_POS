@@ -29,13 +29,13 @@ class DeviceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('devices.index', compact('devices', 'search'));
+        return view('devices.index', compact('devices', 'search'))->with('activePage', 'devices');
     }
 
 
     public function create()
     {
-        return view('devices.create');
+        return view('devices.create')->with('activePage', 'devices.create');
     }
 
     public function store(Request $request)
@@ -98,13 +98,13 @@ class DeviceController extends Controller
         // تحويل الناتج إلى Data URI لعرضه في الـ View
         $qrCodeDataUri = $result->getDataUri();
 
-        return view('devices.show', compact('device', 'qrCodeDataUri'));
+        return view('devices.show', compact('device', 'qrCodeDataUri'))->with('activePage', 'devices');
     }
 
     public function edit($id)
     {
         $device = Device::findOrFail($id);
-        return view('devices.edit', compact('device'));
+        return view('devices.edit', compact('device'))->with('activePage', 'devices');
     }
 
     public function update(Request $request, $id)

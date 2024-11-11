@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تعديل عملية البيع')
+@section('title', '- ' . __('Edit Sale'))
 
 @section('content')
     <div class="container">

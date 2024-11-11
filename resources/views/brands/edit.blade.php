@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تعديل علامة تجارية')
+@section('title', '- ' . __('Edit Brand'))
 
 @section('content')
     <div class="container">

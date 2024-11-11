@@ -15,12 +15,12 @@ class BrandController extends Controller
             return $query->where('name', 'LIKE', "%$search%");
         })->get();
 
-        return view('brands.index', compact('brands', 'search'));
+        return view('brands.index', compact('brands', 'search'))->with('activePage', 'brands');
     }
 
     public function create()
     {
-        return view('brands.create');
+        return view('brands.create')->with('activePage', 'brands');
     }
 
     public function store(Request $request)
@@ -41,13 +41,13 @@ class BrandController extends Controller
     public function show($id)
     {
         $brand = Brand::findOrFail($id);
-        return view('brands.show', compact('brand'));
+        return view('brands.show', compact('brand'))->with('activePage', 'brands');
     }
 
     public function edit($id)
     {
         $brand = Brand::findOrFail($id);
-        return view('brands.edit', compact('brand'));
+        return view('brands.edit', compact('brand'))->with('activePage', 'brands');
     }
 
     public function update(Request $request, $id)

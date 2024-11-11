@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة علامة تجارية جديدة')
+@section('title', '- ' . __('Create Brand'))
 
 @section('content')
     <div class="container">

@@ -1,276 +1,301 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة منتج جديد')
+@section('title', '- ' . __('Create Product'))
 
 @section('content')
-    <div class="container">
-        <h1 class="mb-4">إضافة منتج جديد</h1>
-
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>خطأ!</strong> يرجى تصحيح الأخطاء التالية:
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    {{ __('Create Product') }}</h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('Dashboard') }}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('products.index') }}" class="text-muted text-hover-primary">{{ __('All Products') }}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">{{ __('Create') }}</li>
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="إغلاق"></button>
             </div>
-        @endif
-
-        <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-            <!-- الاسم -->
-            <div class="mb-3">
-                <label for="name" class="form-label">اسم المنتج</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
-            </div>
-
-            <!-- الكود (الباركود) -->
-            <div class="mb-3">
-                <label for="code" class="form-label">كود المنتج (الباركود)</label>
-                <input type="text" class="form-control" id="code" name="code" value="{{ old('code') }}" required>
-            </div>
-
-            <!-- القسم -->
-            <div class="mb-3">
-                <label for="category_id" class="form-label">القسم</label>
-                <div class="input-group">
-                    <select class="form-select" id="category_id" name="category_id" required>
-                        <option value="">اختر القسم</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id ?? '') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                        إضافة
-                    </button>
-                </div>
-            </div>
-
-            <!-- العلامة التجارية -->
-            <div class="mb-3">
-                <label for="brand_id" class="form-label">العلامة التجارية</label>
-                <div class="input-group">
-                    <select class="form-select" id="brand_id" name="brand_id">
-                        <option value="">اختر العلامة التجارية</option>
-                        @foreach($brands as $brand)
-                            <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id ?? '') == $brand->id ? 'selected' : '' }}>
-                                {{ $brand->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addBrandModal">
-                        إضافة
-                    </button>
-                </div>
-            </div>
-
-            <!-- الكمية -->
-            <div class="mb-3">
-                <label for="quantity" class="form-label">الكمية</label>
-                <input type="number" class="form-control" id="quantity" name="quantity" value="{{ old('quantity') }}" required>
-            </div>
-
-            <!-- تنبيه المخزون -->
-            <div class="mb-3">
-                <label for="stock_alert" class="form-label">تنبيه المخزون</label>
-                <input type="number" class="form-control" id="stock_alert" name="stock_alert" value="{{ old('stock_alert') }}" required>
-            </div>
-
-            <!-- التكلفة -->
-            <div class="mb-3">
-                <label for="cost" class="form-label">التكلفة</label>
-                <input type="number" class="form-control" id="cost" name="cost" value="{{ old('cost') }}" step="0.01" required>
-            </div>
-
-            <!-- سعر البيع -->
-            <div class="mb-3">
-                <label for="price" class="form-label">سعر البيع</label>
-                <input type="number" class="form-control" id="price" name="price" value="{{ old('price') }}" step="0.01" required>
-            </div>
-
-            <!-- سعر الجملة -->
-            <div class="mb-3">
-                <label for="wholesale_price" class="form-label">سعر الجملة</label>
-                <input type="number" class="form-control" id="wholesale_price" name="wholesale_price" value="{{ old('wholesale_price') }}" step="0.01" required>
-            </div>
-
-            <!-- أقل سعر للبيع -->
-            <div class="mb-3">
-                <label for="min_sale_price" class="form-label">أقل سعر للبيع</label>
-                <input type="number" class="form-control" id="min_sale_price" name="min_sale_price" value="{{ old('min_sale_price') }}" step="0.01" required>
-            </div>
-
-            <!-- الصورة -->
-            <div class="mb-3">
-                <label for="image" class="form-label">صورة المنتج</label>
-                <input type="file" class="form-control" id="image" name="image">
-            </div>
-
-            <!-- هل هذا موبايل؟ -->
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="is_mobile" name="is_mobile" {{ old('is_mobile') ? 'checked' : '' }}>
-                <label class="form-check-label" for="is_mobile">هل هذا موبايل؟</label>
-            </div>
-
-            <!-- تفاصيل الموبايل (تظهر إذا كان المنتج موبايلًا) -->
-            <div id="mobile_details" style="display: {{ old('is_mobile') ? 'block' : 'none' }};">
-                <hr>
-                <h4>تفاصيل الموبايل</h4>
-
-                <!-- اللون -->
-                <div class="mb-3">
-                    <label for="color" class="form-label">اللون</label>
-                    <input type="text" class="form-control" id="color" name="color" value="{{ old('color') }}">
-                </div>
-
-                <!-- المساحة -->
-                <div class="mb-3">
-                    <label for="storage" class="form-label">المساحة (جيجابايت/تيرابايت)</label>
-                    <input type="text" class="form-control" id="storage" name="storage" value="{{ old('storage') }}">
-                </div>
-
-                <!-- صحة البطارية -->
-                <div class="mb-3">
-                    <label for="battery_health" class="form-label">صحة البطارية (%)</label>
-                    <input type="number" class="form-control" id="battery_health" name="battery_health" value="{{ old('battery_health') }}" step="0.01">
-                </div>
-
-                <!-- الرام -->
-                <div class="mb-3">
-                    <label for="ram" class="form-label">الرام (جيجابايت/تيرابايت)</label>
-                    <input type="text" class="form-control" id="ram" name="ram" value="{{ old('ram') }}">
-                </div>
-
-                <!-- معالج الرسوم -->
-                <div class="mb-3">
-                    <label for="gpu" class="form-label">معالج الرسوم</label>
-                    <input type="text" class="form-control" id="gpu" name="gpu" value="{{ old('gpu') }}">
-                </div>
-
-                <!-- المعالج -->
-                <div class="mb-3">
-                    <label for="cpu" class="form-label">المعالج</label>
-                    <input type="text" class="form-control" id="cpu" name="cpu" value="{{ old('cpu') }}">
-                </div>
-
-                <!-- حالة الجهاز -->
-                <div class="mb-3">
-                    <label for="condition" class="form-label">حالة الجهاز</label>
-                    <input type="text" class="form-control" id="condition" name="condition" value="{{ old('condition') }}">
-                </div>
-
-                <!-- وصف الجهاز -->
-                <div class="mb-3">
-                    <label for="device_description" class="form-label">وصف الجهاز</label>
-                    <textarea class="form-control" id="device_description" name="device_description" rows="3">{{ old('device_description') }}</textarea>
-                </div>
-
-                <!-- هل توجد علبة الجهاز؟ -->
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="has_box" name="has_box" {{ old('has_box') ? 'checked' : '' }}>
-                    <label class="form-check-label" for="has_box">هل توجد علبة الجهاز؟</label>
-                </div>
-                <!-- نوع العميل -->
-                <div class="mb-3">
-                    <label for="client_type" class="form-label">نوع العميل</label>
-                    <select class="form-select" id="client_type" name="client_type">
-                        <option value="">اختر النوع</option>
-                        <option value="customer" {{ old('client_type') == 'customer' ? 'selected' : '' }}>زبون</option>
-                        <option value="supplier" {{ old('client_type') == 'supplier' ? 'selected' : '' }}>مورد</option>
-                    </select>
-                </div>
-
-                <!-- اختيار العميل (زبون أو مورد) -->
-                <div class="mb-3" id="customer_select" style="display: none;">
-                    <label for="customer_id" class="form-label">الزبون</label>
-                    <div class="input-group">
-                        <select class="form-select" id="customer_id" name="customer_id">
-                            <option value="">اختر الزبون</option>
-                            @foreach($customers as $customer)
-                                <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                                    {{ $customer->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-                            إضافة
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mb-3" id="supplier_select" style="display: none;">
-                    <label for="supplier_id" class="form-label">المورد</label>
-                    <div class="input-group">
-                        <select class="form-select" id="supplier_id" name="supplier_id">
-                            <option value="">اختر المورد</option>
-                            @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                                    {{ $supplier->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-                            إضافة
-                        </button>
-                    </div>
-                </div>
-
-                <!-- طريقة الدفع -->
-                <div class="mb-3">
-                    <label for="payment_method" class="form-label">طريقة الدفع</label>
-                    <select class="form-select" id="payment_method" name="payment_method" required>
-                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>كاش</option>
-                        <option value="credit" {{ old('payment_method') == 'credit' ? 'selected' : '' }}>آجل</option>
-                    </select>
-                </div>
-
-                <!-- Scan ID File -->
-                <div class="mb-3">
-                    <label for="scan_id" class="form-label">ملف Scan ID</label>
-                    <input type="file" class="form-control" id="scan_id" name="scan_id" accept=".pdf,.jpeg,.jpg,.png">
-                </div>
-
-                <!-- Scan Document File -->
-                <div class="mb-3">
-                    <label for="scan_documents" class="form-label">ملف Scan Document</label>
-                    <input type="file" class="form-control" id="scan_documents" name="scan_documents" accept=".pdf,.jpeg,.jpg,.png">
-                </div>
-            </div>
-
-            <!-- زر الحفظ -->
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-check-circle"></i> حفظ
-            </button>
-            <a href="{{ route('products.index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> إلغاء
-            </a>
-        </form>
+        </div>
     </div>
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" class="form d-flex flex-column flex-lg-row">
+                @csrf
+                <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-12">
+                    <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-n2">
+                        <li class="nav-item">
+                            <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_ecommerce_add_product_general">{{ __('General') }}</a>
+                        </li>
+                        <li class="nav-item" id="detailsTab" style="display: none;">
+                            <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_details">{{ __('Details') }}</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general" role="tab-panel">
+                            <div class="d-flex flex-column gap-7 gap-lg-12">
+                                <div class="card card-flush py-4">
+                                    <div class="card-header mb-5">
+                                        <div class="card-title">
+                                            <h2>{{ __('General') }}</h2>
+                                        </div>
+                                        <div class="card-title">
+                                            <h2 class="me-5">{{ __('Is This A Device?') }}</h2>
+                                            <input type="checkbox" class="form-check-input me-2" id="is_mobile" name="is_mobile">
+                                            <label class="form-check-label" for="is_mobile">{{ __('Yes') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="card-body row pt-0">
+                                        <div class="mb-10 col-md-4">
+                                            <label class="form-label">{{ __('Name') }}</label>
+                                            <input type="text" class="form-control mb-2" id="name" name="name" required>
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Code') }}</label>
+                                            <input type="text" class="form-control mb-2" id="code" name="code" required>
+                                        </div>
+                                        <div class="mb-10 col-md-5">
+                                            <label class="form-label">{{ __('Barcode') }}</label>
+                                            <div class="input-group d-flex align-items-center">
+                                                <input type="text" class="form-control mb-2" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" id="barcode" name="barcode" required>
+                                                <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="generateBarcode">{{ __('Generate') }}</button>
+                                                <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="printBarcode">{{ __('Print') }}</button>
+                                            </div>
+                                        </div>
+                                        <div class="mb-10 col-md-6">
+                                            <label class="form-label">{{ __('Stock') }}</label>
+                                            <input type="number" class="form-control mb-2" id="quantity" name="quantity" required>
+                                        </div>
+                                        <div class="mb-10 col-md-6">
+                                            <label class="form-label">{{ __('Stock Alert') }}</label>
+                                            <input type="number" class="form-control mb-2" id="stock_alert" name="stock_alert" required>
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Cost') }}</label>
+                                            <input type="number" class="form-control mb-2" id="cost" name="cost" step="0.01" required>
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Price') }}</label>
+                                            <input type="number" class="form-control mb-2" id="price" name="price" step="0.01" required>
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Wholesale Price') }}</label>
+                                            <input type="number" class="form-control mb-2" id="wholesale_price" name="wholesale_price" step="0.01" required>
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Lowest Price For Sale') }}</label>
+                                            <input type="number" class="form-control mb-2" id="min_sale_price" name="min_sale_price" step="0.01" required>
+                                        </div>
+                                        <div class="mb-10 col-md-12">
+                                            <label class="form-label">{{ __('Description') }}</label>
+                                            <textarea class="form-control mb-2 min-h-100px" id="description" name="description"></textarea>
+                                        </div>
+                                        <div class="mb-10 col-md-4">
+                                            <label class="form-label">{{ __('Image') }}</label>
+                                            <input type="file" class="form-control mb-2" id="image" name="image" step="0.01" required>
+                                        </div>
+                                        <div class="mb-10 col-md-4">
+                                            <label class="form-label d-block">{{ __('Category') }}</label>
+                                            <select class="form-select w-75 d-inline-block" id="category_id" name="category_id" required>
+                                                <option value="">{{ __('Choose Category') }}</option>
+                                                @foreach($categories as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="button" class="btn btn-primary" style="margin-top: -2px;" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                                {{ __('Add') }}
+                                            </button>
+                                        </div>
+                                        <div class="mb-10 col-md-4">
+                                            <label class="form-label d-block">{{ __('Brand') }}</label>
+                                            <select class="form-select w-75 d-inline-block" id="brand_id" name="brand_id" required>
+                                                <option value="">{{ __('Choose Brand') }}</option>
+                                                @foreach($brands as $brand)
+                                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="button" class="btn btn-primary" style="margin-top: -2px;" data-bs-toggle="modal" data-bs-target="#addBrandModal">
+                                                {{ __('Add') }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="kt_ecommerce_add_product_details" role="tab-panel">
+                            <div class="d-flex flex-column gap-7 gap-lg-10">
+                                <div class="card card-flush py-4">
+                                    <div class="card-header">
+                                        <div class="card-title">
+                                            <h2>{{ __('Device Details') }}</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card-body row pt-0">
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Color') }}</label>
+                                            <input type="text" class="form-control mb-2" id="color" name="color">
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Storage') }}</label>
+                                            <input type="text" class="form-control mb-2" id="storage" name="storage">
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Battery Health') }}</label>
+                                            <input type="number" class="form-control mb-2" id="battery_health" name="battery_health" min="0" max="100">
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('RAM') }}</label>
+                                            <input type="text" class="form-control mb-2" id="ram" name="ram">
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('CPU') }}</label>
+                                            <input type="text" class="form-control mb-2" id="cpu" name="cpu">
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('GPU') }}</label>
+                                            <input type="text" class="form-control mb-2" id="gpu" name="gpu">
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('Condition') }}</label>
+                                            <input type="text" class="form-control mb-2" id="condition" name="condition">
+                                        </div>
+                                        <div class="mb-10 col-md-3">
+                                            <label class="form-label">{{ __('With Box') }}</label>
+                                            <select class="form-select mb-2" id="has_box" name="has_box">
+                                                <option value="">{{ __('Choose') }}</option>
+                                                <option value="1">{{ __('Yes') }}</option>
+                                                <option value="0">{{ __('No') }}</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-10 col-md-12">
+                                            <label class="form-label">{{ __('Device Description') }}</label>
+                                            <textarea class="form-control mb-2 min-h-100px" id="device_description" name="device_description"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-success me-3">{{ __('Save') }}</button>
+                        <a href="{{ route('products.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @section('scripts')
+        <script>
+            document.getElementById('is_mobile').addEventListener('change', function() {
+                var detailsTab = document.getElementById('detailsTab');
+                detailsTab.style.display = this.checked ? 'block' : 'none';
+            });
+
+            document.getElementById('paperSize').addEventListener('change', function () {
+                const customLabelCountContainer = document.getElementById('customLabelCountContainer');
+                if (this.value === 'custom') {
+                    customLabelCountContainer.style.display = 'block';
+                } else {
+                    customLabelCountContainer.style.display = 'none';
+                }
+            });
+
+            document.getElementById('generateBarcode').addEventListener('click', function() {
+                fetch('{{ route("products.generateBarcode") }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('barcode').value = data.barcode;
+                        } else {
+                            alert('Error generating barcode.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            document.getElementById('printBarcode').addEventListener('click', function() {
+                var printOptionsModal = new bootstrap.Modal(document.getElementById('printOptionsModal'));
+                printOptionsModal.show();
+            });
+
+            document.getElementById('confirmPrint').addEventListener('click', function() {
+                let paperSize = document.getElementById('paperSize').value;
+                if (paperSize === 'custom') {
+                    paperSize = document.getElementById('customLabelCount').value;
+                }
+
+                const barcodeValue = document.getElementById('barcode').value;
+
+                if (!barcodeValue) {
+                    alert('Please generate a barcode first.');
+                    return;
+                }
+
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Print Barcode</title>
+                        <style>
+                            body { display: flex; flex-wrap: wrap; padding: 0; margin: 0; }
+                            .label { width: calc(100% / 5); text-align: center; }
+                            img { max-width: 100%; height: auto; }
+                            p { font-size: 12px; margin: 0; }
+                        </style>
+                    </head>
+                    <body>
+                        ${Array.from({ length: paperSize }).map((_, index) => `
+                            <div class="label">
+                                <img id="barcode-${index}" />
+                            </div>
+                        `).join('')}
+                        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                for (let i = 0; i < ${paperSize}; i++) {
+                                    JsBarcode("#barcode-" + i, "${barcodeValue}", {
+                                        format: "CODE128",
+                                        displayValue: true
+                                    });
+                                }
+                                window.print();
+                            });
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+
+                var printOptionsModal = bootstrap.Modal.getInstance(document.getElementById('printOptionsModal'));
+                printOptionsModal.hide();
+            });
+        </script>
+    @endsection
 
     <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">إضافة قسم جديد</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                    <h5 class="modal-title" id="addCategoryModalLabel">{{ __('Add New Category') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addCategoryForm">
                         @csrf
                         <div class="mb-3">
-                            <label for="category_name" class="form-label">اسم القسم</label>
+                            <label for="category_name" class="form-label">{{ __('Category Name') }}</label>
                             <input type="text" class="form-control" id="category_name" name="name" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">الوصف</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">إضافة</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
                     </form>
                 </div>
             </div>
@@ -281,304 +306,60 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addBrandModalLabel">إضافة علامة تجارية جديدة</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                    <h5 class="modal-title" id="addBrandModalLabel">{{ __('Add New Brand') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addBrandForm">
                         @csrf
                         <div class="mb-3">
-                            <label for="brand_name" class="form-label">اسم العلامة التجارية</label>
+                            <label for="brand_name" class="form-label">{{ __('Brand Name') }}</label>
                             <input type="text" class="form-control" id="brand_name" name="name" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">الوصف</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">إضافة</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+    <div class="modal fade" id="printOptionsModal" tabindex="-1" aria-labelledby="printOptionsLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCustomerModalLabel">إضافة زبون جديد</h5>
+                    <h5 class="modal-title" id="printOptionsLabel">Print Options</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addCustomerForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="customer_name" class="form-label">اسم الزبون</label>
-                            <input type="text" class="form-control" id="customer_name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customer_email" class="form-label">البريد الإلكتروني</label>
-                            <input type="email" class="form-control" id="customer_email" name="email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="customer_phone" class="form-label">رقم الهاتف</label>
-                            <input type="text" class="form-control" id="customer_phone" name="phone">
-                        </div>
-                        <div class="mb-3">
-                            <label for="customer_address" class="form-label">العنوان</label>
-                            <input type="text" class="form-control" id="customer_address" name="address">
-                        </div>
-                        <div class="mb-3">
-                            <label for="customer_notes" class="form-label">ملاحظات</label>
-                            <textarea class="form-control" id="customer_notes" name="notes" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">إضافة</button>
-                    </form>
+                    <div class="form-group">
+                        <label for="paperSize">Select Labels per Sheet</label>
+                        <select class="form-select" id="paperSize" required>
+                            <option value="40">40 per sheet (A4)</option>
+                            <option value="30">30 per sheet (A4)</option>
+                            <option value="24">24 per sheet (A4)</option>
+                            <option value="20">20 per sheet (A4)</option>
+                            <option value="18">18 per sheet (A4)</option>
+                            <option value="14">14 per sheet (A4)</option>
+                            <option value="12">12 per sheet (A4)</option>
+                            <option value="10">10 per sheet (A4)</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customLabelCountContainer" style="display: none;">
+                        <label for="customLabelCount">Enter custom number of labels per page (1-40):</label>
+                        <input type="number" id="customLabelCount" min="1" max="40" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="labelContent" class="form-label">Label Content</label>
+                        <input type="text" class="form-control" id="labelContent" placeholder="Enter content to appear on the label" value="Product Name, Price, and Barcode" disabled>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmPrint">Print</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addSupplierModalLabel">إضافة مورد جديد</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addSupplierForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="supplier_name" class="form-label">اسم المورد</label>
-                            <input type="text" class="form-control" id="supplier_name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="supplier_email" class="form-label">البريد الإلكتروني</label>
-                            <input type="email" class="form-control" id="supplier_email" name="email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="supplier_phone" class="form-label">رقم الهاتف</label>
-                            <input type="text" class="form-control" id="supplier_phone" name="phone">
-                        </div>
-                        <div class="mb-3">
-                            <label for="supplier_address" class="form-label">العنوان</label>
-                            <input type="text" class="form-control" id="supplier_address" name="address">
-                        </div>
-                        <button type="submit" class="btn btn-primary">إضافة</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript لإظهار وإخفاء تفاصيل الموبايل واختيار العميل -->
-    @section('scripts')
-        <script>
-            document.getElementById('is_mobile').addEventListener('change', function() {
-                var mobileDetails = document.getElementById('mobile_details');
-                mobileDetails.style.display = this.checked ? 'block' : 'none';
-            });
-
-            document.getElementById('client_type').addEventListener('change', function() {
-                var clientType = this.value;
-                document.getElementById('customer_select').style.display = clientType === 'customer' ? 'block' : 'none';
-                document.getElementById('supplier_select').style.display = clientType === 'supplier' ? 'block' : 'none';
-            });
-
-            document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                let formData = {
-                    name: document.getElementById('category_name').value,
-                    _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                };
-
-                fetch('/categories', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': formData._token
-                    },
-                    body: JSON.stringify(formData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('تم إضافة القسم بنجاح!');
-
-                            // تحديث القائمة بعد إضافة القسم الجديد
-                            let categorySelect = document.getElementById('category_id');
-                            let newOption = new Option(formData.name, data.category_id, true, true);
-                            categorySelect.add(newOption);
-
-                            // إعادة تعيين النموذج وإغلاق الـ Modal
-                            document.getElementById('addCategoryForm').reset();
-                            let modalElement = document.getElementById('addCategoryModal');
-                            let modalInstance = bootstrap.Modal.getInstance(modalElement);
-                            modalInstance.hide();
-                        } else {
-                            alert('حدث خطأ أثناء إضافة القسم.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('حدث خطأ أثناء معالجة الطلب.');
-                    });
-            });
-
-            document.getElementById('addBrandForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                let formData = {
-                    name: document.getElementById('brand_name').value,
-                    _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                };
-
-                fetch('/brands', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': formData._token
-                    },
-                    body: JSON.stringify(formData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('تم إضافة العلامة التجارية بنجاح!');
-
-                            // تحديث القائمة بعد إضافة العلامة التجارية الجديدة
-                            let brandSelect = document.getElementById('brand_id');
-                            let newOption = new Option(formData.name, data.brand_id, true, true);
-                            brandSelect.add(newOption);
-
-                            // إعادة تعيين النموذج وإغلاق الـ Modal
-                            document.getElementById('addBrandForm').reset();
-                            let modalElement = document.getElementById('addBrandModal');
-                            let modalInstance = bootstrap.Modal.getInstance(modalElement);
-                            modalInstance.hide();
-                        } else {
-                            alert('حدث خطأ أثناء إضافة العلامة التجارية.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('حدث خطأ أثناء معالجة الطلب.');
-                    });
-            });
-
-            document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                let csrfToken = document.querySelector('meta[name="csrf-token"]');
-                if (!csrfToken) {
-                    alert('CSRF token غير موجود في الصفحة.');
-                    return;
-                }
-
-                let formData = {
-                    name: document.getElementById('customer_name').value,
-                    email: document.getElementById('customer_email').value,
-                    phone: document.getElementById('customer_phone').value,
-                    address: document.getElementById('customer_address').value,
-                    notes: document.getElementById('customer_notes').value,
-                };
-
-                fetch('/customers', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken.getAttribute('content')
-                    },
-                    body: JSON.stringify(formData)
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('حدث خطأ في الاستجابة من السيرفر.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-
-                            document.getElementById('addCustomerForm').reset();
-
-                            let modalElement = document.getElementById('addCustomerModal');
-                            let modalInstance = bootstrap.Modal.getInstance(modalElement);
-                            modalInstance.hide();
-
-                            let customerSelect = document.getElementById('customer_id');
-                            if (customerSelect) {
-                                let newOption = new Option(formData.name, data.customer_id, true, true);
-                                customerSelect.add(newOption);
-                            }
-                        } else {
-                            alert('حدث خطأ أثناء إضافة العميل.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('حدث خطأ أثناء إرسال البيانات.');
-                    });
-            });
-
-            document.getElementById('addSupplierForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                let csrfToken = document.querySelector('meta[name="csrf-token"]');
-                if (!csrfToken) {
-                    alert('CSRF token غير موجود في الصفحة.');
-                    return;
-                }
-
-                let formData = {
-                    name: document.getElementById('supplier_name').value,
-                    email: document.getElementById('supplier_email').value,
-                    phone: document.getElementById('supplier_phone').value,
-                    address: document.getElementById('supplier_address').value,
-                };
-
-                fetch('/suppliers', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken.getAttribute('content')
-                    },
-                    body: JSON.stringify(formData)
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('حدث خطأ في الاستجابة من السيرفر.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-
-                            document.getElementById('addSupplierForm').reset();
-
-                            let modalElement = document.getElementById('addSupplierModal');
-                            let modalInstance = bootstrap.Modal.getInstance(modalElement);
-                            modalInstance.hide();
-
-                            let customerSelect = document.getElementById('supplier_id');
-                            if (customerSelect) {
-                                let newOption = new Option(formData.name, data.customer_id, true, true);
-                                customerSelect.add(newOption);
-                            }
-                        } else {
-                            alert('حدث خطأ أثناء إضافة العميل.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('حدث خطأ أثناء إرسال البيانات.');
-                    });
-            });
-        </script>
-    @endsection
 
 @endsection

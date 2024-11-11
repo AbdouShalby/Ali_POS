@@ -16,7 +16,7 @@ class CryptoTransactionController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $date = $request->get('date', now()->toDateString()); // الافتراضي هو تاريخ اليوم
+        $date = $request->get('date', now()->toDateString());
 
         $transactions = CryptoTransaction::with('cryptoGateway')
             ->whereDate('created_at', $date)
@@ -29,14 +29,14 @@ class CryptoTransactionController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('crypto_transactions.index', compact('transactions', 'search', 'date'));
+        return view('crypto_transactions.index', compact('transactions', 'search', 'date'))->with('activePage', 'crypto_transactions');
     }
 
 
     public function create($gatewayId)
     {
         $gateway = CryptoGateway::findOrFail($gatewayId);
-        return view('crypto_transactions.create', compact('gateway'));
+        return view('crypto_transactions.create', compact('gateway'))->with('activePage', 'crypto_transactions');
     }
 
     public function store(Request $request, $gatewayId)
@@ -99,6 +99,6 @@ class CryptoTransactionController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('crypto_transactions.history', compact('transactions', 'search', 'dateFrom', 'dateTo'));
+        return view('crypto_transactions.history', compact('transactions', 'search', 'dateFrom', 'dateTo'))->with('activePage', 'crypto_transactions.history');
     }
 }

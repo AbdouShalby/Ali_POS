@@ -15,12 +15,12 @@ class ExternalPurchaseController extends Controller
     public function index()
     {
         $externalPurchases = ExternalPurchase::all();
-        return view('external_purchases.index', compact('externalPurchases'));
+        return view('external_purchases.index', compact('externalPurchases'))->with('activePage', 'external_purchases');
     }
 
     public function create()
     {
-        return view('external_purchases.create');
+        return view('external_purchases.create')->with('activePage', 'external_purchases.create');
     }
 
     public function store(Request $request)
@@ -40,13 +40,13 @@ class ExternalPurchaseController extends Controller
     public function show($id)
     {
         $externalPurchase = ExternalPurchase::findOrFail($id);
-        return view('external_purchases.show', compact('externalPurchase'));
+        return view('external_purchases.show', compact('externalPurchase'))->with('activePage', 'external_purchases');
     }
 
     public function edit($id)
     {
         $externalPurchase = ExternalPurchase::findOrFail($id);
-        return view('external_purchases.edit', compact('externalPurchase'));
+        return view('external_purchases.edit', compact('externalPurchase'))->with('activePage', 'external_purchases');
     }
 
     public function update(Request $request, $id)

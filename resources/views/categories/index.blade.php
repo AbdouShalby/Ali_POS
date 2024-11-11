@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'قائمة الأقسام')
+@section('title', '- ' . __('All Categories'))
 
 @section('content')
     <div class="container">

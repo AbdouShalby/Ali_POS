@@ -21,9 +21,6 @@ class Product extends Model
         'quantity',
         'min_sale_quantity',
         'stock_alert',
-        'unit_id',
-        'sale_unit_id',
-        'purchase_unit_id',
         'brand_id',
         'category_id',
         'is_device',
@@ -54,21 +51,6 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function unit()
-    {
-        return $this->belongsTo(Unit::class, 'unit_id');
-    }
-
-    public function saleUnit()
-    {
-        return $this->belongsTo(Unit::class, 'sale_unit_id');
-    }
-
-    public function purchaseUnit()
-    {
-        return $this->belongsTo(Unit::class, 'purchase_unit_id');
-    }
-
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -81,6 +63,7 @@ class Product extends Model
 
     public function mobileDetail()
     {
-        return $this->hasOne(MobileDetail::class);
+        return $this->hasOne(MobileDetail::class, 'product_id', 'id');
     }
+
 }

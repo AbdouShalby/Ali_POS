@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'قائمة العلامات التجارية')
+@section('title', '- ' . __('All Brands'))
 
 @section('content')
     <div class="container">

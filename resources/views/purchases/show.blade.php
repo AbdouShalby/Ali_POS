@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تفاصيل عملية الشراء')
+@section('title', '- ' . __('Purchase Details'))
 
 @section('content')
     <div class="container">

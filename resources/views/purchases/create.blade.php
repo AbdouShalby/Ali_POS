@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة عملية شراء جديدة')
+@section('title', '- ' . __('Create Purchase'))
 
 @section('content')
     <div class="container">
@@ -45,16 +45,23 @@
                 <input type="date" class="form-control" id="purchase_date" name="purchase_date" value="{{ old('purchase_date') ?? date('Y-m-d') }}" required>
             </div>
             <div id="product-container" class="mb-3">
-                <label for="products" class="form-label">المنتجات (اختياري)</label>
-                <div class="product-row">
-                    <select class="form-select mt-2" name="products[0][product_id]">
-                        <option value="">اختر المنتج</option>
-                        @foreach($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                <!-- الصف الأول للمنتج والقسم -->
+                <div class="product-row mt-2">
+                    <label for="category_id" class="form-label">اختر القسم</label>
+                    <select class="form-select category-select" onchange="loadProductsByCategory(this)">
+                        <option value="">اختر القسم</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
-                    <input type="number" class="form-control mt-2" name="products[0][quantity]" placeholder="الكمية" min="1">
-                    <input type="number" class="form-control mt-2" name="products[0][price]" placeholder="السعر" step="0.01">
+
+                    <label for="product_id" class="form-label mt-2">اختر المنتج</label>
+                    <select class="form-select product-select" name="products[0][product_id]" disabled>
+                        <option value="">اختر المنتج</option>
+                    </select>
+
+                    <input type="number" class="form-control mt-2" name="products[0][quantity]" placeholder="الكمية" min="1" disabled>
+                    <input type="number" class="form-control mt-2" name="products[0][price]" placeholder="السعر" step="0.01" disabled>
                 </div>
             </div>
             <button type="button" class="btn btn-secondary mt-2" onclick="addProductRow()">إضافة منتج آخر</button>
@@ -158,18 +165,77 @@
                 productRow.className = 'product-row mt-2';
 
                 productRow.innerHTML = `
-            <select class="form-select mt-2" name="products[${index}][product_id]">
-                <option value="">اختر المنتج</option>
-                @foreach($products as $product)
-                <option value="{{ $product->id }}">{{ $product->name }}</option>
-                @endforeach
-                </select>
-                <input type="number" class="form-control mt-2" name="products[${index}][quantity]" placeholder="الكمية" min="1">
-            <input type="number" class="form-control mt-2" name="products[${index}][price]" placeholder="السعر" step="0.01">
-        `;
+                    <select class="form-select mt-2" name="products[${index}][product_id]">
+                        <option value="">اختر المنتج</option>
+                        @foreach($products as $product)
+                        <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        @endforeach
+                        </select>
+                        <input type="number" class="form-control mt-2" name="products[${index}][quantity]" placeholder="الكمية" min="1">
+                    <input type="number" class="form-control mt-2" name="products[${index}][price]" placeholder="السعر" step="0.01">
+                `;
 
                 container.appendChild(productRow);
             }
+
+            let productIndex = 1; // متغير لتتبع عدد المنتجات
+
+            function addProductRow() {
+                const container = document.getElementById('product-container');
+
+                const productRow = document.createElement('div');
+                productRow.className = 'product-row mt-2';
+
+                productRow.innerHTML = `
+        <label for="category_id" class="form-label">اختر القسم</label>
+        <select class="form-select category-select" onchange="loadProductsByCategory(this)">
+            <option value="">اختر القسم</option>
+            @foreach($categories as $category)
+                <option value="{{ $category->id }}">{{ $category->name }}</option>
+            @endforeach
+                </select>
+
+                <label for="product_id" class="form-label mt-2">اختر المنتج</label>
+                <select class="form-select product-select" name="products[${productIndex}][product_id]" disabled>
+            <option value="">اختر المنتج</option>
+        </select>
+
+        <input type="number" class="form-control mt-2" name="products[${productIndex}][quantity]" placeholder="الكمية" min="1" disabled>
+        <input type="number" class="form-control mt-2" name="products[${productIndex}][price]" placeholder="السعر" step="0.01" disabled>
+    `;
+
+                container.appendChild(productRow);
+                productIndex++;
+            }
+
+            function loadProductsByCategory(selectElement) {
+                let categoryId = selectElement.value;
+                let productSelect = selectElement.parentNode.querySelector('.product-select');
+                let quantityInput = selectElement.parentNode.querySelector('input[name*="[quantity]"]');
+                let priceInput = selectElement.parentNode.querySelector('input[name*="[price]"]');
+
+                // إعادة تعيين الحقول عند تغيير القسم
+                productSelect.innerHTML = '<option value="">اختر المنتج</option>';
+                productSelect.disabled = true;
+                quantityInput.disabled = true;
+                priceInput.disabled = true;
+
+                if (categoryId) {
+                    fetch(`/products-by-category/${categoryId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(product => {
+                                let option = new Option(product.name, product.id);
+                                productSelect.add(option);
+                            });
+                            productSelect.disabled = false; // تفعيل الحقل عند تحميل المنتجات
+                            quantityInput.disabled = false;
+                            priceInput.disabled = false;
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            }
+
         </script>
     @endsection
 @endsection

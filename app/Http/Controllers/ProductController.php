@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
+use Picqer\Barcode\BarcodeGeneratorHTML;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class ProductController extends Controller
 {
@@ -26,33 +28,46 @@ class ProductController extends Controller
         $brand = $request->get('brand');
         $minPrice = $request->get('min_price');
         $maxPrice = $request->get('max_price');
+        $barcode = $request->get('barcode');
+        $sellingPrice = $request->get('selling_price');
 
         $products = Product::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%');
-        })->when($category, function ($query, $category) {
-            return $query->where('category_id', $category);
-        })->when($brand, function ($query, $brand) {
-            return $query->where('brand_id', $brand);
-        })->when($minPrice, function ($query, $minPrice) {
-            return $query->where('price', '>=', $minPrice);
-        })->when($maxPrice, function ($query, $maxPrice) {
-            return $query->where('price', '<=', $maxPrice);
-        })->orderBy('created_at', 'desc')->paginate(10);
+        })
+            ->when($barcode, function ($query, $barcode) {
+                return $query->where('barcode', 'like', '%' . $barcode . '%');
+            })
+            ->when($category, function ($query, $category) {
+                return $query->where('category_id', $category);
+            })
+            ->when($brand, function ($query, $brand) {
+                return $query->where('brand_id', $brand);
+            })
+            ->when($minPrice, function ($query, $minPrice) {
+                return $query->where('price', '>=', $minPrice);
+            })
+            ->when($maxPrice, function ($query, $maxPrice) {
+                return $query->where('price', '<=', $maxPrice);
+            })
+            ->when($sellingPrice, function ($query, $sellingPrice) {
+                return $query->where('price', $sellingPrice);
+            })
+            ->orderBy('created_at', 'desc')->paginate(10);
 
         $categories = Category::all();
         $brands = Brand::all();
-
-        return view('products.index', compact('products', 'categories', 'brands', 'search', 'category', 'brand', 'minPrice', 'maxPrice'));
+        return view('products.index', compact('products', 'categories', 'brands', 'search', 'category', 'brand', 'minPrice', 'maxPrice', 'barcode', 'sellingPrice'))
+            ->with('activePage', 'products');
     }
+
 
     public function create()
     {
         $categories = Category::all();
         $brands = Brand::all();
-        $units = Unit::all();
         $suppliers = Supplier::all();
         $customers = Customer::all();
-        return view('products.create', compact('categories', 'brands', 'units', 'suppliers', 'customers'));
+        return view('products.create', compact('categories', 'brands', 'suppliers', 'customers'))->with('activePage', 'products.create');
     }
 
     public function store(Request $request)
@@ -98,9 +113,14 @@ class ProductController extends Controller
             $scanDocumentName = null;
         }
 
+        $barcodeGenerator = new BarcodeGeneratorHTML();
+        $barcode = rand(100000000000, 999999999999);
+        $barcodeHTML = $barcodeGenerator->getBarcode($barcode, $barcodeGenerator::TYPE_CODE_128);
+
         $product = Product::create([
             'name' => $request->name,
             'code' => $request->code,
+            'barcode' => $barcode,
             'description' => $request->description,
             'image' => $imageName,
             'cost' => $request->cost,
@@ -109,9 +129,6 @@ class ProductController extends Controller
             'min_sale_price' => $request->min_sale_price,
             'quantity' => $request->quantity,
             'stock_alert' => $request->stock_alert,
-            'unit_id' => $request->unit_id,
-            'sale_unit_id' => $request->sale_unit_id,
-            'purchase_unit_id' => $request->purchase_unit_id,
             'brand_id' => $request->brand_id,
             'category_id' => $request->category_id,
             'client_type' => $request->client_type,
@@ -149,24 +166,23 @@ class ProductController extends Controller
             ]);
         }
 
-        return redirect()->route('products.index')->with('success', 'تم إضافة المنتج بنجاح');
+        return redirect()->route('products.index')->with('success', __('The Product Has Been Added Successfully.'));
     }
 
     public function show($id)
     {
-        $purchase = Purchase::with(['supplier', 'purchaseItems.product'])->findOrFail($id);
-        return view('purchases.show', compact('purchase'));
+        $product = Product::with(['category', 'brand', 'mobileDetail'])->findOrFail($id);
+        return view('products.show', compact('product'))->with('activePage', 'products');
     }
 
     public function edit($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::with('mobileDetail')->findOrFail($id);
         $categories = Category::all();
         $brands = Brand::all();
-        $units = Unit::all();
         $suppliers = Supplier::all();
         $customers = Customer::all();
-        return view('products.edit', compact('product', 'categories', 'brands', 'units', 'suppliers', 'customers'));
+        return view('products.edit', compact('product', 'categories', 'brands', 'suppliers', 'customers'))->with('activePage', 'products');
     }
 
     public function update(Request $request, $id)
@@ -214,9 +230,6 @@ class ProductController extends Controller
             'min_sale_price' => $request->min_sale_price,
             'quantity' => $request->quantity,
             'stock_alert' => $request->stock_alert,
-            'unit_id' => $request->unit_id,
-            'sale_unit_id' => $request->sale_unit_id,
-            'purchase_unit_id' => $request->purchase_unit_id,
             'brand_id' => $request->brand_id,
             'category_id' => $request->category_id,
             'client_type' => $request->client_type,
@@ -271,7 +284,7 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'تم تحديث المنتج بنجاح');
+        return redirect()->route('products.index')->with('success', __('The Product Has Been Updated Successfully.'));
     }
 
     public function destroy($id)
@@ -279,6 +292,15 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'تم حذف المنتج بنجاح');
+        return redirect()->route('products.index')->with('success', __('The Product Has Been Deleted Successfully.'));
+    }
+
+    public function generateBarcode()
+    {
+        do {
+            $barcode = mt_rand(1000000000000, 9999999999999);
+        } while (Product::where('barcode', $barcode)->exists());
+
+        return response()->json(['success' => true, 'barcode' => $barcode], 200, ['Content-Type' => 'application/json']);
     }
 }

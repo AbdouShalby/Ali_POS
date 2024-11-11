@@ -21,12 +21,12 @@ class CategoryController extends Controller
             return $query->where('name', 'LIKE', "%$search%");
         })->get();
 
-        return view('categories.index', compact('categories', 'search'));
+        return view('categories.index', compact('categories', 'search'))->with('activePage', 'categories');
     }
 
     public function create()
     {
-        return view('categories.create');
+        return view('categories.create')->with('activePage', 'categories');
     }
 
     public function store(Request $request)
@@ -47,13 +47,13 @@ class CategoryController extends Controller
     public function show($id)
     {
         $category = Category::findOrFail($id);
-        return view('categories.show', compact('category'));
+        return view('categories.show', compact('category'))->with('activePage', 'categories');
     }
 
     public function edit($id)
     {
         $category = Category::findOrFail($id);
-        return view('categories.edit', compact('category'));
+        return view('categories.edit', compact('category'))->with('activePage', 'categories');
     }
 
     public function update(Request $request, $id)

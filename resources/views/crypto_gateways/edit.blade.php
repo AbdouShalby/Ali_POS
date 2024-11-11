@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تعديل بوابة العملات المشفرة')
+@section('title', '- ' . __('Edit Cryptocurrency Gateway'))
 
 @section('content')
     <div class="container">

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Maintenance;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class MaintenanceController extends Controller
 {
@@ -30,12 +32,12 @@ class MaintenanceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('maintenances.index', compact('maintenances', 'status', 'search'));
+        return view('maintenances.index', compact('maintenances', 'status', 'search'))->with('activePage', 'maintenances');
     }
 
     public function create()
     {
-        return view('maintenances.create');
+        return view('maintenances.create')->with('activePage', 'maintenances.create');
     }
 
     public function store(Request $request)
@@ -57,13 +59,13 @@ class MaintenanceController extends Controller
     public function show($id)
     {
         $maintenance = Maintenance::findOrFail($id);
-        return view('maintenances.show', compact('maintenance'));
+        return view('maintenances.show', compact('maintenance'))->with('activePage', 'maintenances');
     }
 
     public function edit($id)
     {
         $maintenance = Maintenance::findOrFail($id);
-        return view('maintenances.edit', compact('maintenance'));
+        return view('maintenances.edit', compact('maintenance'))->with('activePage', 'maintenances');
     }
 
     public function update(Request $request, $id)
@@ -91,5 +93,33 @@ class MaintenanceController extends Controller
         $maintenance->delete();
 
         return redirect()->route('maintenances.index')->with('success', 'تم حذف عملية الصيانة بنجاح');
+    }
+
+    private function calculateEAN13CheckDigit($barcode)
+    {
+        $sum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $sum += ($i % 2 === 0 ? 1 : 3) * (int)$barcode[$i];
+        }
+        $checkDigit = (10 - ($sum % 10)) % 10;
+        return $checkDigit;
+    }
+
+    public function print($id)
+    {
+        $maintenance = Maintenance::findOrFail($id);
+
+        do {
+            $barcodeNumber = str_pad(mt_rand(1, 999999999999), 12, '0', STR_PAD_LEFT);
+            $isUnique = !Product::where('barcode', $barcodeNumber)->exists();
+        } while (!$isUnique);
+
+        $checkDigit = $this->calculateEAN13CheckDigit($barcodeNumber);
+        $barcodeNumber .= $checkDigit;
+
+        $generator = new BarcodeGeneratorPNG();
+        $barcodeImage = base64_encode($generator->getBarcode($barcodeNumber, $generator::TYPE_EAN_13));
+
+        return view('maintenances.print', compact('maintenance', 'barcodeImage', 'barcodeNumber'));
     }
 }

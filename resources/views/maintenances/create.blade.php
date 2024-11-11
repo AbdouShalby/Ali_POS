@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة عملية صيانة جديدة')
+@section('title', '- ' . __('Create Maintenance Operation'))
 
 @section('content')
     <div class="container">

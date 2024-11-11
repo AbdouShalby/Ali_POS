@@ -22,7 +22,7 @@ class SaleController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $date = $request->get('date', now()->toDateString()); // استخدام تاريخ اليوم كافتراضي
+        $date = $request->get('date', now()->toDateString());
 
         $sales = Sale::with(['customer', 'saleItems.product'])
             ->whereDate('sale_date', $date)
@@ -33,7 +33,7 @@ class SaleController extends Controller
             })
             ->get();
 
-        return view('sales.index', compact('sales', 'search', 'date'));
+        return view('sales.index', compact('sales', 'search', 'date'))->with('activePage', 'sales');
     }
 
     public function create()
@@ -44,7 +44,7 @@ class SaleController extends Controller
         $brands = Brand::all();
         $units = Unit::all();
 
-        return view('sales.create', compact('customers', 'products', 'categories', 'brands', 'units'));
+        return view('sales.create', compact('customers', 'products', 'categories', 'brands', 'units'))->with('activePage', 'sales.create');
     }
 
     public function store(Request $request)
@@ -102,7 +102,7 @@ class SaleController extends Controller
     public function show($id)
     {
         $sale = Sale::with(['customer', 'saleItems.product'])->findOrFail($id);
-        return view('sales.show', compact('sale'));
+        return view('sales.show', compact('sale'))->with('activePage', 'sales');
     }
 
     public function edit($id)
@@ -111,7 +111,7 @@ class SaleController extends Controller
         $customers = Customer::all();
         $products = Product::all();
 
-        return view('sales.edit', compact('sale', 'customers', 'products'));
+        return view('sales.edit', compact('sale', 'customers', 'products'))->with('activePage', 'sales');
     }
 
     public function update(Request $request, $id)
@@ -204,7 +204,7 @@ class SaleController extends Controller
             })
             ->get();
 
-        return view('sales.history', compact('sales', 'search', 'dateFrom', 'dateTo'));
+        return view('sales.history', compact('sales', 'search', 'dateFrom', 'dateTo'))->with('activePage', 'sales.history');
     }
 
 }

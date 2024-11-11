@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Purchase;
 use App\Models\Supplier;
@@ -32,14 +33,15 @@ class PurchaseController extends Controller
             })
             ->get();
 
-        return view('purchases.index', compact('purchases', 'search', 'date'));
+        return view('purchases.index', compact('purchases', 'search', 'date'))->with('activePage', 'purchases');
     }
 
     public function create()
     {
         $suppliers = Supplier::all();
         $products = Product::all();
-        return view('purchases.create', compact('suppliers', 'products'));
+        $categories = Category::all();
+        return view('purchases.create', compact('suppliers', 'products', 'categories'))->with('activePage', 'purchases.create');
     }
 
     public function store(Request $request)
@@ -86,8 +88,7 @@ class PurchaseController extends Controller
                         'price' => $price,
                     ]);
 
-                    $product->quantity += $quantity;
-                    $product->save();
+                    $product->increment('quantity', $quantity);
                 }
             }
         }
@@ -101,7 +102,7 @@ class PurchaseController extends Controller
     public function show($id)
     {
         $purchase = Purchase::with(['supplier', 'purchaseItems.product'])->findOrFail($id);
-        return view('purchases.show', compact('purchase'));
+        return view('purchases.show', compact('purchase'))->with('activePage', 'purchases');
     }
 
     public function edit($id)
@@ -110,7 +111,7 @@ class PurchaseController extends Controller
         $suppliers = Supplier::all();
         $products = Product::all();
 
-        return view('purchases.edit', compact('purchase', 'suppliers', 'products'));
+        return view('purchases.edit', compact('purchase', 'suppliers', 'products'))->with('activePage', 'purchases');
     }
 
     public function update(Request $request, $id)
@@ -213,6 +214,13 @@ class PurchaseController extends Controller
             })
             ->get();
 
-        return view('purchases.history', compact('purchases', 'search', 'dateFrom', 'dateTo'));
+        return view('purchases.history', compact('purchases', 'search', 'dateFrom', 'dateTo'))->with('activePage', 'purchases.history');
     }
+
+    public function getProductsByCategory($categoryId)
+    {
+        $products = Product::where('category_id', $categoryId)->get();
+        return response()->json($products);
+    }
+
 }

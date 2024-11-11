@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة مستخدم جديد')
+@section('title', '- ' . __('Create User'))
 
 @section('content')
     <div class="container">

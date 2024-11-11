@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة قسم جديد')
+@section('title', '- ' . __('Create Category'))
 
 @section('content')
     <div class="container">

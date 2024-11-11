@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تنفيذ عملية بيع/شراء')
+@section('title', '- ' . __('Buy/Sell Cryptocurrencies'))
 
 @section('content')
     <div class="container">
@@ -85,21 +85,35 @@
             const percentageResultInput = document.getElementById('percentage_result');
             const includesFeesCheckbox = document.getElementById('includes_fees');
             const finalAmountInput = document.getElementById('final_amount');
+            const typeSelect = document.getElementById('type'); // إضافة مرجع لنوع العملية
 
             // Function to update percentage result and final amount
             function updateCalculations() {
                 const amount = parseFloat(amountInput.value) || 0;
                 const percentage = parseFloat(percentageInput.value) || 0;
+                const type = typeSelect.value; // الحصول على نوع العملية (شراء أو بيع)
 
                 // Calculate percentage result
                 const percentageResult = (amount * percentage) / 100;
                 percentageResultInput.value = percentageResult.toFixed(8);
 
-                // Calculate final amount based on whether fees are included or not
+                // Calculate final amount based on type and whether fees are included or not
                 if (includesFeesCheckbox.checked) {
-                    finalAmountInput.value = (amount - percentageResult).toFixed(8);
+                    if (type === 'buy') {
+                        // إذا كانت عملية شراء وتشمل المصاريف، يتم إضافة النسبة إلى المبلغ النهائي
+                        finalAmountInput.value = (amount + percentageResult).toFixed(8);
+                    } else if (type === 'sell') {
+                        // إذا كانت عملية بيع وتشمل المصاريف، يتم خصم النسبة من المبلغ النهائي
+                        finalAmountInput.value = (amount - percentageResult).toFixed(8);
+                    }
                 } else {
-                    finalAmountInput.value = (amount + percentageResult).toFixed(8);
+                    if (type === 'buy') {
+                        // إذا كانت عملية شراء ولا تشمل المصاريف، المبلغ النهائي بدون تغيير
+                        finalAmountInput.value = amount.toFixed(8);
+                    } else if (type === 'sell') {
+                        // إذا كانت عملية بيع ولا تشمل المصاريف، المبلغ النهائي بدون تغيير
+                        finalAmountInput.value = amount.toFixed(8);
+                    }
                 }
             }
 
@@ -107,6 +121,7 @@
             amountInput.addEventListener('input', updateCalculations);
             percentageInput.addEventListener('input', updateCalculations);
             includesFeesCheckbox.addEventListener('change', updateCalculations);
+            typeSelect.addEventListener('change', updateCalculations); // إضافة مستمع لتغيير نوع العملية
         });
     </script>
 @endsection

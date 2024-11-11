@@ -16,13 +16,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('roles')->get();
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users'))->with('activePage', 'users');
     }
 
     public function create()
     {
         $roles = Role::all();
-        return view('users.create', compact('roles'));
+        return view('users.create', compact('roles'))->with('activePage', 'users.create');
     }
 
     public function store(Request $request)
@@ -49,7 +49,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $roles = Role::all();
-        return view('users.edit', compact('user', 'roles'));
+        return view('users.edit', compact('user', 'roles'))->with('activePage', 'users');
     }
 
     public function update(Request $request, $id)

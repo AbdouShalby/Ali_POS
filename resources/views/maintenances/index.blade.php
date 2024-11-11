@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'جميع عمليات الصيانة')
+@section('title', '- ' . __('All Maintenance Operations'))
 
 @section('content')
     <div class="container">
@@ -70,6 +70,7 @@
                     <td>
                         <a href="{{ route('maintenances.show', $maintenance->id) }}" class="btn btn-info btn-sm">عرض</a>
                         <a href="{{ route('maintenances.edit', $maintenance->id) }}" class="btn btn-warning btn-sm">تعديل</a>
+                        <a href="{{ route('maintenances.print', $maintenance->id) }}" class="btn btn-secondary btn-sm" target="_blank">طباعة الإيصال</a>
                         <form action="{{ route('maintenances.destroy', $maintenance->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
