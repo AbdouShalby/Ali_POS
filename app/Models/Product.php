@@ -11,7 +11,6 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'code',
         'description',
         'image',
         'cost',
@@ -65,5 +64,4 @@ class Product extends Model
     {
         return $this->hasOne(MobileDetail::class, 'product_id', 'id');
     }
-
 }

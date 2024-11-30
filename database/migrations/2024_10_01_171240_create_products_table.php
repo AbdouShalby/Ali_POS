@@ -12,7 +12,6 @@ class CreateProductsTable extends Migration
             $table->id();
 
             $table->string('name');
-            $table->string('code')->unique();
             $table->string('barcode')->nullable()->unique();
             $table->text('description')->nullable();
             $table->string('image')->nullable();

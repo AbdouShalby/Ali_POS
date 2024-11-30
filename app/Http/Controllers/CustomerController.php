@@ -44,9 +44,16 @@ class CustomerController extends Controller
         $customer = Customer::create($validated);
 
         if ($customer) {
-            return response()->json(['success' => true, 'message' => 'تم إضافة العميل بنجاح']);
+            return response()->json([
+                'success' => true,
+                'message' => __('تم إضافة العميل بنجاح'), // استخدام الترجمة
+                'customer' => $customer, // إرسال بيانات العميل الجديد إذا لزم الأمر
+            ], 200, [], JSON_UNESCAPED_UNICODE); // فك الترميز
         } else {
-            return response()->json(['success' => false, 'message' => 'فشل في إضافة العميل']);
+            return response()->json([
+                'success' => false,
+                'message' => __('فشل في إضافة العميل'),
+            ], 500, [], JSON_UNESCAPED_UNICODE);
         }
     }
 

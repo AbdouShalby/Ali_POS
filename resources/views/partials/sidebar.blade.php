@@ -23,7 +23,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-shop fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'products' || $activePage == 'products.create' || $activePage == 'categories' || $activePage == 'brands') ? 'text-primary' : '' }}">{{ __('Products') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'products' || $activePage == 'products.create' || $activePage == 'categories' || $activePage == 'brands') ? 'text-primary' : '' }}">{{ __('sidebar.products') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">

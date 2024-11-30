@@ -11,16 +11,16 @@ class CustomersTableSeeder extends Seeder
     {
         $customers = [
             [
-                'name' => 'أحمد محمد',
+                'name' => 'Ahmed Mohamed',
                 'phone' => '01000000003',
                 'email' => 'customer1@example.com',
-                'address' => 'الجيزة، مصر',
+                'address' => 'Giza, Egypt',
             ],
             [
-                'name' => 'سارة علي',
+                'name' => 'Sara Ali',
                 'phone' => '01000000004',
                 'email' => 'customer2@example.com',
-                'address' => 'المنصورة، مصر',
+                'address' => 'Mansoura, Egypt',
             ],
         ];
 

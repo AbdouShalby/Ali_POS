@@ -10,7 +10,7 @@ class CreateMobileDetailsTable extends Migration
     {
         Schema::create('mobile_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id')->unique(); // لإضافة علاقة المنتج (فريد لكل منتج)
+            $table->unsignedBigInteger('product_id')->unique();
 
             $table->string('color')->nullable();
             $table->string('storage')->nullable();
@@ -24,7 +24,7 @@ class CreateMobileDetailsTable extends Migration
 
             $table->timestamps();
 
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade'); // عند حذف المنتج، يتم حذف تفاصيله
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 

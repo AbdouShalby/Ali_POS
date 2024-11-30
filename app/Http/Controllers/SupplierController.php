@@ -45,9 +45,16 @@ class SupplierController extends Controller
         $supplier = Supplier::create($validated);
 
         if ($supplier) {
-            return response()->json(['success' => true, 'message' => 'تم إضافة المورد بنجاح', 'supplier_id' => $supplier->id]);
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إضافة المورد بنجاح',
+                'supplier' => $supplier, // إرسال بيانات المورد
+            ], 200, [], JSON_UNESCAPED_UNICODE);
         } else {
-            return response()->json(['success' => false, 'message' => 'فشل في إضافة المورد']);
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في إضافة المورد',
+            ], 500, [], JSON_UNESCAPED_UNICODE);
         }
     }
 

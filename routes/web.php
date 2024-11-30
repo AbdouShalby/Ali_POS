@@ -27,6 +27,8 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 
+    Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
+
     Route::resource('customers', CustomerController::class)->middleware(['auth', 'permission:manage customers']);
 
     Route::resource('brands', BrandController::class)->middleware(['auth', 'permission:manage brands']);

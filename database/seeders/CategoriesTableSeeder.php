@@ -10,11 +10,11 @@ class CategoriesTableSeeder extends Seeder
     public function run()
     {
         $categories = [
-            ['name' => 'هواتف'],
-            ['name' => 'أجهزة لوحية'],
-            ['name' => 'إكسسوارات'],
-            ['name' => 'أجهزة منزلية'],
-            ['name' => 'أجهزة كمبيوتر'],
+            ['name' => 'Phones'],
+            ['name' => 'Tablets'],
+            ['name' => 'Accessories'],
+            ['name' => 'Home Appliances'],
+            ['name' => 'Computers'],
         ];
 
         foreach ($categories as $category) {

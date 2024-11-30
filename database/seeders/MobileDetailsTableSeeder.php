@@ -10,32 +10,32 @@ class MobileDetailsTableSeeder extends Seeder
 {
     public function run()
     {
-        $productSamsung = Product::where('code', 'SAM-S21')->first();
-        $productApple = Product::where('code', 'APL-IP13')->first();
+        $productSamsung = Product::where('name', 'Samsung Galaxy S21')->first();
+        $productApple = Product::where('name', 'iPhone 13')->first();
 
         $mobileDetails = [
             [
                 'product_id' => $productSamsung->id,
-                'color' => 'أسود',
-                'storage' => '128 جيجابايت',
+                'color' => 'Black',
+                'storage' => '128GB',
                 'battery_health' => 100,
-                'ram' => '8 جيجابايت',
+                'ram' => '8GB',
                 'gpu' => 'Mali-G78',
                 'cpu' => 'Exynos 2100',
-                'condition' => 'جديد',
-                'device_description' => 'هاتف سامسونج جالاكسي S21 جديد كليًا',
+                'condition' => 'New',
+                'device_description' => 'Brand new Samsung Galaxy S21 smartphone',
                 'has_box' => true,
             ],
             [
                 'product_id' => $productApple->id,
-                'color' => 'أبيض',
-                'storage' => '256 جيجابايت',
+                'color' => 'White',
+                'storage' => '256GB',
                 'battery_health' => 100,
-                'ram' => '6 جيجابايت',
+                'ram' => '6GB',
                 'gpu' => 'Apple GPU',
                 'cpu' => 'A15 Bionic',
-                'condition' => 'جديد',
-                'device_description' => 'هاتف آيفون 13 جديد مع ضمان سنة',
+                'condition' => 'New',
+                'device_description' => 'Brand new iPhone 13 with one-year warranty',
                 'has_box' => true,
             ],
         ];
@@ -43,6 +43,7 @@ class MobileDetailsTableSeeder extends Seeder
         foreach ($mobileDetails as $detail) {
             MobileDetail::updateOrCreate(
                 ['product_id' => $detail['product_id']],
+                $detail
             );
         }
     }

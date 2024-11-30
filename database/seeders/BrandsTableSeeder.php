@@ -10,11 +10,11 @@ class BrandsTableSeeder extends Seeder
     public function run()
     {
         $brands = [
-            ['name' => 'سامسونج'],
-            ['name' => 'آبل'],
-            ['name' => 'هواوي'],
-            ['name' => 'شاومي'],
-            ['name' => 'إل جي'],
+            ['name' => 'Samsung'],
+            ['name' => 'Apple'],
+            ['name' => 'Huawei'],
+            ['name' => 'Xiaomi'],
+            ['name' => 'LG'],
         ];
 
         foreach ($brands as $brand) {

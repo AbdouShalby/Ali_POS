@@ -11,16 +11,16 @@ class SuppliersTableSeeder extends Seeder
     {
         $suppliers = [
             [
-                'name' => 'شركة التقنية المتقدمة',
+                'name' => 'Advanced Technology Co.',
                 'phone' => '01000000001',
                 'email' => 'supplier1@example.com',
-                'address' => 'القاهرة، مصر',
+                'address' => 'Cairo, Egypt',
             ],
             [
-                'name' => 'مؤسسة الأجهزة الحديثة',
+                'name' => 'Modern Devices Inc.',
                 'phone' => '01000000002',
                 'email' => 'supplier2@example.com',
-                'address' => 'الإسكندرية، مصر',
+                'address' => 'Alexandria, Egypt',
             ],
         ];
 
