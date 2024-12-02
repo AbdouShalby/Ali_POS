@@ -11,6 +11,7 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'barcode',
         'description',
         'image',
         'cost',
@@ -37,8 +38,9 @@ class Product extends Model
         'supplier_id',
         'payment_method',
         'seller_name',
+        'scan_id',
+        'scan_documents'
     ];
-
 
     public function category()
     {
@@ -63,5 +65,16 @@ class Product extends Model
     public function mobileDetail()
     {
         return $this->hasOne(MobileDetail::class, 'product_id', 'id');
+    }
+    public function warehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'product_warehouse')
+            ->withPivot('stock')
+            ->withTimestamps();
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id');
     }
 }

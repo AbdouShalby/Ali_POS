@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '- ' . __('Dashboard'))
+@section('title', '- ' . __('dashboard.Dashboard'))
 
 @section('content')
 
@@ -14,15 +14,15 @@
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('products.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('All Products') }}</span>
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.All Products') }}</span>
                                         </a>
                                     </h3>
                                 </div>
                                 <div class="card-body text-center pt-5 m-auto">
                                     <div id="productsLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
-                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="productCount">{{ $totalProducts . ' ' . __('Products')}}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $totalProducts }}" title="{{ __('Copy') }}">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="productCount">{{ $totalProducts . ' ' . __('dashboard.Products')}}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $totalProducts }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -34,7 +34,7 @@
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('crypto_gateways.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Cryptocurrency Balance') }}</span>
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Cryptocurrency Balance') }}</span>
                                         </a>
                                     </h3>
                                 </div>
@@ -42,7 +42,7 @@
                                     <div id="cryptoLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
                                         <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="cryptoBalance">{{ number_format($totalCryptoBalance, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalCryptoBalance, 2) }}" title="{{ __('Copy') }}">
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalCryptoBalance, 2) }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -54,7 +54,7 @@
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('sales.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Sales') }}</span>
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Sales') }}</span>
                                         </a>
                                     </h3>
                                 </div>
@@ -62,7 +62,7 @@
                                     <div id="salesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
                                         <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalSales">${{ number_format($totalSales, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalSales, 2) }}" title="{{ __('Copy') }}">
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalSales, 2) }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -74,7 +74,7 @@
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('purchases.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Purchases') }}</span>
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Purchases') }}</span>
                                         </a>
                                     </h3>
                                 </div>
@@ -82,7 +82,7 @@
                                     <div id="purchasesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
                                         <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalPurchases">${{ number_format($totalPurchases, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalPurchases, 2) }}" title="{{ __('Copy') }}">
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalPurchases, 2) }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -96,7 +96,7 @@
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('external_purchases.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total External Purchases') }}</span>
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total External Purchases') }}</span>
                                         </a>
                                     </h3>
                                 </div>
@@ -104,7 +104,7 @@
                                     <div id="externalProductsLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
                                         <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="externalProductsLottie">${{ number_format($totalExternalPurchases, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalExternalPurchases, 2) }}" title="{{ __('Copy') }}">
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalExternalPurchases, 2) }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -116,15 +116,15 @@
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('suppliers.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Suppliers') }}</span>
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Suppliers') }}</span>
                                         </a>
                                     </h3>
                                 </div>
                                 <div class="card-body text-center pt-5 m-auto">
                                     <div id="totalSuppliers" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
-                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalSuppliers">{{ $totalSuppliers }} {{ __('Suppliers') }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $totalSuppliers }}" title="{{ __('Copy') }}">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalSuppliers">{{ $totalSuppliers }} {{ __('dashboard.Suppliers') }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $totalSuppliers }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -136,15 +136,15 @@
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('maintenances.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Phones in Maintenance') }}</span>
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Phones in Maintenance') }}</span>
                                         </a>
                                     </h3>
                                 </div>
                                 <div class="card-body text-center pt-5 m-auto">
                                     <div id="phonesInMaintenance" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
-                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="phonesInMaintenance">{{ $phonesInMaintenance }} {{ __('Phones') }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $phonesInMaintenance }}" title="{{ __('Copy') }}">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="phonesInMaintenance">{{ $phonesInMaintenance }} {{ __('dashboard.Phones') }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $phonesInMaintenance }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -155,14 +155,14 @@
                             <div class="card card-flush h-xl-100" style="background-color: #F6E5CA">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
-                                        <span class="card-label fw-bold fs-4 text-gray-800">{{ __('Total Cash Balance') }}</span>
+                                        <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Cash Balance') }}</span>
                                     </h3>
                                 </div>
                                 <div class="card-body text-center pt-5 m-auto">
                                     <div id="cashBalance" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
                                         <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="cashBalance">${{ number_format($cashBalance, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($cashBalance, 2) }}" title="{{ __('Copy') }}">
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($cashBalance, 2) }}" title="{{ __('dashboard.Copy') }}">
                                             Copy <i class="bi bi-clipboard"></i>
                                         </button>
                                     </div>
@@ -175,7 +175,7 @@
                         <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                             <div class="d-flex">
                                 <div class="toast-body">
-                                    {{ __('Copy completed successfully!') }}
+                                    {{ __('dashboard.Copy completed successfully!') }}
                                 </div>
                                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
@@ -188,21 +188,21 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Top 10 Selling Products') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Top 10 Selling Products') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($topSellingProducts->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Products Sold Yet') }}
+                                        {{ __('dashboard.There Are No Products Sold Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Product') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Total Quantity Sold') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Product') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Total Quantity Sold') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -236,21 +236,21 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Lowest Stock Products (Less Than 5)') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Lowest Stock Products (Less Than 5)') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($veryLowStockProducts->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('No Products With Low Stock') }}
+                                        {{ __('dashboard.No Products With Low Stock') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Product') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Remaining Stock') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Product') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Remaining Stock') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -286,23 +286,23 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 10 Devices In Maintenance') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Devices In Maintenance') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestMaintenances->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Phones For Maintenance') }}
+                                        {{ __('dashboard.There Are No Phones For Maintenance') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Customer Name') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Customer Phone') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Device Type') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Status') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Customer Name') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Customer Phone') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Device Type') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Status') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -342,23 +342,23 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 10 Sales') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Sales') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestSales->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Products Sold Yet') }}
+                                        {{ __('dashboard.There Are No Products Sold Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Invoice ID') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Customer Name') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Total') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Date') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Invoice ID') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Customer Name') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Total') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Date') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -400,23 +400,23 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 10 Purchases') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Purchases') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestPurchases->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Purchases Yet') }}
+                                        {{ __('dashboard.There Are No Purchases Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Invoice ID') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Supplier') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Total') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Date') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Invoice ID') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Supplier') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Total') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Date') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -456,20 +456,20 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 5 Categories') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 5 Categories') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestCategories->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Categories Yet') }}
+                                        {{ __('dashboard.There Are No Categories Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Category') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Category') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -502,23 +502,23 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 10 Cryptocurrency Purchases') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Cryptocurrency Purchases') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestCryptoBuys->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Purchases Yet') }}
+                                        {{ __('dashboard.There Are No Purchases Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Transaction Number') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Payment Gateway') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Amount') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Date') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Transaction Number') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Payment Gateway') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Amount') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Date') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -558,23 +558,23 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 10 Cryptocurrency Sales') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Cryptocurrency Sales') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestCryptoSells->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Purchases Yet') }}
+                                        {{ __('dashboard.There Are No Purchases Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Transaction Number') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Payment Gateway') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Amount') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('Date') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Transaction Number') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Payment Gateway') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Amount') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Date') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -616,20 +616,20 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 5 Customers') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 5 Customers') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestCustomers->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Customers Yet') }}
+                                        {{ __('dashboard.There Are No Customers Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Customer Name') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Customer Name') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -660,20 +660,20 @@
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('Latest 5 Suppliers') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 5 Suppliers') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
                                 @if($latestSuppliers->isEmpty())
                                     <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('There Are No Suppliers Yet') }}
+                                        {{ __('dashboard.There Are No Suppliers Yet') }}
                                     </div>
                                 @else
                                     <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
                                         <thead>
                                         <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('Suppliers Name') }}</th>
+                                            <th class="p-0 min-w-175px">{{ __('dashboard.Suppliers Name') }}</th>
                                             <th class="p-0 min-w-50px"></th>
                                         </tr>
                                         </thead>
@@ -778,7 +778,7 @@
                 });
 
                 clipboard.on('error', function(e) {
-                    console.error('{{ __('Copy failed') }}:', e);
+                    console.error('{{ __('dashboard.Copy failed') }}:', e);
                 });
             });
         </script>

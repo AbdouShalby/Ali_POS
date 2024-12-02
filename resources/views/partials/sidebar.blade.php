@@ -14,7 +14,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-category fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && $activePage == 'dashboard' ? 'text-primary' : '' }}">{{ __('Dashboard') }}</span>
+                            <span class="menu-title {{ isset($activePage) && $activePage == 'dashboard' ? 'text-primary' : '' }}">{{ __('sidebar.Dashboard') }}</span>
                         </a>
                     </div>
 
@@ -23,7 +23,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-shop fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'products' || $activePage == 'products.create' || $activePage == 'categories' || $activePage == 'brands') ? 'text-primary' : '' }}">{{ __('sidebar.products') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'products' || $activePage == 'products.create' || $activePage == 'categories' || $activePage == 'brands') ? 'text-primary' : '' }}">{{ __('sidebar.Products') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -32,7 +32,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'products' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'products' ? 'text-primary' : '' }}">{{ __('All Products') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'products' ? 'text-primary' : '' }}">{{ __('sidebar.All Products') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -40,7 +40,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'products.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'products.create' ? 'text-primary' : '' }}">{{ __('Create Product') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'products.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Product') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -48,7 +48,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'categories' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'categories' ? 'text-primary' : '' }}">{{ __('Categories') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'categories' ? 'text-primary' : '' }}">{{ __('sidebar.Categories') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -56,7 +56,15 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'brands' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'brands' ? 'text-primary' : '' }}">{{ __('Brands') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'brands' ? 'text-primary' : '' }}">{{ __('sidebar.Brands') }}</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'warehouses' ? 'active' : '' }}" href="{{ route('warehouses.index') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'warehouses' ? 'bg-primary' : '' }}"></span>
+                                    </span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'warehouses' ? 'text-primary' : '' }}">{{ __('sidebar.Warehouses') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -67,7 +75,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-delivery fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'suppliers' || $activePage == 'suppliers.create') ? 'text-primary' : '' }}">{{ __('Suppliers') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'suppliers' || $activePage == 'suppliers.create') ? 'text-primary' : '' }}">{{ __('sidebar.Suppliers') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -76,7 +84,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'suppliers' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'suppliers' ? 'text-primary' : '' }}">{{ __('All Suppliers') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'suppliers' ? 'text-primary' : '' }}">{{ __('sidebar.All Suppliers') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -84,7 +92,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'suppliers.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'suppliers.create' ? 'text-primary' : '' }}">{{ __('Create Supplier') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'suppliers.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Supplier') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -95,7 +103,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-user-tick fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'customers' || $activePage == 'customers.create') ? 'text-primary' : '' }}">{{ __('Customers') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'customers' || $activePage == 'customers.create') ? 'text-primary' : '' }}">{{ __('sidebar.Customers') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -104,7 +112,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'customers' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'customers' ? 'text-primary' : '' }}">{{ __('All Customers') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'customers' ? 'text-primary' : '' }}">{{ __('sidebar.All Customers') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -112,7 +120,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'customers.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'customers.create' ? 'text-primary' : '' }}">{{ __('Create Customer') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'customers.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Customer') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -123,7 +131,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-cheque fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'sales' || $activePage == 'sales.create' || $activePage == 'sales.history') ? 'text-primary' : '' }}">{{ __('Sales') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'sales' || $activePage == 'sales.create' || $activePage == 'sales.history') ? 'text-primary' : '' }}">{{ __('sidebar.Sales') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -132,7 +140,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'sales' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales' ? 'text-primary' : '' }}">{{ __('All Sales') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales' ? 'text-primary' : '' }}">{{ __('sidebar.All Sales') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -140,7 +148,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'sales.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales.create' ? 'text-primary' : '' }}">{{ __('Create Sale') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Sale') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -148,7 +156,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'sales.history' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales.history' ? 'text-primary' : '' }}">{{ __('Sales History') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales.history' ? 'text-primary' : '' }}">{{ __('sidebar.Sales History') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -159,7 +167,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-handcart fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'purchases' || $activePage == 'purchases.create' || $activePage == 'purchases.history') ? 'text-primary' : '' }}">{{ __('Purchases') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'purchases' || $activePage == 'purchases.create' || $activePage == 'purchases.history') ? 'text-primary' : '' }}">{{ __('sidebar.Purchases') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -168,7 +176,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'purchases' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases' ? 'text-primary' : '' }}">{{ __('All Purchases') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases' ? 'text-primary' : '' }}">{{ __('sidebar.All Purchases') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -176,7 +184,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'purchases.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases.create' ? 'text-primary' : '' }}">{{ __('Create Purchase') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Purchase') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -184,7 +192,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'purchases.history' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases.history' ? 'text-primary' : '' }}">{{ __('Purchase History') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases.history' ? 'text-primary' : '' }}">{{ __('sidebar.Purchase History') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -195,7 +203,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-handcart fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'external_purchases' || $activePage == 'external_purchases.create') ? 'text-primary' : '' }}">{{ __('External Purchases') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'external_purchases' || $activePage == 'external_purchases.create') ? 'text-primary' : '' }}">{{ __('sidebar.External Purchases') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -204,7 +212,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'external_purchases' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'external_purchases' ? 'text-primary' : '' }}">{{ __('All External Purchases') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'external_purchases' ? 'text-primary' : '' }}">{{ __('sidebar.All External Purchases') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -212,7 +220,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'external_purchases.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'external_purchases.create' ? 'text-primary' : '' }}">{{ __('Create External Purchases') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'external_purchases.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create External Purchases') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -223,7 +231,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-bitcoin fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'crypto_gateways' || $activePage == 'crypto_transactions' || $activePage == 'crypto_gateways.create' || $activePage == 'crypto_transactions.history') ? 'text-primary' : '' }}">{{ __('Cryptocurrencies') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'crypto_gateways' || $activePage == 'crypto_transactions' || $activePage == 'crypto_gateways.create' || $activePage == 'crypto_transactions.history') ? 'text-primary' : '' }}">{{ __('sidebar.Cryptocurrencies') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -232,7 +240,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'crypto_gateways' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'crypto_gateways' ? 'text-primary' : '' }}">{{ __('Gateways') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'crypto_gateways' ? 'text-primary' : '' }}">{{ __('sidebar.Gateways') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -240,7 +248,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'crypto_transactions' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'crypto_transactions' ? 'text-primary' : '' }}">{{ __('Daily Transactions') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'crypto_transactions' ? 'text-primary' : '' }}">{{ __('sidebar.Daily Transactions') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -248,7 +256,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'crypto_transactions.history' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'crypto_transactions.history' ? 'text-primary' : '' }}">{{ __('Transactions History') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'crypto_transactions.history' ? 'text-primary' : '' }}">{{ __('sidebar.Transactions History') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -259,7 +267,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-profile-circle fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'users' || $activePage == 'users.create') ? 'text-primary' : '' }}">{{ __('Users') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'users' || $activePage == 'users.create') ? 'text-primary' : '' }}">{{ __('sidebar.Users') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -268,7 +276,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'users' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users' ? 'text-primary' : '' }}">{{ __('All Users') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users' ? 'text-primary' : '' }}">{{ __('sidebar.All Users') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -276,7 +284,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'users.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users.create' ? 'text-primary' : '' }}">{{ __('Create User') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create User') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -287,7 +295,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-data fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'maintenances' || $activePage == 'maintenances.create') ? 'text-primary' : '' }}">{{ __('Maintenance') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'maintenances' || $activePage == 'maintenances.create') ? 'text-primary' : '' }}">{{ __('sidebar.Maintenance') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -315,7 +323,7 @@
                             <span class="menu-icon">
                                 <i class="ki-solid ki-phone fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'devices' || $activePage == 'devices.create') ? 'text-primary' : '' }}">{{ __('Phones Details') }}</span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'devices' || $activePage == 'devices.create') ? 'text-primary' : '' }}">{{ __('sidebar.Phones Details') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -324,7 +332,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'devices' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'devices' ? 'text-primary' : '' }}">{{ __('All Phones') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'devices' ? 'text-primary' : '' }}">{{ __('sidebar.All Phones') }}</span>
                                 </a>
                             </div>
                             <div class="menu-item">
@@ -332,7 +340,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'devices.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'devices.create' ? 'text-primary' : '' }}">{{ __('Create Phone') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'devices.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Phone') }}</span>
                                 </a>
                             </div>
                         </div>

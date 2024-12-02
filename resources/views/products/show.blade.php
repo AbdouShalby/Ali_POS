@@ -1,21 +1,22 @@
 @extends('layouts.app')
 
-@section('title', '- ' . __('Product Details'))
+@section('title', '- ' . __('products.product_details'))
 
 @section('content')
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                 <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                    {{ __('All Products') }}</h1>
+                    {{ __('products.all_products') }}
+                </h1>
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                     <li class="breadcrumb-item text-muted">
-                        <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('Dashboard') }}</a>
+                        <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('products.dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
                         <span class="bullet bg-gray-500 w-5px h-2px"></span>
                     </li>
-                    <li class="breadcrumb-item text-muted">{{ __('All Products') }}</li>
+                    <li class="breadcrumb-item text-muted">{{ __('products.all_products') }}</li>
                     <li class="breadcrumb-item">
                         <span class="bullet bg-gray-500 w-5px h-2px"></span>
                     </li>
@@ -24,18 +25,19 @@
             </div>
         </div>
     </div>
+
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
             <div class="d-flex justify-content-end">
-                <a href="{{ route('products.index') }}" class="btn btn-dark me-5">{{ __('Back') }}</a>
-                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning me-5">{{ __('Edit') }}</a>
+                <a href="{{ route('products.index') }}" class="btn btn-dark me-5">{{ __('products.back') }}</a>
+                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning me-5">{{ __('products.edit') }}</a>
             </div>
             <form id="kt_ecommerce_add_product_form" class="form d-flex flex-column flex-lg-row">
                 <div class="d-flex flex-column gap-7 gap-lg-10 w-100 w-lg-300px mb-7 me-lg-10">
                     <div class="card card-flush py-3">
                         <div class="card-header">
                             <div class="card-title">
-                                <h2>{{ __('Image') }}</h2>
+                                <h2>{{ __('products.product_image') }}</h2>
                             </div>
                         </div>
                         <div class="card-body text-center pt-0">
@@ -52,7 +54,7 @@
                         <div class="card card-flush py-3">
                             <div class="card-header">
                                 <div class="card-title">
-                                    <h2>{{ __('Barcode') }}</h2>
+                                    <h2>{{ __('products.product_barcode') }}</h2>
                                 </div>
                             </div>
                             <div class="card-body text-center pt-0">
@@ -68,32 +70,32 @@
                     <div class="card card-flush py-3">
                         <div class="card-header">
                             <div class="card-title">
-                                <h2>{{ __('Category') }}</h2>
+                                <h2>{{ __('products.category') }}</h2>
                             </div>
                         </div>
                         <div class="card-body pt-0">
-                            <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Name') }}" value="{{ $product->category->name }}" readonly />
+                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->category->name ?? __('products.empty_field') }}" readonly />
                         </div>
                     </div>
                     <div class="card card-flush py-3">
                         <div class="card-header">
                             <div class="card-title">
-                                <h2>{{ __('Brand') }}</h2>
+                                <h2>{{ __('products.brand') }}</h2>
                             </div>
                         </div>
                         <div class="card-body pt-0">
-                            <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Name') }}" value="{{ $product->brand->name }}" readonly />
+                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->brand->name ?? __('products.empty_field') }}" readonly />
                         </div>
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
                     <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-n2">
                         <li class="nav-item">
-                            <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_ecommerce_add_product_general">{{ __('General') }}</a>
+                            <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_ecommerce_add_product_general">{{ __('products.general_information') }}</a>
                         </li>
                         @if($product->mobileDetail && !empty($product->mobileDetail->id))
                             <li class="nav-item">
-                                <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_advanced">{{ __('Device') }}</a>
+                                <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_advanced">{{ __('products.device_details') }}</a>
                             </li>
                         @endif
                     </ul>
@@ -103,45 +105,45 @@
                                 <div class="card card-flush py-4">
                                     <div class="card-header">
                                         <div class="card-title">
-                                            <h2>General</h2>
+                                            <h2>{{ __('products.general_information') }}</h2>
                                         </div>
                                     </div>
                                     <div class="card-body row pt-0">
                                         <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('Name') }}</label>
-                                            <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Name') }}" value="{{ $product->name }}" readonly />
+                                            <label class="form-label">{{ __('products.name') }}</label>
+                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->name }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('Code') }}</label>
-                                            <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Code') }}" value="{{ $product->code }}" readonly />
+                                            <label class="form-label">{{ __('products.barcode') }}</label>
+                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->barcode }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('Cost') }}</label>
-                                            <input type="number" class="form-control mb-2" placeholder="{{ __('Empty Cost') }}" value="{{ $product->cost }}" readonly />
+                                            <label class="form-label">{{ __('products.product_cost') }}</label>
+                                            <input type="number" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->cost }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('Price') }}</label>
-                                            <input type="number" class="form-control mb-2" placeholder="{{ __('Empty Price') }}" value="{{ $product->price }}" readonly />
+                                            <label class="form-label">{{ __('products.product_price') }}</label>
+                                            <input type="number" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->price }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('Wholesale Price') }}</label>
-                                            <input type="number" class="form-control mb-2" placeholder="{{ __('Empty Wholesale Price') }}" value="{{ $product->wholesale_price }}" readonly />
+                                            <label class="form-label">{{ __('products.wholesale_price') }}</label>
+                                            <input type="number" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->wholesale_price }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('Lowest Price For Sale') }}</label>
-                                            <input type="number" class="form-control mb-2" placeholder="{{ __('Empty Lowest Price For Sale') }}" value="{{ $product->min_sale_price }}" readonly />
+                                            <label class="form-label">{{ __('products.minimum_sale_price') }}</label>
+                                            <input type="number" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->min_sale_price }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('Stock') }}</label>
-                                            <input type="number" class="form-control mb-2 {{ $product->quantity <= $product->stock_alert ? 'text-warning' : '' }}" placeholder="{{ __('Empty Stock') }}" value="{{ $product->quantity }}" readonly />
+                                            <label class="form-label">{{ __('products.current_stock') }}</label>
+                                            <input type="number" class="form-control mb-2 {{ $product->quantity <= $product->stock_alert ? 'text-warning' : '' }}" placeholder="{{ __('products.empty_field') }}" value="{{ $product->quantity }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('Stock Alert') }}</label>
-                                            <input type="number" class="form-control mb-2" placeholder="{{ __('Empty Stock Alert') }}" value="{{ $product->stock_alert }}" readonly />
+                                            <label class="form-label">{{ __('products.stock_alert_level') }}</label>
+                                            <input type="number" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->stock_alert }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-12">
-                                            <label class="form-label">{{ __('Description') }}</label>
-                                            <textarea class="form-control mb-2 min-h-100px" placeholder="{{ __('Empty Description') }}" readonly>{{ $product->description }}</textarea>
+                                            <label class="form-label">{{ __('products.product_description') }}</label>
+                                            <textarea class="form-control mb-2 min-h-100px" placeholder="{{ __('products.empty_field') }}" readonly>{{ $product->description }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -153,45 +155,45 @@
                                     <div class="card card-flush py-4">
                                         <div class="card-header">
                                             <div class="card-title">
-                                                <h2>{{ __('Device') }}</h2>
+                                                <h2>{{ __('products.device_details') }}</h2>
                                             </div>
                                         </div>
                                         <div class="card-body row pt-0">
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('Color') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Color') }}" value="{{ $product->mobileDetail->color }}" readonly />
+                                                <label class="form-label">{{ __('products.color') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->mobileDetail->color }}" readonly />
                                             </div>
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('Storage') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Storage') }}" value="{{ $product->mobileDetail->storage }}" readonly />
+                                                <label class="form-label">{{ __('products.storage') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->mobileDetail->storage }}" readonly />
                                             </div>
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('Battery Health') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Battery Health') }}" value="{{ number_format($product->mobileDetail->battery_health, 0) }}%" readonly />
+                                                <label class="form-label">{{ __('products.battery_health') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ number_format($product->mobileDetail->battery_health, 0) }}%" readonly />
                                             </div>
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('Ram') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Ram') }}" value="{{ ($product->mobileDetail->ram) }}" readonly />
+                                                <label class="form-label">{{ __('products.ram') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->mobileDetail->ram }}" readonly />
                                             </div>
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('CPU') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty CPU') }}" value="{{ ($product->mobileDetail->cpu) }}" readonly />
+                                                <label class="form-label">{{ __('products.cpu') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->mobileDetail->cpu }}" readonly />
                                             </div>
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('GPU') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty GPU') }}" value="{{ ($product->mobileDetail->gpu) }}" readonly />
+                                                <label class="form-label">{{ __('products.gpu') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->mobileDetail->gpu }}" readonly />
                                             </div>
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('Condition') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty Condition') }}" value="{{ ($product->mobileDetail->condition) }}" readonly />
+                                                <label class="form-label">{{ __('products.condition') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->mobileDetail->condition }}" readonly />
                                             </div>
                                             <div class="mb-10 col-md-3">
-                                                <label class="form-label">{{ __('With Box') }}</label>
-                                                <input type="text" class="form-control mb-2" placeholder="{{ __('Empty With Box') }}" value="{{ $product->mobileDetail->has_box ? 'Yes' : 'No' }}" readonly />
+                                                <label class="form-label">{{ __('products.with_box') }}</label>
+                                                <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->mobileDetail->has_box ? __('products.yes') : __('products.no') }}" readonly />
                                             </div>
                                             <div class="mb-10 col-md-12">
-                                                <label class="form-label">{{ __('Device Description') }}</label>
-                                                <textarea class="form-control mb-2 min-h-100px" placeholder="{{ __('Empty Device Description') }}" readonly>{{ $product->mobileDetail->device_description }}</textarea>
+                                                <label class="form-label">{{ __('products.device_description') }}</label>
+                                                <textarea class="form-control mb-2 min-h-100px" placeholder="{{ __('products.empty_field') }}" readonly>{{ $product->mobileDetail->device_description }}</textarea>
                                             </div>
                                         </div>
                                     </div>

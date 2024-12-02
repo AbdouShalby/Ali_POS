@@ -2,23 +2,30 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Product;
+use App\Models\MobileDetail;
+use App\Models\Supplier;
+use App\Models\Customer;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Warehouse;
+use Illuminate\Database\Seeder;
 
 class ProductsTableSeeder extends Seeder
 {
     public function run()
     {
-        $brandSamsung = Brand::where('name', 'Samsung')->first();
-        $brandApple = Brand::where('name', 'Apple')->first();
-        $categoryPhones = Category::where('name', 'Phones')->first();
-        $categoryAccessories = Category::where('name', 'Accessories')->first();
+        $brandSamsung = Brand::firstWhere('name', 'Samsung');
+        $brandApple = Brand::firstWhere('name', 'Apple');
+        $categoryPhones = Category::firstWhere('name', 'Phones');
+        $supplier = Supplier::first();
+        $customer = Customer::first();
+        $warehouses = Warehouse::all();
 
         $products = [
             [
                 'name' => 'Samsung Galaxy S21',
+                'barcode' => $this->generateUniqueBarcode(),
                 'description' => 'Smartphone from Samsung',
                 'cost' => 8000.00,
                 'price' => 9000.00,
@@ -28,6 +35,14 @@ class ProductsTableSeeder extends Seeder
                 'stock_alert' => 10,
                 'brand_id' => $brandSamsung->id,
                 'category_id' => $categoryPhones->id,
+                'warehouse_id' => $warehouses->random()->id,
+                'supplier_id' => $supplier->id,
+                'customer_id' => $customer->id,
+                'payment_method' => 'cash',
+                'seller_name' => 'Admin User',
+                'scan_id' => 'scan_id_example.pdf',
+                'scan_documents' => 'scan_documents_example.pdf',
+                'image' => 'product_image.jpg',
                 'mobile_details' => [
                     'color' => 'Black',
                     'storage' => '128GB',
@@ -40,66 +55,20 @@ class ProductsTableSeeder extends Seeder
                     'has_box' => true,
                 ],
             ],
-            [
-                'name' => 'iPhone 13',
-                'description' => 'Smartphone from Apple',
-                'cost' => 12000.00,
-                'price' => 13000.00,
-                'wholesale_price' => 12500.00,
-                'min_sale_price' => 12800.00,
-                'quantity' => 30,
-                'stock_alert' => 5,
-                'brand_id' => $brandApple->id,
-                'category_id' => $categoryPhones->id,
-                'mobile_details' => [
-                    'color' => 'White',
-                    'storage' => '256GB',
-                    'battery_health' => 100,
-                    'ram' => '6GB',
-                    'gpu' => 'Apple GPU',
-                    'cpu' => 'A15 Bionic',
-                    'condition' => 'New',
-                    'device_description' => 'Excellent condition with box and all accessories',
-                    'has_box' => true,
-                ],
-            ],
-            [
-                'name' => 'Samsung Fast Charger',
-                'description' => 'Fast charger with 25W power',
-                'cost' => 100.00,
-                'price' => 150.00,
-                'wholesale_price' => 120.00,
-                'min_sale_price' => 130.00,
-                'quantity' => 100,
-                'stock_alert' => 20,
-                'brand_id' => $brandSamsung->id,
-                'category_id' => $categoryAccessories->id,
-            ],
-            [
-                'name' => 'Apple AirPods',
-                'description' => 'Wireless earphones from Apple',
-                'cost' => 1500.00,
-                'price' => 2000.00,
-                'wholesale_price' => 1800.00,
-                'min_sale_price' => 1900.00,
-                'quantity' => 50,
-                'stock_alert' => 5,
-                'brand_id' => $brandApple->id,
-                'category_id' => $categoryAccessories->id,
-            ],
         ];
 
         foreach ($products as $productData) {
             $mobileDetails = $productData['mobile_details'] ?? null;
             unset($productData['mobile_details']);
 
-            // Generate unique 13-digit barcode
-            $productData['barcode'] = $this->generateUniqueBarcode();
-
             $product = Product::create($productData);
 
             if ($mobileDetails) {
-                $product->mobileDetail()->updateOrCreate(['product_id' => $product->id], $mobileDetails);
+                $product->mobileDetail()->create($mobileDetails);
+            }
+
+            foreach ($warehouses->random(2) as $warehouse) {
+                $product->warehouses()->attach($warehouse->id, ['stock' => rand(1, 20)]);
             }
         }
     }

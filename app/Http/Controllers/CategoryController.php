@@ -19,10 +19,11 @@ class CategoryController extends Controller
 
         $categories = Category::when($search, function ($query, $search) {
             return $query->where('name', 'LIKE', "%$search%");
-        })->get();
+        })->paginate(10);
 
         return view('categories.index', compact('categories', 'search'))->with('activePage', 'categories');
     }
+
 
     public function create()
     {
@@ -31,22 +32,22 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-            'description' => 'nullable|string|max:255',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
         ]);
 
-        $category = Category::create($request->all());
+        $category = Category::create($validatedData);
 
         return response()->json([
             'success' => true,
-            'category_id' => $category->id,
+            'message' => 'Category added successfully.',
+            'category' => $category,
         ]);
     }
 
     public function show($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::with('products')->findOrFail($id);
         return view('categories.show', compact('category'))->with('activePage', 'categories');
     }
 

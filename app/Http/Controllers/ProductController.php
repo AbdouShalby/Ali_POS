@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Unit;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Brand;
@@ -67,14 +68,18 @@ class ProductController extends Controller
         $brands = Brand::all();
         $suppliers = Supplier::all();
         $customers = Customer::all();
-        return view('products.create', compact('categories', 'brands', 'suppliers', 'customers'))->with('activePage', 'products.create');
+        $warehouses = Warehouse::all();
+        return view('products.create', compact('categories', 'brands', 'suppliers', 'customers', 'warehouses'))->with('activePage', 'products.create');
     }
 
     public function store(Request $request)
     {
+        $request->merge([
+            'is_mobile' => $request->has('is_mobile') ? true : false,
+        ]);
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:products,code',
+            'barcode' => 'required|string|max:255|unique:products,barcode',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'quantity' => 'required|integer',
@@ -119,7 +124,6 @@ class ProductController extends Controller
 
         $product = Product::create([
             'name' => $request->name,
-            'code' => $request->code,
             'barcode' => $barcode,
             'description' => $request->description,
             'image' => $imageName,
@@ -139,6 +143,10 @@ class ProductController extends Controller
             'scan_id' => $scanIdName,
             'scan_documents' => $scanDocumentName,
         ]);
+
+        if ($request->warehouse_id) {
+            $product->warehouses()->attach($request->warehouse_id, ['stock' => $request->quantity]);
+        }
 
         if ($request->is_mobile) {
             $request->validate([
@@ -177,13 +185,17 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product = Product::with('mobileDetail')->findOrFail($id);
+        $product = Product::with(['mobileDetail', 'warehouse'])->findOrFail($id);
         $categories = Category::all();
         $brands = Brand::all();
         $suppliers = Supplier::all();
         $customers = Customer::all();
-        return view('products.edit', compact('product', 'categories', 'brands', 'suppliers', 'customers'))->with('activePage', 'products');
+        $warehouses = Warehouse::all();
+
+        return view('products.edit', compact('product', 'categories', 'brands', 'suppliers', 'customers', 'warehouses'))
+            ->with('activePage', 'products');
     }
+
 
     public function update(Request $request, $id)
     {

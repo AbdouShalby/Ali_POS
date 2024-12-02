@@ -61,18 +61,33 @@
                                         <div class="mb-10 col-md-7">
                                             <label class="form-label">{{ __('products.barcode') }}</label>
                                             <div class="input-group d-flex align-items-center">
-                                                <input type="text" class="form-control mb-2" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" id="barcode" name="barcode" required>
-                                                <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="generateBarcode">{{ __('Generate') }}</button>
-                                                <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="printBarcode">{{ __('Print') }}</button>
+                                                <input type="text" class="form-control mb-2" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" id="barcode" name="barcode" readonly required>
+                                                <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="generateBarcode">{{ __('products.generate') }}</button>
+                                                <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="printBarcode">{{ __('products.print') }}</button>
                                             </div>
                                         </div>
-                                        <div class="mb-10 col-md-6">
+                                        <div class="mb-10 col-md-4">
                                             <label class="form-label">{{ __('products.stock') }}</label>
                                             <input type="number" class="form-control mb-2" id="quantity" name="quantity" value="1" required>
                                         </div>
-                                        <div class="mb-10 col-md-6">
+                                        <div class="mb-10 col-md-4">
                                             <label class="form-label">{{ __('products.stock_alert') }}</label>
                                             <input type="number" class="form-control mb-2" id="stock_alert" name="stock_alert" value="1" required>
+                                        </div>
+                                        <div class="card card-flush py-4">
+                                            <div class="card-header">
+                                                <h2>{{ __('products.warehouse_stock') }}</h2>
+                                            </div>
+                                            <div class="card-body row pt-0">
+                                                @foreach($warehouses as $warehouse)
+                                                    <div class="mb-10 col-md-4">
+                                                        <label class="form-label">{{ $warehouse->name }}</label>
+                                                        <input type="number" class="form-control mb-2" name="warehouses[{{ $warehouse->id }}]"
+                                                               value="{{ old('warehouses.' . $warehouse->id, $product->warehouses->find($warehouse->id)->pivot->stock ?? 0) }}"
+                                                               placeholder="{{ __('products.stock_in_warehouse') }}">
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
                                         <div class="mb-10 col-md-3">
                                             <label class="form-label">{{ __('products.cost') }}</label>
@@ -253,17 +268,17 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">{{ __('Add New Category') }}</h5>
+                    <h5 class="modal-title" id="addCategoryModalLabel">{{ __('products.add_new_category') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addCategoryForm">
                         @csrf
                         <div class="mb-3">
-                            <label for="category_name" class="form-label">{{ __('Category Name') }}</label>
+                            <label for="category_name" class="form-label">{{ __('products.category_name') }}</label>
                             <input type="text" class="form-control" id="category_name" name="name" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('products.add') }}</button>
                     </form>
                 </div>
             </div>
@@ -274,17 +289,17 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addBrandModalLabel">{{ __('Add New Brand') }}</h5>
+                    <h5 class="modal-title" id="addBrandModalLabel">{{ __('products.add_new_brand') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addBrandForm">
                         @csrf
                         <div class="mb-3">
-                            <label for="brand_name" class="form-label">{{ __('Brand Name') }}</label>
+                            <label for="brand_name" class="form-label">{{ __('products.brand_name') }}</label>
                             <input type="text" class="form-control" id="brand_name" name="name" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('products.add') }}</button>
                     </form>
                 </div>
             </div>
@@ -375,19 +390,19 @@
                         @csrf
                         <div class="mb-3">
                             <label for="supplier_name" class="form-label">{{ __('products.supplier_name') }}</label>
-                            <input type="text" class="form-control" id="supplier_name" name="name" placeholder="{{ __('products.supplier_name') }}" required>
+                            <input type="text" class="form-control" id="supplier_name" name="name" required>
                         </div>
                         <div class="mb-3">
                             <label for="supplier_phone" class="form-label">{{ __('products.supplier_phone') }}</label>
-                            <input type="text" class="form-control" id="supplier_phone" name="phone" placeholder="{{ __('products.supplier_phone') }}">
+                            <input type="text" class="form-control" id="supplier_phone" name="phone">
                         </div>
                         <div class="mb-3">
                             <label for="supplier_email" class="form-label">{{ __('products.supplier_email') }}</label>
-                            <input type="email" class="form-control" id="supplier_email" name="email" placeholder="{{ __('products.supplier_email') }}">
+                            <input type="email" class="form-control" id="supplier_email" name="email">
                         </div>
                         <div class="mb-3">
                             <label for="supplier_address" class="form-label">{{ __('products.supplier_address') }}</label>
-                            <input type="text" class="form-control" id="supplier_address" name="address" placeholder="{{ __('products.supplier_address') }}">
+                            <input type="text" class="form-control" id="supplier_address" name="address">
                         </div>
                         <button type="button" class="btn btn-primary" id="saveSupplier">{{ __('products.save') }}</button>
                     </form>
@@ -437,6 +452,7 @@
                             const newOption = document.createElement('option');
                             newOption.value = data.customer.id;
                             newOption.textContent = data.customer.name;
+                            newOption.selected = true;
                             customerSelect.appendChild(newOption);
 
                             const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
@@ -444,7 +460,7 @@
 
                             form.reset();
                         } else {
-                            alert(data.message || 'Error saving customer.');
+                            console.error(data.message || 'Error saving customer.');
                         }
                     })
                     .catch(error => console.error('Error:', error));
@@ -464,23 +480,87 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            alert(data.message);
-
-                            // إضافة المورد الجديد إلى القائمة
                             const supplierSelect = document.getElementById('supplier_id');
                             const newOption = document.createElement('option');
                             newOption.value = data.supplier.id;
                             newOption.textContent = data.supplier.name;
+                            newOption.selected = true;
                             supplierSelect.appendChild(newOption);
 
-                            // إغلاق المودال
                             const modal = bootstrap.Modal.getInstance(document.getElementById('addSupplierModal'));
                             modal.hide();
 
-                            // إعادة تعيين الحقول
                             form.reset();
                         } else {
-                            alert(data.message || 'Error saving supplier.');
+                            console.error(data.message || 'Error saving supplier.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            document.getElementById('addBrandForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const form = document.getElementById('addBrandForm');
+                const formData = new FormData(form);
+
+                fetch('{{ route('brands.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const brandSelect = document.getElementById('brand_id');
+                            const newOption = document.createElement('option');
+                            newOption.value = data.brand.id;
+                            newOption.textContent = data.brand.name;
+                            newOption.selected = true;
+                            brandSelect.appendChild(newOption);
+
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('addBrandModal'));
+                            modal.hide();
+
+                            form.reset();
+                        } else {
+                            alert(data.message || 'Error saving brand.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            document.getElementById('addCategoryForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const form = document.getElementById('addCategoryForm');
+                const formData = new FormData(form);
+
+                fetch('{{ route('categories.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const categorySelect = document.getElementById('category_id');
+                            const newOption = document.createElement('option');
+                            newOption.value = data.category.id;
+                            newOption.textContent = data.category.name;
+                            newOption.selected = true;
+                            categorySelect.appendChild(newOption);
+
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
+                            modal.hide();
+
+                            form.reset();
+                        } else {
+                            alert(data.message || 'Error saving category.');
                         }
                     })
                     .catch(error => console.error('Error:', error));

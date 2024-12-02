@@ -25,16 +25,16 @@ class BrandController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:brands,name',
-            'description' => 'nullable|string|max:255',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
         ]);
 
-        $brand = Brand::create($request->all());
+        $brand = Brand::create($validatedData);
 
         return response()->json([
             'success' => true,
-            'brand_id' => $brand->id,
+            'message' => 'Brand added successfully.',
+            'brand' => $brand,
         ]);
     }
 

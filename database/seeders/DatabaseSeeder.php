@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             CategoriesTableSeeder::class,
             SuppliersTableSeeder::class,
             CustomersTableSeeder::class,
+            WarehouseSeeder::class,
             ProductsTableSeeder::class,
             MobileDetailsTableSeeder::class,
             UsersTableSeeder::class,

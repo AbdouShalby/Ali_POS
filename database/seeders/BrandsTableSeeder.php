@@ -18,7 +18,7 @@ class BrandsTableSeeder extends Seeder
         ];
 
         foreach ($brands as $brand) {
-            Brand::create($brand);
+            Brand::firstOrCreate($brand);
         }
     }
 }

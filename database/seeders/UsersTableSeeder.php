@@ -18,6 +18,7 @@ class UsersTableSeeder extends Seeder
             'manage suppliers',
             'manage customers',
             'manage brands',
+            'manage warehouses',
             'manage categories',
             'manage products',
             'manage mobiles',

@@ -13,6 +13,7 @@ class CreateProductsTable extends Migration
 
             $table->string('name');
             $table->string('barcode')->nullable()->unique();
+            $table->unsignedBigInteger('warehouse_id')->nullable();
             $table->text('description')->nullable();
             $table->string('image')->nullable();
 
@@ -39,6 +40,7 @@ class CreateProductsTable extends Migration
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null');
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
         });
     }
 
