@@ -49,65 +49,79 @@
                                         </div>
                                         <div class="card-title">
                                             <h2 class="me-5">{{ __('products.is_device') }}</h2>
-                                            <input type="checkbox" class="form-check-input me-2" id="is_mobile" name="is_mobile">
+                                            <input type="checkbox" class="form-check-input me-2" id="is_mobile" name="is_mobile" {{ old('is_mobile') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="is_mobile">{{ __('products.yes') }}</label>
                                         </div>
                                     </div>
                                     <div class="card-body row pt-0">
                                         <div class="mb-10 col-md-5">
                                             <label class="form-label">{{ __('products.name') }}</label>
-                                            <input type="text" class="form-control mb-2" id="name" name="name" required>
+                                            <input type="text" class="form-control mb-2" id="name" name="name" value="{{ old('name') }}" required>
                                         </div>
                                         <div class="mb-10 col-md-7">
                                             <label class="form-label">{{ __('products.barcode') }}</label>
                                             <div class="input-group d-flex align-items-center">
-                                                <input type="text" class="form-control mb-2" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" id="barcode" name="barcode" readonly required>
+                                                <input type="text" class="form-control mb-2" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" id="barcode" name="barcode" value="{{ old('barcode') }}" readonly required>
                                                 <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="generateBarcode">{{ __('products.generate') }}</button>
                                                 <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="printBarcode">{{ __('products.print') }}</button>
                                             </div>
                                         </div>
-                                        <div class="mb-10 col-md-4">
-                                            <label class="form-label">{{ __('products.stock') }}</label>
-                                            <input type="number" class="form-control mb-2" id="quantity" name="quantity" value="1" required>
-                                        </div>
-                                        <div class="mb-10 col-md-4">
-                                            <label class="form-label">{{ __('products.stock_alert') }}</label>
-                                            <input type="number" class="form-control mb-2" id="stock_alert" name="stock_alert" value="1" required>
-                                        </div>
-                                        <div class="card card-flush py-4">
+                                        <div class="card py-10 mb-10">
                                             <div class="card-header">
-                                                <h2>{{ __('products.warehouse_stock') }}</h2>
+                                                <h4>{{ __('products.assign_stock_to_warehouses') }}</h4>
                                             </div>
-                                            <div class="card-body row pt-0">
-                                                @foreach($warehouses as $warehouse)
-                                                    <div class="mb-10 col-md-4">
-                                                        <label class="form-label">{{ $warehouse->name }}</label>
-                                                        <input type="number" class="form-control mb-2" name="warehouses[{{ $warehouse->id }}]"
-                                                               value="{{ old('warehouses.' . $warehouse->id, $product->warehouses->find($warehouse->id)->pivot->stock ?? 0) }}"
-                                                               placeholder="{{ __('products.stock_in_warehouse') }}">
+                                            <div class="card-body" id="warehouse-container">
+                                                @if(old('warehouses'))
+                                                    @foreach(old('warehouses') as $index => $warehouse)
+                                                        <div class="input-group mb-2 warehouse-entry">
+                                                            <select class="form-select" name="warehouses[{{ $index }}][id]" required>
+                                                                <option value="">{{ __('products.select_warehouse') }}</option>
+                                                                @foreach($warehouses as $warehouseOption)
+                                                                    <option value="{{ $warehouseOption->id }}" {{ $warehouse['id'] == $warehouseOption->id ? 'selected' : '' }}>
+                                                                        {{ $warehouseOption->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                            <input type="number" class="form-control" name="warehouses[{{ $index }}][stock]" value="{{ $warehouse['stock'] }}" placeholder="{{ __('products.stock') }}" required>
+                                                            <input type="number" class="form-control" name="warehouses[{{ $index }}][stock_alert]" value="{{ $warehouse['stock_alert'] }}" placeholder="{{ __('products.stock_alert') }}" required>
+                                                            <button type="button" class="btn btn-danger remove-warehouse">{{ __('products.remove') }}</button>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <div class="input-group mb-2 warehouse-entry">
+                                                        <select class="form-select" name="warehouses[0][id]" required>
+                                                            <option value="">{{ __('products.select_warehouse') }}</option>
+                                                            @foreach($warehouses as $warehouse)
+                                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <input type="number" class="form-control" name="warehouses[0][stock]" placeholder="{{ __('products.stock') }}" required>
+                                                        <input type="number" class="form-control" name="warehouses[0][stock_alert]" placeholder="{{ __('products.stock_alert') }}" required>
+                                                        <button type="button" class="btn btn-danger remove-warehouse">{{ __('products.remove') }}</button>
                                                     </div>
-                                                @endforeach
+                                                @endif
                                             </div>
+                                            <button type="button" id="add-warehouse" class="btn btn-primary">{{ __('products.add_warehouse') }}</button>
                                         </div>
                                         <div class="mb-10 col-md-3">
                                             <label class="form-label">{{ __('products.cost') }}</label>
-                                            <input type="number" class="form-control mb-2" id="cost" name="cost" step="0.01" value="0" required>
+                                            <input type="number" class="form-control mb-2" id="cost" name="cost" step="0.01" value="{{ old('cost', 0) }}" required>
                                         </div>
                                         <div class="mb-10 col-md-3">
                                             <label class="form-label">{{ __('products.price') }}</label>
-                                            <input type="number" class="form-control mb-2" id="price" name="price" step="0.01" value="0" required>
+                                            <input type="number" class="form-control mb-2" id="price" name="price" step="0.01" value="{{ old('price', 0) }}" required>
                                         </div>
                                         <div class="mb-10 col-md-3">
                                             <label class="form-label">{{ __('products.wholesale_price') }}</label>
-                                            <input type="number" class="form-control mb-2" id="wholesale_price" name="wholesale_price" step="0.01" value="0" required>
+                                            <input type="number" class="form-control mb-2" id="wholesale_price" name="wholesale_price" step="0.01" value="{{ old('wholesale_price', 0) }}" required>
                                         </div>
                                         <div class="mb-10 col-md-3">
                                             <label class="form-label">{{ __('products.lowest_price_for_sale') }}</label>
-                                            <input type="number" class="form-control mb-2" id="min_sale_price" name="min_sale_price" step="0.01" value="0" required>
+                                            <input type="number" class="form-control mb-2" id="min_sale_price" name="min_sale_price" step="0.01" value="{{ old('min_sale_price', 0) }}" required>
                                         </div>
                                         <div class="mb-10 col-md-12">
                                             <label class="form-label">{{ __('products.description') }}</label>
-                                            <textarea class="form-control mb-2 min-h-100px" id="description" name="description"></textarea>
+                                            <textarea class="form-control mb-2 min-h-100px" id="description" name="description">{{ old('description') }}</textarea>
                                         </div>
                                         <div class="mb-10 col-md-4">
                                             <label class="form-label">{{ __('products.image') }}</label>
@@ -119,7 +133,9 @@
                                                 <select class="form-select me-2" id="category_id" name="category_id" required>
                                                     <option value="">{{ __('products.choose_category') }}</option>
                                                     @foreach($categories as $category)
-                                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                            {{ $category->name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
@@ -127,13 +143,16 @@
                                                 </button>
                                             </div>
                                         </div>
+
                                         <div class="mb-10 col-md-4">
                                             <label class="form-label">{{ __('products.brand') }}</label>
                                             <div class="d-flex align-items-center">
                                                 <select class="form-select me-2" id="brand_id" name="brand_id" required>
                                                     <option value="">{{ __('products.choose_brand') }}</option>
                                                     @foreach($brands as $brand)
-                                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                                        <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                                            {{ $brand->name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal">
@@ -154,102 +173,106 @@
                                         </div>
                                     </div>
                                     <div class="card-body row pt-0">
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.color') }}</label>
-                                            <input type="text" class="form-control mb-2" id="color" name="color">
-                                        </div>
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.storage') }}</label>
-                                            <input type="text" class="form-control mb-2" id="storage" name="storage">
-                                        </div>
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.battery_health') }}</label>
-                                            <input type="number" class="form-control mb-2" id="battery_health" name="battery_health" min="0" max="100" value="0">
-                                        </div>
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.ram') }}</label>
-                                            <input type="text" class="form-control mb-2" id="ram" name="ram">
-                                        </div>
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.cpu') }}</label>
-                                            <input type="text" class="form-control mb-2" id="cpu" name="cpu">
-                                        </div>
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.gpu') }}</label>
-                                            <input type="text" class="form-control mb-2" id="gpu" name="gpu">
-                                        </div>
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.condition') }}</label>
-                                            <input type="text" class="form-control mb-2" id="condition" name="condition">
-                                        </div>
-                                        <div class="mb-10 col-md-3">
-                                            <label class="form-label">{{ __('products.with_box') }}</label>
-                                            <select class="form-select mb-2" id="has_box" name="has_box">
-                                                <option value="">{{ __('products.choose') }}</option>
-                                                <option value="1">{{ __('products.yes') }}</option>
-                                                <option value="0">{{ __('products.no') }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-10 col-md-12">
-                                            <label class="form-label">{{ __('products.device_description') }}</label>
-                                            <textarea class="form-control mb-2 min-h-100px" id="device_description" name="device_description"></textarea>
-                                        </div>
-                                        <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('products.payment_method') }}</label>
-                                            <select class="form-select" id="payment_method" name="payment_method">
-                                                <option value="">{{ __('products.choose_payment_method') }}</option>
-                                                <option value="cash">{{ __('products.cash') }}</option>
-                                                <option value="credit">{{ __('products.credit') }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('products.seller_name') }}</label>
-                                            <input type="text" class="form-control" id="seller_name" name="seller_name" value="{{ Auth::user()->name }}" readonly>
-                                        </div>
-                                        <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('products.scan_id') }}</label>
-                                            <input type="file" class="form-control" id="scan_id" name="scan_id">
-                                        </div>
-                                        <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('products.scan_documents') }}</label>
-                                            <input type="file" class="form-control" id="scan_documents" name="scan_documents">
-                                        </div>
-                                        <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('products.client_type') }}</label>
-                                            <select class="form-select" id="client_type" name="client_type">
-                                                <option value="">{{ __('products.choose_client_type') }}</option>
-                                                <option value="customer">{{ __('products.customer') }}</option>
-                                                <option value="supplier">{{ __('products.supplier') }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-10 col-md-6" id="customer_section" style="display: none;">
-                                            <label class="form-label">{{ __('products.select_customer') }}</label>
-                                            <div class="d-flex align-items-center">
-                                                <select class="form-select me-2" id="customer_id" name="customer_id">
-                                                    <option value="">{{ __('products.choose_customer') }}</option>
-                                                    @foreach($customers as $customer)
-                                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-                                                    {{ __('products.add') }}
-                                                </button>
+                                        <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.color') }}</label>
+                                                <input type="text" class="form-control mb-2" id="color" name="color" value="{{ old('color') }}">
                                             </div>
-                                        </div>
-                                        <div class="mb-10 col-md-6" id="supplier_section" style="display: none;">
-                                            <label class="form-label">{{ __('products.select_supplier') }}</label>
-                                            <div class="d-flex align-items-center">
-                                                <select class="form-select me-2" id="supplier_id" name="supplier_id">
-                                                    <option value="">{{ __('products.choose_supplier') }}</option>
-                                                    @foreach($suppliers as $supplier)
-                                                        <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-                                                    {{ __('products.add') }}
-                                                </button>
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.storage') }}</label>
+                                                <input type="text" class="form-control mb-2" id="storage" name="storage" value="{{ old('storage') }}">
                                             </div>
-                                        </div>
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.battery_health') }}</label>
+                                                <input type="number" class="form-control mb-2" id="battery_health" name="battery_health" min="0" max="100" value="{{ old('battery_health', 0) }}">
+                                            </div>
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.ram') }}</label>
+                                                <input type="text" class="form-control mb-2" id="ram" name="ram" value="{{ old('ram') }}">
+                                            </div>
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.cpu') }}</label>
+                                                <input type="text" class="form-control mb-2" id="cpu" name="cpu" value="{{ old('cpu') }}">
+                                            </div>
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.gpu') }}</label>
+                                                <input type="text" class="form-control mb-2" id="gpu" name="gpu" value="{{ old('gpu') }}">
+                                            </div>
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.condition') }}</label>
+                                                <input type="text" class="form-control mb-2" id="condition" name="condition" value="{{ old('condition') }}">
+                                            </div>
+                                            <div class="mb-10 col-md-3">
+                                                <label class="form-label">{{ __('products.with_box') }}</label>
+                                                <select class="form-select mb-2" id="has_box" name="has_box">
+                                                    <option value="">{{ __('products.choose') }}</option>
+                                                    <option value="1" {{ old('has_box') == '1' ? 'selected' : '' }}>{{ __('products.yes') }}</option>
+                                                    <option value="0" {{ old('has_box') == '0' ? 'selected' : '' }}>{{ __('products.no') }}</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-10 col-md-12">
+                                                <label class="form-label">{{ __('products.device_description') }}</label>
+                                                <textarea class="form-control mb-2 min-h-100px" id="device_description" name="device_description">{{ old('device_description') }}</textarea>
+                                            </div>
+                                            <div class="mb-10 col-md-6">
+                                                <label class="form-label">{{ __('products.payment_method') }}</label>
+                                                <select class="form-select" id="payment_method" name="payment_method">
+                                                    <option value="">{{ __('products.choose_payment_method') }}</option>
+                                                    <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>{{ __('products.cash') }}</option>
+                                                    <option value="credit" {{ old('payment_method') == 'credit' ? 'selected' : '' }}>{{ __('products.credit') }}</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-10 col-md-6">
+                                                <label class="form-label">{{ __('products.seller_name') }}</label>
+                                                <input type="text" class="form-control" id="seller_name" name="seller_name" value="{{ Auth::user()->name }}" readonly>
+                                            </div>
+                                            <div class="mb-10 col-md-6">
+                                                <label class="form-label">{{ __('products.scan_id') }}</label>
+                                                <input type="file" class="form-control" id="scan_id" name="scan_id">
+                                            </div>
+                                            <div class="mb-10 col-md-6">
+                                                <label class="form-label">{{ __('products.scan_documents') }}</label>
+                                                <input type="file" class="form-control" id="scan_documents" name="scan_documents">
+                                            </div>
+                                            <div class="mb-10 col-md-6">
+                                                <label class="form-label">{{ __('products.client_type') }}</label>
+                                                <select class="form-select" id="client_type" name="client_type" onchange="toggleClientSections(this.value)">
+                                                    <option value="">{{ __('products.choose_client_type') }}</option>
+                                                    <option value="customer" {{ old('client_type') == 'customer' ? 'selected' : '' }}>{{ __('products.customer') }}</option>
+                                                    <option value="supplier" {{ old('client_type') == 'supplier' ? 'selected' : '' }}>{{ __('products.supplier') }}</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-10 col-md-6" id="customer_section" style="display: {{ old('client_type') == 'customer' ? 'block' : 'none' }};">
+                                                <label class="form-label">{{ __('products.select_customer') }}</label>
+                                                <div class="d-flex align-items-center">
+                                                    <select class="form-select me-2" id="customer_id" name="customer_id">
+                                                        <option value="">{{ __('products.choose_customer') }}</option>
+                                                        @foreach($customers as $customer)
+                                                            <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>{{ $customer->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                                                        {{ __('products.add') }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="mb-10 col-md-6" id="supplier_section" style="display: {{ old('client_type') == 'supplier' ? 'block' : 'none' }};">
+                                                <label class="form-label">{{ __('products.select_supplier') }}</label>
+                                                <div class="d-flex align-items-center">
+                                                    <select class="form-select me-2" id="supplier_id" name="supplier_id">
+                                                        <option value="">{{ __('products.choose_supplier') }}</option>
+                                                        @foreach($suppliers as $supplier)
+                                                            <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                                                        {{ __('products.add') }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">{{ __('products.save') }}</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -413,9 +436,76 @@
 
     @section('scripts')
         <script>
+            @if ($errors->any())
+            @foreach ($errors->all() as $error)
+            toastr.error("{{ $error }}");
+            @endforeach
+            @endif
+
             document.getElementById('is_mobile').addEventListener('change', function() {
                 var detailsTab = document.getElementById('detailsTab');
                 detailsTab.style.display = this.checked ? 'block' : 'none';
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const warehouseContainer = document.getElementById('warehouse-container');
+                const addWarehouseButton = document.getElementById('add-warehouse');
+                let warehouseIndex = 1;
+
+                function updateWarehouseOptions() {
+                    const selectedWarehouses = Array.from(document.querySelectorAll('select[name^="warehouses"]')).map(select => select.value);
+                    const allSelects = document.querySelectorAll('select[name^="warehouses"]');
+
+                    allSelects.forEach((select) => {
+                        const currentValue = select.value;
+                        select.innerHTML = `
+                <option value="">{{ __('Select Warehouse') }}</option>
+            `;
+
+                        @foreach($warehouses as $warehouse)
+                        if (!selectedWarehouses.includes("{{ $warehouse->id }}") || currentValue === "{{ $warehouse->id }}") {
+                            select.innerHTML += `<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>`;
+                        }
+                        @endforeach
+
+                            select.value = currentValue;
+                    });
+                }
+
+                addWarehouseButton.addEventListener('click', function () {
+                    const newWarehouseEntry = document.createElement('div');
+                    newWarehouseEntry.classList.add('input-group', 'mb-2', 'warehouse-entry');
+                    newWarehouseEntry.innerHTML = `
+            <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
+                <option value="">{{ __('Select Warehouse') }}</option>
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                @endforeach
+                    </select>
+                    <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('Stock') }}" required>
+            <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('Stock Alert') }}" required>
+            <button type="button" class="btn btn-danger remove-warehouse">{{ __('Remove') }}</button>
+        `;
+                    warehouseContainer.appendChild(newWarehouseEntry);
+
+                    warehouseIndex++;
+                    updateWarehouseOptions();
+                });
+
+                warehouseContainer.addEventListener('change', function (e) {
+                    if (e.target.tagName === 'SELECT') {
+                        updateWarehouseOptions();
+                    }
+                });
+
+                warehouseContainer.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('remove-warehouse')) {
+                        e.target.closest('.warehouse-entry').remove();
+                        updateWarehouseOptions();
+                    }
+                });
+
+                updateWarehouseOptions();
             });
 
             document.getElementById('client_type').addEventListener('change', function () {

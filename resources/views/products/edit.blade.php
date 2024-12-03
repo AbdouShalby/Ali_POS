@@ -7,7 +7,8 @@
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                 <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                    {{ __('products.edit_product') }}</h1>
+                    {{ __('products.edit_product') }}
+                </h1>
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                     <li class="breadcrumb-item text-muted">
                         <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('products.dashboard') }}</a>
@@ -86,6 +87,54 @@
                     detailsTab.style.display = 'none';
                     detailsContent.style.display = 'none';
                 }
+            });
+
+            document.getElementById('client_type').addEventListener('change', function () {
+                const customerSection = document.getElementById('customer_section');
+                const supplierSection = document.getElementById('supplier_section');
+
+                if (this.value === 'customer') {
+                    customerSection.style.display = 'block';
+                    supplierSection.style.display = 'none';
+                    document.getElementById('customer_id').value = ''; // Reset supplier field
+                } else if (this.value === 'supplier') {
+                    customerSection.style.display = 'none';
+                    supplierSection.style.display = 'block';
+                    document.getElementById('supplier_id').value = ''; // Reset customer field
+                } else {
+                    customerSection.style.display = 'none';
+                    supplierSection.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const warehouseContainer = document.getElementById('warehouse-container');
+                const addWarehouseButton = document.getElementById('add-warehouse');
+                let warehouseIndex = {{ $product->warehouses->count() }};
+
+                addWarehouseButton.addEventListener('click', function () {
+                    const newWarehouseEntry = document.createElement('div');
+                    newWarehouseEntry.classList.add('input-group', 'mb-2', 'warehouse-entry');
+                    newWarehouseEntry.innerHTML = `
+            <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
+                <option value="">{{ __('products.select_warehouse') }}</option>
+                @foreach($warehouses as $availableWarehouse)
+                    <option value="{{ $availableWarehouse->id }}">{{ $availableWarehouse->name }}</option>
+                @endforeach
+                    </select>
+                    <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('products.stock') }}" required>
+            <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('products.stock_alert') }}" required>
+            <button type="button" class="btn btn-danger remove-warehouse">{{ __('products.remove') }}</button>
+        `;
+                    warehouseContainer.appendChild(newWarehouseEntry);
+                    warehouseIndex++;
+                });
+
+                warehouseContainer.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('remove-warehouse')) {
+                        e.target.closest('.warehouse-entry').remove();
+                    }
+                });
             });
         </script>
     @endsection

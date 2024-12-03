@@ -64,17 +64,11 @@ class Product extends Model
 
     public function mobileDetail()
     {
-        return $this->hasOne(MobileDetail::class, 'product_id', 'id');
-    }
-    public function warehouses()
-    {
-        return $this->belongsToMany(Warehouse::class, 'product_warehouse')
-            ->withPivot('stock')
-            ->withTimestamps();
+        return $this->hasOne(MobileDetail::class);
     }
 
-    public function warehouse()
+    public function warehouses()
     {
-        return $this->belongsTo(Warehouse::class, 'warehouse_id');
+        return $this->belongsToMany(Warehouse::class)->withPivot('stock', 'stock_alert');
     }
 }

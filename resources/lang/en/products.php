@@ -136,4 +136,10 @@ return [
     'warehouse' => 'Warehouse',
     'select_warehouse' => 'Select Warehouse',
     'warehouse_stock' => 'Warehouse Stock',
+    'assign_stock_to_warehouses' => 'Assign Stock to Warehouses',
+    'remove' => 'Remove',
+    'add_warehouse' => 'Add Warehouse',
+    'warehouses' => 'Warehouses',
+    'warehouse_details' => 'Warehouse Details',
+    'warehouse_name' => 'Warehouse Name',
 ];

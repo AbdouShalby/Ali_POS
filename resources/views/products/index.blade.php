@@ -70,7 +70,6 @@
                                 <th class="min-w-100px text-start">{{ __('products.barcode') }}</th>
                                 <th class="min-w-100px text-start">{{ __('products.category') }}</th>
                                 <th class="min-w-100px text-start">{{ __('products.brand') }}</th>
-                                <th class="min-w-100px text-start">{{ __('products.stock') }}</th>
                                 <th class="min-w-100px text-start">{{ __('products.selling_price') }}</th>
                                 <th class="min-w-100px text-start">{{ __('products.lowest_price_for_sale') }}</th>
                                 <th class="min-w-100px text-start">{{ __('products.device') }}</th>
@@ -84,14 +83,6 @@
                                     <td class="text-start">{{ $product->barcode }}</td>
                                     <td class="text-start">{{ $product->category->name ?? __('products.undefined') }}</td>
                                     <td class="text-start">{{ $product->brand->name ?? __('products.undefined') }}</td>
-                                    <td class="text-start">
-                                        @if($product->quantity <= $product->stock_alert)
-                                            <span class="badge badge-light-warning">{{ __('products.low_stock') }}</span>
-                                            <span class="fw-bold text-warning ms-3">{{ $product->quantity }}</span>
-                                        @else
-                                            {{ $product->quantity }}
-                                        @endif
-                                    </td>
                                     <td class="text-start">{{ number_format($product->price, 2) }}</td>
                                     <td class="text-start">{{ number_format($product->min_sale_price, 2) }}</td>
                                     <td class="text-start">{{ $product->mobileDetail ? __('products.yes') : __('products.no') }}</td>

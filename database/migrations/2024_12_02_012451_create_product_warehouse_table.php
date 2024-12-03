@@ -10,13 +10,11 @@ class CreateProductWarehouseTable extends Migration
     {
         Schema::create('product_warehouse', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('warehouse_id');
-            $table->integer('stock')->default(0);
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
+            $table->integer('stock');
+            $table->integer('stock_alert');
             $table->timestamps();
-
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
         });
     }
 

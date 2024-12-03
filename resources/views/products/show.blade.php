@@ -45,7 +45,7 @@
                                 @if(empty($product->image))
                                     <div class="image-input-wrapper w-150px h-150px" id="noImageLottie"></div>
                                 @else
-                                    <div class="image-input-wrapper w-150px h-150px" style="background-image: url({{ asset('images/products/' . $product->image) }})"></div>
+                                    <div class="image-input-wrapper w-150px h-150px" style="background-image: url({{ Storage::url($product->image) }})"></div>
                                 @endif
                             </div>
                         </div>
@@ -98,6 +98,9 @@
                                 <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_advanced">{{ __('products.device_details') }}</a>
                             </li>
                         @endif
+                        <li class="nav-item">
+                            <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_warehouses">{{ __('products.warehouses') }}</a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general" role="tab-panel">
@@ -132,14 +135,6 @@
                                         <div class="mb-10 col-md-3">
                                             <label class="form-label">{{ __('products.minimum_sale_price') }}</label>
                                             <input type="number" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->min_sale_price }}" readonly />
-                                        </div>
-                                        <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('products.current_stock') }}</label>
-                                            <input type="number" class="form-control mb-2 {{ $product->quantity <= $product->stock_alert ? 'text-warning' : '' }}" placeholder="{{ __('products.empty_field') }}" value="{{ $product->quantity }}" readonly />
-                                        </div>
-                                        <div class="mb-10 col-md-6">
-                                            <label class="form-label">{{ __('products.stock_alert_level') }}</label>
-                                            <input type="number" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" value="{{ $product->stock_alert }}" readonly />
                                         </div>
                                         <div class="mb-10 col-md-12">
                                             <label class="form-label">{{ __('products.product_description') }}</label>
@@ -200,6 +195,40 @@
                                 </div>
                             </div>
                         @endif
+
+                        <div class="tab-pane fade" id="kt_ecommerce_add_product_warehouses" role="tab-panel">
+                            <div class="d-flex flex-column gap-7 gap-lg-10">
+                                <div class="card card-flush py-4">
+                                    <div class="card-header">
+                                        <div class="card-title">
+                                            <h2>{{ __('products.warehouse_details') }}</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card-body row pt-0">
+                                        <div class="col-md-12">
+                                            <table class="table align-middle table-row-dashed fs-6 gy-5">
+                                                <thead>
+                                                <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                                    <th class="min-w-150px">{{ __('products.warehouse_name') }}</th>
+                                                    <th class="min-w-100px">{{ __('products.stock') }}</th>
+                                                    <th class="min-w-100px">{{ __('products.stock_alert') }}</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="fw-semibold text-gray-600">
+                                                @foreach($product->warehouses as $warehouse)
+                                                    <tr>
+                                                        <td>{{ $warehouse->name }}</td>
+                                                        <td>{{ $warehouse->pivot->stock }}</td>
+                                                        <td>{{ $warehouse->pivot->stock_alert }}</td>
+                                                    </tr>
+                                                @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>

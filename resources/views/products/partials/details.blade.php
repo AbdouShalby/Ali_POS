@@ -61,10 +61,10 @@
                 <label class="form-label">{{ __('products.payment_method') }}</label>
                 <select class="form-select" id="payment_method" name="payment_method">
                     <option value="">{{ __('products.choose_payment_method') }}</option>
-                    <option value="cash" {{ old('payment_method', $mobileDetail->payment_method ?? '') == 'cash' ? 'selected' : '' }}>
+                    <option value="cash" {{ old('payment_method', $product->payment_method ?? '') == 'cash' ? 'selected' : '' }}>
                         {{ __('products.cash') }}
                     </option>
-                    <option value="credit" {{ old('payment_method', $mobileDetail->payment_method ?? '') == 'credit' ? 'selected' : '' }}>
+                    <option value="credit" {{ old('payment_method', $product->payment_method ?? '') == 'credit' ? 'selected' : '' }}>
                         {{ __('products.credit') }}
                     </option>
                 </select>
@@ -80,18 +80,43 @@
                 <input type="file" class="form-control" id="scan_documents" name="scan_documents">
             </div>
 
-            <div class="mb-5 col-md-4">
+            <div class="mb-10 col-md-6">
                 <label class="form-label">{{ __('products.client_type') }}</label>
                 <select class="form-select" id="client_type" name="client_type">
                     <option value="">{{ __('products.choose_client_type') }}</option>
-                    <option value="customer" {{ old('client_type', $mobileDetail->client_type ?? '') == 'customer' ? 'selected' : '' }}>
+                    <option value="customer" {{ old('client_type', $product->client_type ?? '') == 'customer' ? 'selected' : '' }}>
                         {{ __('products.customer') }}
                     </option>
-                    <option value="supplier" {{ old('client_type', $mobileDetail->client_type ?? '') == 'supplier' ? 'selected' : '' }}>
+                    <option value="supplier" {{ old('client_type', $product->client_type ?? '') == 'supplier' ? 'selected' : '' }}>
                         {{ __('products.supplier') }}
                     </option>
                 </select>
             </div>
+
+            <div class="mb-10 col-md-6" id="customer_section" style="display: {{ old('client_type', $product->client_type ?? '') == 'customer' ? 'block' : 'none' }};">
+                <label class="form-label">{{ __('products.select_customer') }}</label>
+                <select class="form-select" id="customer_id" name="customer_id">
+                    <option value="">{{ __('products.choose_customer') }}</option>
+                    @foreach($customers as $customer)
+                        <option value="{{ $customer->id }}" {{ old('customer_id', $product->customer_id ?? '') == $customer->id ? 'selected' : '' }}>
+                            {{ $customer->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-10 col-md-6" id="supplier_section" style="display: {{ old('client_type', $product->client_type ?? '') == 'supplier' ? 'block' : 'none' }};">
+                <label class="form-label">{{ __('products.select_supplier') }}</label>
+                <select class="form-select" id="supplier_id" name="supplier_id">
+                    <option value="">{{ __('products.choose_supplier') }}</option>
+                    @foreach($suppliers as $supplier)
+                        <option value="{{ $supplier->id }}" {{ old('supplier_id', $product->supplier_id ?? '') == $supplier->id ? 'selected' : '' }}>
+                            {{ $supplier->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
         </div>
     </div>
 </div>
