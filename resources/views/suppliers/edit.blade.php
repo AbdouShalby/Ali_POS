@@ -1,48 +1,88 @@
 @extends('layouts.app')
 
-@section('title', '- ' . __('Edit Supplier'))
+@section('title', '- ' . __('suppliers.edit_supplier'))
 
 @section('content')
-    <div class="container">
-        <h1 class="mb-4">تعديل المورد: {{ $supplier->name }}</h1>
-
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>خطأ!</strong> يرجى تصحيح الأخطاء التالية:
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    {{ __('suppliers.edit_supplier') }}: {{ $supplier->name }}
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('suppliers.dashboard') }}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('suppliers.index') }}" class="text-muted text-hover-primary">{{ __('suppliers.all_suppliers') }}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">{{ __('suppliers.edit_supplier') }}</li>
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="إغلاق"></button>
             </div>
-        @endif
+        </div>
+    </div>
 
-        <form action="{{ route('suppliers.update', $supplier->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="mb-3">
-                <label for="name" class="form-label">اسم المورد</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $supplier->name) }}" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">البريد الإلكتروني</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $supplier->email) }}">
-            </div>
-            <div class="mb-3">
-                <label for="phone" class="form-label">رقم الهاتف</label>
-                <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $supplier->phone) }}">
-            </div>
-            <div class="mb-3">
-                <label for="address" class="form-label">العنوان</label>
-                <textarea class="form-control" id="address" name="address" rows="2">{{ old('address', $supplier->address) }}</textarea>
-            </div>
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-check-circle"></i> تحديث
-            </button>
-            <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> إلغاء
-            </a>
-        </form>
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show mb-5" role="alert">
+                    <strong>{{ __('suppliers.error') }}</strong>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <form action="{{ route('suppliers.update', $supplier->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="card card-flush">
+                    <div class="card-header">
+                        <h2 class="card-title">{{ __('suppliers.edit_supplier_details') }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="mb-10 col-md-6">
+                                <label for="name" class="form-label">{{ __('suppliers.name') }}</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $supplier->name) }}" required>
+                            </div>
+                            <div class="mb-10 col-md-6">
+                                <label for="email" class="form-label">{{ __('suppliers.email') }}</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $supplier->email) }}">
+                            </div>
+                            <div class="mb-10 col-md-6">
+                                <label for="phone" class="form-label">{{ __('suppliers.phone') }}</label>
+                                <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $supplier->phone) }}">
+                            </div>
+                            <div class="mb-10 col-md-6">
+                                <label for="address" class="form-label">{{ __('suppliers.address') }}</label>
+                                <textarea class="form-control" id="address" name="address" rows="2">{{ old('address', $supplier->address) }}</textarea>
+                            </div>
+                            <div class="mb-10 col-md-12">
+                                <label for="notes" class="form-label">{{ __('suppliers.notes') }}</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes', $supplier->notes) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success me-3 d-flex align-items-center">
+                            <i class="bi bi-check-circle me-2"></i>{{ __('suppliers.update') }}
+                        </button>
+                        <a href="{{ route('suppliers.index') }}" class="btn btn-secondary d-flex align-items-center">
+                            <i class="bi bi-arrow-left me-2"></i>{{ __('suppliers.cancel') }}
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 @endsection

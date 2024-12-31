@@ -142,4 +142,5 @@ return [
     'warehouses' => 'Warehouses',
     'warehouse_details' => 'Warehouse Details',
     'warehouse_name' => 'Warehouse Name',
+    'quantity' => 'Quantity',
 ];

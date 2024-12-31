@@ -66,4 +66,22 @@ class WarehouseController extends Controller
 
         return redirect()->route('warehouses.index')->with('success', __('Warehouse deleted successfully.'));
     }
+
+    public function getProducts(Warehouse $warehouse)
+    {
+        try {
+            // جلب المنتجات مع المخزون
+            $products = $warehouse->products()->get()->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'stock' => $product->pivot->stock, // تأكد من أن علاقة pivot تحتوي على stock
+                ];
+            });
+
+            return response()->json($products, 200); // إرسال JSON
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

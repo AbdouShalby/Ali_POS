@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Unit;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\SaleItem;
+use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
@@ -31,7 +33,7 @@ class SaleController extends Controller
                     $query->where('name', 'LIKE', "%$search%");
                 })->orWhere('id', $search);
             })
-            ->get();
+            ->paginate(10); // تقسيم النتائج إلى 10 عناصر في الصفحة
 
         return view('sales.index', compact('sales', 'search', 'date'))->with('activePage', 'sales');
     }
@@ -39,12 +41,9 @@ class SaleController extends Controller
     public function create()
     {
         $customers = Customer::all();
-        $products = Product::all();
-        $categories = Category::all();
-        $brands = Brand::all();
-        $units = Unit::all();
+        $warehouses = Warehouse::with('products')->get();
 
-        return view('sales.create', compact('customers', 'products', 'categories', 'brands', 'units'))->with('activePage', 'sales.create');
+        return view('sales.create', compact('customers', 'warehouses'))->with('activePage', 'sales.create');
     }
 
     public function store(Request $request)
@@ -52,6 +51,7 @@ class SaleController extends Controller
         $validated = $request->validate([
             'customer_id' => 'nullable|exists:customers,id',
             'sale_date' => 'required|date',
+            'products.*.warehouse_id' => 'required|exists:warehouses,id',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|numeric|min:0',
@@ -69,25 +69,30 @@ class SaleController extends Controller
 
         if (!empty($request->products) && is_array($request->products)) {
             foreach ($request->products as $item) {
-                $product = Product::find($item['product_id']);
+                $warehouseId = $item['warehouse_id'];
+                $productId = $item['product_id'];
                 $quantity = $item['quantity'];
-                $price = $item['price'];
 
-                if ($product->quantity < $quantity) {
-                    return redirect()->back()->withErrors(['error' => 'الكمية المتوفرة من المنتج ' . $product->name . ' غير كافية']);
+                $warehouseProduct = DB::table('product_warehouse')
+                    ->where('warehouse_id', $warehouseId)
+                    ->where('product_id', $productId)
+                    ->first();
+
+                if (!$warehouseProduct || $warehouseProduct->stock < $quantity) {
+                    return redirect()->back()->withErrors(['error' => 'الكمية المطلوبة غير متوفرة']);
                 }
 
-                $totalAmount += $price * $quantity;
+                DB::table('product_warehouse')
+                    ->where('warehouse_id', $warehouseId)
+                    ->where('product_id', $productId)
+                    ->decrement('stock', $quantity);
 
                 SaleItem::create([
                     'sale_id' => $sale->id,
-                    'product_id' => $product->id,
+                    'product_id' => $productId,
                     'quantity' => $quantity,
-                    'price' => $price,
+                    'price' => $item['price'],
                 ]);
-
-                $product->quantity -= $quantity;
-                $product->save();
             }
         } else {
             return redirect()->back()->withErrors(['error' => 'يجب تحديد منتجات الفاتورة.']);
@@ -109,9 +114,9 @@ class SaleController extends Controller
     {
         $sale = Sale::with('saleItems.product')->findOrFail($id);
         $customers = Customer::all();
-        $products = Product::all();
+        $warehouses = Warehouse::with('products')->get(); // جلب المخازن مع المنتجات المرتبطة بها
 
-        return view('sales.edit', compact('sale', 'customers', 'products'))->with('activePage', 'sales');
+        return view('sales.edit', compact('sale', 'customers', 'warehouses'))->with('activePage', 'sales.edit');
     }
 
     public function update(Request $request, $id)

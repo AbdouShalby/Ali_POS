@@ -151,14 +151,6 @@
                                     <span class="menu-title {{ isset($activePage) && $activePage == 'sales.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Sale') }}</span>
                                 </a>
                             </div>
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'sales.history' ? 'active' : '' }}" href="{{ route('sales.history') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'sales.history' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales.history' ? 'text-primary' : '' }}">{{ __('sidebar.Sales History') }}</span>
-                                </a>
-                            </div>
                         </div>
                     </div>
 

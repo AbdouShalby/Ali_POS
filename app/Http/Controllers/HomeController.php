@@ -34,8 +34,8 @@ class HomeController extends Controller
         $totalCryptoBalance = CryptoGateway::sum('balance');
         $totalExternalPurchases = ExternalPurchase::sum('amount');
         $cashBalance = $totalSales + $totalCryptoBalance - $totalPurchases - $totalExternalPurchases;
-        $lowStockProducts = Product::where('quantity', '<', 10)->get();
-        $veryLowStockProducts = Product::where('quantity', '<', 5)->get();
+//        $lowStockProducts = Product::where('quantity', '<', 10)->get();
+//        $veryLowStockProducts = Product::where('quantity', '<', 5)->get();
         $topSellingProducts = SaleItem::select('product_id')
             ->with('product')
             ->selectRaw('SUM(quantity) as total_quantity')
@@ -61,8 +61,6 @@ class HomeController extends Controller
             'phonesInMaintenance',
             'cashBalance',
             'totalCryptoBalance',
-            'lowStockProducts',
-            'veryLowStockProducts',
             'topSellingProducts',
             'latestMaintenances',
             'latestSales',

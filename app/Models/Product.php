@@ -69,6 +69,6 @@ class Product extends Model
 
     public function warehouses()
     {
-        return $this->belongsToMany(Warehouse::class)->withPivot('stock', 'stock_alert');
+        return $this->belongsToMany(Warehouse::class)->withPivot('stock', 'stock_alert')->withTimestamps();
     }
 }

@@ -241,41 +241,41 @@
                         </div>
                         <div class="card-body py-3">
                             <div class="table-responsive">
-                                @if($veryLowStockProducts->isEmpty())
-                                    <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('dashboard.No Products With Low Stock') }}
-                                    </div>
-                                @else
-                                    <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
-                                        <thead>
-                                        <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('dashboard.Product') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('dashboard.Remaining Stock') }}</th>
-                                            <th class="p-0 min-w-50px"></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($veryLowStockProducts as $product)
-                                            <tr>
-                                                <td class="ps-0">
-                                                    <a href="{{ route('products.show', $product->id) }}" class="text-gray-900 fw-bold text-hover-primary mb-1 fs-6">{{ $product->name }}</a>
-                                                </td>
-                                                <td class="ps-0">
-                                                    <span class="text-gray-900 fw-bold d-block fs-6">{{ $product->quantity }}</span>
-                                                </td>
-                                                <td class="text-end">
-                                                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
-                                                        <i class="ki-duotone ki-arrow-right fs-2">
-                                                            <span class="path1"></span>
-                                                            <span class="path2"></span>
-                                                        </i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                @endif
+{{--                                @if($veryLowStockProducts->isEmpty())--}}
+{{--                                    <div class="text-center text-gray-500 fs-6 mt-5">--}}
+{{--                                        {{ __('dashboard.No Products With Low Stock') }}--}}
+{{--                                    </div>--}}
+{{--                                @else--}}
+{{--                                    <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">--}}
+{{--                                        <thead>--}}
+{{--                                        <tr class="border-bottom-1">--}}
+{{--                                            <th class="p-0 min-w-175px">{{ __('dashboard.Product') }}</th>--}}
+{{--                                            <th class="p-0 min-w-175px">{{ __('dashboard.Remaining Stock') }}</th>--}}
+{{--                                            <th class="p-0 min-w-50px"></th>--}}
+{{--                                        </tr>--}}
+{{--                                        </thead>--}}
+{{--                                        <tbody>--}}
+{{--                                        @foreach($veryLowStockProducts as $product)--}}
+{{--                                            <tr>--}}
+{{--                                                <td class="ps-0">--}}
+{{--                                                    <a href="{{ route('products.show', $product->id) }}" class="text-gray-900 fw-bold text-hover-primary mb-1 fs-6">{{ $product->name }}</a>--}}
+{{--                                                </td>--}}
+{{--                                                <td class="ps-0">--}}
+{{--                                                    <span class="text-gray-900 fw-bold d-block fs-6">{{ $product->quantity }}</span>--}}
+{{--                                                </td>--}}
+{{--                                                <td class="text-end">--}}
+{{--                                                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">--}}
+{{--                                                        <i class="ki-duotone ki-arrow-right fs-2">--}}
+{{--                                                            <span class="path1"></span>--}}
+{{--                                                            <span class="path2"></span>--}}
+{{--                                                        </i>--}}
+{{--                                                    </a>--}}
+{{--                                                </td>--}}
+{{--                                            </tr>--}}
+{{--                                        @endforeach--}}
+{{--                                        </tbody>--}}
+{{--                                    </table>--}}
+{{--                                @endif--}}
                             </div>
                         </div>
                     </div>

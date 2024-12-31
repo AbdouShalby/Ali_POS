@@ -21,11 +21,10 @@ class SupplierController extends Controller
             return $query->where('name', 'LIKE', "%$search%")
                 ->orWhere('email', 'LIKE', "%$search%")
                 ->orWhere('phone', 'LIKE', "%$search%");
-        })->get();
+        })->paginate(10);
 
         return view('suppliers.index', compact('suppliers', 'search'))->with('activePage', 'suppliers');
     }
-
 
     public function create()
     {
@@ -44,24 +43,40 @@ class SupplierController extends Controller
 
         $supplier = Supplier::create($validated);
 
-        if ($supplier) {
+        if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'تم إضافة المورد بنجاح',
-                'supplier' => $supplier, // إرسال بيانات المورد
-            ], 200, [], JSON_UNESCAPED_UNICODE);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'فشل في إضافة المورد',
-            ], 500, [], JSON_UNESCAPED_UNICODE);
+                'message' => __('suppliers.supplier_added_successfully'),
+                'supplier' => $supplier,
+            ], 200);
         }
+
+        return redirect()->route('suppliers.index')->with('success', __('suppliers.supplier_added_successfully'));
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $supplier = Supplier::findOrFail($id);
-        return view('suppliers.show', compact('supplier'))->with('activePage', 'suppliers');
+
+        $query = $supplier->purchases()->with('product');
+
+        if ($request->filled('search')) {
+            $query->whereHas('product', function ($productQuery) use ($request) {
+                $productQuery->where('name', 'LIKE', "%{$request->search}%");
+            });
+        }
+
+        if ($request->filled('from') && $request->filled('to')) {
+            $query->whereBetween('created_at', [$request->from, $request->to]);
+        }
+
+        $purchases = $query->paginate(10);
+
+        $products = $purchases->map(function ($purchase) {
+            return $purchase->product;
+        });
+
+        return view('suppliers.show', compact('supplier', 'products', 'purchases'));
     }
 
     public function edit($id)
@@ -83,14 +98,29 @@ class SupplierController extends Controller
         $supplier = Supplier::findOrFail($id);
         $supplier->update($validated);
 
-        return redirect()->route('suppliers.index')->with('success', 'تم تحديث بيانات المورد بنجاح');
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('suppliers.supplier_updated_successfully'),
+                'supplier' => $supplier,
+            ], 200);
+        }
+
+        return redirect()->route('suppliers.index')->with('success', __('suppliers.supplier_updated_successfully'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $supplier = Supplier::findOrFail($id);
         $supplier->delete();
 
-        return redirect()->route('suppliers.index')->with('success', 'تم حذف المورد بنجاح');
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('suppliers.supplier_deleted_successfully'),
+            ], 200);
+        }
+
+        return redirect()->route('suppliers.index')->with('success', __('suppliers.supplier_deleted_successfully'));
     }
 }

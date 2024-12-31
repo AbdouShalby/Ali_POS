@@ -13,7 +13,7 @@ class BrandController extends Controller
 
         $brands = Brand::when($search, function ($query, $search) {
             return $query->where('name', 'LIKE', "%$search%");
-        })->get();
+        })->paginate(10);
 
         return view('brands.index', compact('brands', 'search'))->with('activePage', 'brands');
     }
@@ -26,16 +26,21 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:brands,name',
+            'description' => 'nullable|string|max:255',
         ]);
 
         $brand = Brand::create($validatedData);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Brand added successfully.',
-            'brand' => $brand,
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('brands.brand_added_successfully'),
+                'brand' => $brand,
+            ]);
+        }
+
+        return redirect()->route('brands.index')->with('success', __('brands.brand_added_successfully'));
     }
 
     public function show($id)
@@ -60,14 +65,29 @@ class BrandController extends Controller
         $brand = Brand::findOrFail($id);
         $brand->update($validated);
 
-        return redirect()->route('brands.index')->with('success', 'تم تحديث البراند بنجاح');
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('brands.brand_updated_successfully'),
+                'brand' => $brand,
+            ]);
+        }
+
+        return redirect()->route('brands.index')->with('success', __('brands.brand_updated_successfully'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $brand = Brand::findOrFail($id);
         $brand->delete();
 
-        return redirect()->route('brands.index')->with('success', 'تم حذف البراند بنجاح');
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('brands.brand_deleted_successfully'),
+            ]);
+        }
+
+        return redirect()->route('brands.index')->with('success', __('brands.brand_deleted_successfully'));
     }
 }

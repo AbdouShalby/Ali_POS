@@ -26,6 +26,8 @@ Auth::routes();
 Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home')->middleware(['auth', 'role:Admin']);
 
+    Route::get('warehouses/{warehouse}/products', [WarehouseController::class, 'getProducts']);
+
     Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 
     Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');

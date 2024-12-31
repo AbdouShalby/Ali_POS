@@ -1,25 +1,135 @@
 @extends('layouts.app')
 
-@section('title', '- ' . __('Supplier Details'))
+@section('title', '- ' . __('suppliers.supplier_details'))
 
 @section('content')
-    <div class="container">
-        <h1 class="mb-4">تفاصيل المورد</h1>
-        <div class="card">
-            <div class="card-header">
-                {{ $supplier->name }}
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    {{ __('suppliers.supplier_details') }}
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('suppliers.dashboard') }}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('suppliers.index') }}" class="text-muted text-hover-primary">{{ __('suppliers.all_suppliers') }}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">{{ $supplier->name }}</li>
+                </ul>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">معلومات الاتصال</h5>
-                <p class="card-text"><strong>البريد الإلكتروني:</strong> {{ $supplier->email ?? 'غير متوفر' }}</p>
-                <p class="card-text"><strong>رقم الهاتف:</strong> {{ $supplier->phone ?? 'غير متوفر' }}</p>
-                <p class="card-text"><strong>العنوان:</strong> {{ $supplier->address ?? 'غير متوفر' }}</p>
-                <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-warning mt-3">
-                    <i class="bi bi-pencil-square"></i> تعديل
-                </a>
-                <a href="{{ route('suppliers.index') }}" class="btn btn-secondary mt-3">
-                    <i class="bi bi-arrow-left"></i> العودة إلى القائمة
-                </a>
+        </div>
+    </div>
+
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <a href="{{ route('suppliers.index') }}" class="btn btn-secondary me-3">
+                        <i class="bi bi-arrow-left"></i> {{ __('suppliers.back_to_list') }}
+                    </a>
+                    <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> {{ __('suppliers.edit_supplier') }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="card mt-5">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2>{{ $supplier->name }}</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <i class="bi bi-envelope-fill text-primary me-3 fs-4"></i>
+                                <span><strong>{{ __('suppliers.email') }}:</strong> {{ $supplier->email ?? __('suppliers.not_available') }}</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <i class="bi bi-telephone-fill text-success me-3 fs-4"></i>
+                                <span><strong>{{ __('suppliers.phone') }}:</strong> {{ $supplier->phone ?? __('suppliers.not_available') }}</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <i class="bi bi-geo-alt-fill text-danger me-3 fs-4"></i>
+                                <span><strong>{{ __('suppliers.address') }}:</strong> {{ $supplier->address ?? __('suppliers.not_available') }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                <i class="bi bi-card-text text-warning me-3 fs-4"></i>
+                                <span><strong>{{ __('suppliers.notes') }}:</strong> {{ $supplier->notes ?? __('suppliers.not_available') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2>{{ __('suppliers.supplier_products') }}</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{{ route('suppliers.show', $supplier->id) }}" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" name="search" class="form-control" placeholder="{{ __('suppliers.search_by_name') }}" value="{{ request('search') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" name="from" class="form-control" value="{{ request('from') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" name="to" class="form-control" value="{{ request('to') }}">
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <button type="submit" class="btn btn-primary">{{ __('suppliers.filter') }}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead>
+                            <tr>
+                                <th>{{ __('products.name') }}</th>
+                                <th>{{ __('products.quantity') }}</th>
+                                <th>{{ __('products.price') }}</th>
+                                <th>{{ __('products.actions') }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @forelse($products as $product)
+                                <tr>
+                                    <td>{{ $product->name }}</td>
+                                    <td>{{ $product->quantity }}</td>
+                                    <td>{{ number_format($product->price, 2) }}</td>
+                                    <td>
+                                        <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> {{ __('products.view') }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">{{ __('suppliers.no_products_found') }}</td>
+                                </tr>
+                            @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{ $purchases->links() }}
+                </div>
             </div>
         </div>
     </div>

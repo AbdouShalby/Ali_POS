@@ -21,7 +21,7 @@ class CustomerController extends Controller
             return $query->where('name', 'LIKE', "%$search%")
                 ->orWhere('email', 'LIKE', "%$search%")
                 ->orWhere('phone', 'LIKE', "%$search%");
-        })->get();
+        })->paginate(10);
 
         return view('customers.index', compact('customers', 'search'))->with('activePage', 'customers');
     }
@@ -43,24 +43,34 @@ class CustomerController extends Controller
 
         $customer = Customer::create($validated);
 
-        if ($customer) {
+        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => __('تم إضافة العميل بنجاح'), // استخدام الترجمة
-                'customer' => $customer, // إرسال بيانات العميل الجديد إذا لزم الأمر
-            ], 200, [], JSON_UNESCAPED_UNICODE); // فك الترميز
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => __('فشل في إضافة العميل'),
-            ], 500, [], JSON_UNESCAPED_UNICODE);
+                'message' => __('customers.customer_added_successfully'),
+                'customer' => $customer,
+            ], 200, [], JSON_UNESCAPED_UNICODE);
         }
+
+        return redirect()->route('customers.index')->with('success', __('customers.customer_added_successfully'));
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $customer = Customer::findOrFail($id);
-        return view('customers.show', compact('customer'))->with('activePage', 'customers');
+
+        $salesQuery = $customer->sales();
+
+        if ($request->filled('search')) {
+            $salesQuery->where('product_name', 'LIKE', "%{$request->search}%");
+        }
+
+        if ($request->filled('from') && $request->filled('to')) {
+            $salesQuery->whereBetween('created_at', [$request->from, $request->to]);
+        }
+
+        $sales = $salesQuery->paginate(10);
+
+        return view('customers.show', compact('customer', 'sales'))->with('activePage', 'customers');
     }
 
     public function edit($id)
@@ -82,14 +92,29 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
         $customer->update($validated);
 
-        return redirect()->route('customers.index')->with('success', 'تم تحديث بيانات العميل بنجاح');
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('customers.customer_updated_successfully'),
+                'customer' => $customer,
+            ], 200, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        return redirect()->route('customers.index')->with('success', __('customers.customer_updated_successfully'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $customer = Customer::findOrFail($id);
         $customer->delete();
 
-        return redirect()->route('customers.index')->with('success', 'تم حذف العميل بنجاح');
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('customers.customer_deleted_successfully'),
+            ], 200, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        return redirect()->route('customers.index')->with('success', __('customers.customer_deleted_successfully'));
     }
 }
