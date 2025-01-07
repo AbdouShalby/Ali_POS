@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'transactions_today' => 'Today\'s Cash Register Transactions',
+    'dashboard' => 'Dashboard',
+    'search_placeholder' => 'Search transactions...',
+    'search' => 'Search',
+    'transactions_list' => 'Transactions List',
+    'transaction_type' => 'Transaction Type',
+    'amount' => 'Amount',
+    'balance' => 'Balance',
+    'description' => 'Description',
+    'date' => 'Date',
+    'Daily Report' => 'Daily Report',
+    'Daily Report for :date' => 'Daily Report for :date',
+    'Dashboard' => 'Dashboard',
+    'Report Summary' => 'Report Summary',
+    'Total Income' => 'Total Income',
+    'Total Expenses' => 'Total Expenses',
+    'Ending Balance' => 'Ending Balance',
+    'Transactions List' => 'Transactions List',
+    'Date' => 'Date',
+    'Transaction Type' => 'Transaction Type',
+    'Amount' => 'Amount',
+    'Balance' => 'Balance',
+    'Description' => 'Description',
+    'No transactions found' => 'No transactions found',
+];

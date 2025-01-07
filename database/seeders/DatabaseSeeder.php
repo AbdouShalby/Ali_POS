@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ProductsTableSeeder::class,
             MobileDetailsTableSeeder::class,
             UsersTableSeeder::class,
+            CashRegisterSeeder::class,
         ]);
     }
 }

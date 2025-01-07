@@ -38,4 +38,9 @@ return [
     'Phones Details' => 'Phones Details',
     'All Phones' => 'All Phones',
     'Create Phone' => 'Create Phone',
+    'cash_register' => 'Cash Register',
+    'cash_register_overview' => 'Overview',
+    'cash_register_log' => 'Log',
+    'cash_register_reports' => 'Reports',
+    'cash_register_charts' => 'Charts',
 ];

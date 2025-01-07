@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CryptoGatewayController;
 use App\Http\Controllers\CryptoTransactionController;
@@ -23,73 +24,81 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/test-qr', function () {
-    return \QrCode::size(300)->generate('Test QR Code');
-});
-
 Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home')->middleware(['auth', 'role:Admin']);
 
-    Route::get('warehouses/{warehouse}/products', [WarehouseController::class, 'getProducts']);
+    Route::get('/cash-register', [CashRegisterController::class, 'index'])->name('cash-register.index');
 
-    Route::get('suppliers/{supplier}/debts', [SupplierController::class, 'debts'])->name('suppliers.debts');
+    Route::get('/cash-register/daily/{date}', [CashRegisterController::class, 'dailyDetails'])->name('cash-register.daily');
+
+    Route::get('/cash-register/transaction/{id}', [CashRegisterController::class, 'transactionDetails'])->name('cash-register.transaction');
+
+    Route::get('/cash-register/report', [CashRegisterController::class, 'report'])->name('cash-register.report');
+
+    Route::get('/cash-register/charts', [CashRegisterController::class, 'charts'])->name('cash-register.charts');
+
+    Route::get('/cash-register/log', [CashRegisterController::class, 'log'])->name('cash-register.log');
+
+    Route::get('/warehouses/{warehouse}/products', [WarehouseController::class, 'getProducts']);
+
+    Route::get('/suppliers/{supplier}/debts', [SupplierController::class, 'debts'])->name('suppliers.debts');
 
     Route::get('/debts/{debt}/payments', [SupplierController::class, 'showPaymentsForm'])->name('debt.payments');
 
     Route::post('/debts/{debt}/payments', [SupplierController::class, 'recordPayment'])->name('debt.record_payment');
 
-    Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
+    Route::resource('/suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 
     Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
-    Route::resource('customers', CustomerController::class)->middleware(['auth', 'permission:manage customers']);
+    Route::resource('/customers', CustomerController::class)->middleware(['auth', 'permission:manage customers']);
 
     Route::post('/brands/store', [BrandController::class, 'store'])->name('brands.store');
-    Route::resource('brands', BrandController::class)->middleware(['auth', 'permission:manage brands']);
+    Route::resource('/brands', BrandController::class)->middleware(['auth', 'permission:manage brands']);
 
     Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');
-    Route::resource('categories', CategoryController::class)->middleware(['auth', 'permission:manage categories']);
+    Route::resource('/categories', CategoryController::class)->middleware(['auth', 'permission:manage categories']);
 
     Route::get('/products/generate-barcode', [ProductController::class, 'generateBarcode'])->name('products.generateBarcode');
 
     Route::post('/products/{product}/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
 
-    Route::resource('products', ProductController::class)->middleware(['auth', 'permission:manage products']);
+    Route::resource('/products', ProductController::class)->middleware(['auth', 'permission:manage products']);
 
-    Route::resource('mobiles', MobileController::class)->middleware(['auth', 'permission:manage mobiles']);
+    Route::resource('/mobiles', MobileController::class)->middleware(['auth', 'permission:manage mobiles']);
 
     Route::get('/products-by-category/{categoryId}', [PurchaseController::class, 'getProductsByCategory']);
 
     Route::get('/purchases/history', [PurchaseController::class, 'history'])->name('purchases.history')->middleware(['auth', 'permission:manage purchases']);
-    Route::resource('purchases', PurchaseController::class)->middleware(['auth', 'permission:manage purchases']);
+    Route::resource('/purchases', PurchaseController::class)->middleware(['auth', 'permission:manage purchases']);
 
-    Route::resource('external_purchases', ExternalPurchaseController::class)->middleware(['auth', 'permission:manage external_purchases']);
+    Route::resource('/external_purchases', ExternalPurchaseController::class)->middleware(['auth', 'permission:manage external_purchases']);
 
     Route::get('/sales/history', [SaleController::class, 'history'])->name('sales.history')->middleware(['auth', 'permission:manage sales']);
-    Route::resource('sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
+    Route::resource('/sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
 
-    Route::resource('transactions', TransactionController::class)->middleware(['auth', 'permission:manage accounts']);
+    Route::resource('/transactions', TransactionController::class)->middleware(['auth', 'permission:manage accounts']);
 
-    Route::resource('users', UserController::class)->middleware(['auth', 'permission:manage users']);
+    Route::resource('/users', UserController::class)->middleware(['auth', 'permission:manage users']);
 
     Route::get('/maintenances/{id}/print', [MaintenanceController::class, 'print'])->name('maintenances.print');
-    Route::resource('maintenances', MaintenanceController::class)->middleware(['auth', 'permission:manage maintenances']);
+    Route::resource('/maintenances', MaintenanceController::class)->middleware(['auth', 'permission:manage maintenances']);
 
-    Route::resource('settings', SettingsController::class)->except(['show'])->middleware(['auth', 'permission:manage settings']);
+    Route::resource('/settings', SettingsController::class)->except(['show'])->middleware(['auth', 'permission:manage settings']);
 
-    Route::resource('crypto_gateways', CryptoGatewayController::class)->middleware(['auth', 'permission:manage crypto_gateways']);
+    Route::resource('/crypto_gateways', CryptoGatewayController::class)->middleware(['auth', 'permission:manage crypto_gateways']);
 
     Route::delete('/products/{product}/remove-warehouse/{warehouse}', [ProductController::class, 'removeWarehouse']);
 
-    Route::resource('warehouses', WarehouseController::class)->middleware('permission:manage warehouses');
+    Route::resource('/warehouses', WarehouseController::class)->middleware('permission:manage warehouses');
 
-    Route::get('crypto_transactions', [CryptoTransactionController::class, 'index'])->name('crypto_transactions.index')
+    Route::get('/crypto_transactions', [CryptoTransactionController::class, 'index'])->name('crypto_transactions.index')
         ->middleware(['auth', 'permission:manage crypto_transactions']);
-    Route::get('crypto_transactions/{gatewayId}/transactions/create', [CryptoTransactionController::class, 'create'])->name('crypto_transactions.create')
+    Route::get('/crypto_transactions/{gatewayId}/transactions/create', [CryptoTransactionController::class, 'create'])->name('crypto_transactions.create')
         ->middleware(['auth', 'permission:manage crypto_transactions']);
-    Route::post('crypto_transactions/{gatewayId}/transactions', [CryptoTransactionController::class, 'store'])->name('crypto_transactions.store')
+    Route::post('/crypto_transactions/{gatewayId}/transactions', [CryptoTransactionController::class, 'store'])->name('crypto_transactions.store')
         ->middleware(['auth', 'permission:manage crypto_transactions']);
-    Route::get('crypto_transactions/history', [CryptoTransactionController::class, 'history'])->name('crypto_transactions.history')
+    Route::get('/crypto_transactions/history', [CryptoTransactionController::class, 'history'])->name('crypto_transactions.history')
         ->middleware(['auth', 'permission:manage crypto_transactions']);
 
-    Route::resource('devices', DeviceController::class)->middleware(['auth', 'permission:manage devices']);
+    Route::resource('/devices', DeviceController::class)->middleware(['auth', 'permission:manage devices']);
 });
