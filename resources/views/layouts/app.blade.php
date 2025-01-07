@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{ env('APP_NAME') }} @yield('title')</title>
+    <title>{{ config('app.name') }} @yield('title')</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="{{ env('APP_NAME') }}" />
-    <meta property="og:url" content="{{ env('APP_URL') }}" />
-    <meta property="og:site_name" content="{{ env('APP_NAME') }}" />
+    <meta property="og:title" content="{{ config('app.name') }}" />
+    <meta property="og:url" content="{{ config('app.url') }}" />
+    <meta property="og:site_name" content="{{ config('app.name') }}" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="canonical" href="{{ env('APP_URL') }}" />
+    <link rel="canonical" href="{{ config('app.url') }}" />
     <link rel="shortcut icon" href="{{ asset('media/logos/favicon.ico') }}" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <link href="{{ asset('plugins/custom/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet" type="text/css" />

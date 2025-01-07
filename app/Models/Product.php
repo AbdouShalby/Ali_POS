@@ -23,8 +23,9 @@ class Product extends Model
         'stock_alert',
         'brand_id',
         'category_id',
-        'is_device',
+        'is_mobile',
         'color',
+        'imei',
         'storage',
         'battery_health',
         'ram',
@@ -33,13 +34,14 @@ class Product extends Model
         'condition',
         'device_description',
         'has_box',
-        'customer_type',
+        'client_type',
         'customer_id',
         'supplier_id',
         'payment_method',
         'seller_name',
         'scan_id',
-        'scan_documents'
+        'scan_documents',
+        'qrcode'
     ];
 
     public function category()
@@ -70,5 +72,30 @@ class Product extends Model
     public function warehouses()
     {
         return $this->belongsToMany(Warehouse::class)->withPivot('stock', 'stock_alert')->withTimestamps();
+    }
+
+    public function scopeFilter($query, $filters)
+    {
+        return $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%");
+        })
+            ->when($filters['category'] ?? null, function ($query, $category) {
+                $query->where('category_id', $category);
+            })
+            ->when($filters['brand'] ?? null, function ($query, $brand) {
+                $query->where('brand_id', $brand);
+            })
+            ->when($filters['min_price'] ?? null, function ($query, $minPrice) {
+                $query->where('price', '>=', $minPrice);
+            })
+            ->when($filters['max_price'] ?? null, function ($query, $maxPrice) {
+                $query->where('price', '<=', $maxPrice);
+            })
+            ->when($filters['barcode'] ?? null, function ($query, $barcode) {
+                $query->where('barcode', 'like', "%{$barcode}%");
+            })
+            ->when($filters['selling_price'] ?? null, function ($query, $sellingPrice) {
+                $query->where('price', $sellingPrice);
+            });
     }
 }

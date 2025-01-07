@@ -28,4 +28,5 @@ return [
     'brand_deleted_successfully' => 'Brand deleted successfully.',
     'products_in_brand' => 'Products in Brand',
     'no_products_in_brand' => 'No products found in this brand.',
+    'no_description' => 'No description found.',
 ];

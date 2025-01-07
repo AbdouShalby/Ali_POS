@@ -14,7 +14,7 @@ class ExternalPurchaseController extends Controller
 
     public function index()
     {
-        $externalPurchases = ExternalPurchase::all();
+        $externalPurchases = ExternalPurchase::paginate(10);
         return view('external_purchases.index', compact('externalPurchases'))->with('activePage', 'external_purchases');
     }
 

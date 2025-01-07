@@ -25,33 +25,37 @@
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show mb-5" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert alert-success d-flex align-items-center p-5 mb-5">
+                    <i class="bi bi-check-circle-fill fs-2 text-success me-3"></i>
+                    <div>
+                        {{ session('success') }}
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
-            <div class="d-flex justify-content-between align-items-center mb-5">
-                <form action="{{ route('suppliers.index') }}" method="GET" class="d-flex align-items-center w-50">
-                    <input type="text" name="search" class="form-control me-3" placeholder="{{ __('suppliers.search_placeholder') }}" value="{{ request('search') }}">
-                    <button type="submit" class="btn btn-primary d-flex align-items-center">
-                        <i class="bi bi-search me-2"></i> {{ __('suppliers.search') }}
-                    </button>
-                </form>
-                <a href="{{ route('suppliers.create') }}" class="btn btn-primary d-flex align-items-center">
-                    <i class="bi bi-plus-circle me-2"></i> {{ __('suppliers.add_new_supplier') }}
-                </a>
-            </div>
-
             <div class="card card-flush">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                     <h2 class="card-title">{{ __('suppliers.supplier_list') }}</h2>
+                    <div class="card-toolbar">
+                        <form action="{{ route('suppliers.index') }}" method="GET" class="d-flex align-items-center">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="{{ __('suppliers.search_by_name') }}" value="{{ request('search') }}">
+                                <button type="submit" class="btn btn-primary d-flex align-items-center">
+                                    <i class="bi bi-search me-2"></i> {{ __('suppliers.search') }}
+                                </button>
+                            </div>
+                        </form>
+                        <a href="{{ route('suppliers.create') }}" class="btn btn-primary ms-3">
+                            <i class="bi bi-plus-circle"></i> {{ __('suppliers.add_new_supplier') }}
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body py-4">
                     <div class="table-responsive">
                         <table class="table align-middle table-row-dashed fs-6 gy-5">
-                            <thead class="table-light">
-                            <tr>
+                            <thead>
+                            <tr class="text-gray-400 fw-bold fs-7 text-uppercase">
                                 <th>{{ __('suppliers.name') }}</th>
                                 <th>{{ __('suppliers.email') }}</th>
                                 <th>{{ __('suppliers.phone') }}</th>
@@ -59,7 +63,7 @@
                                 <th class="text-center">{{ __('suppliers.actions') }}</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="fw-semibold text-gray-600">
                             @forelse($suppliers as $supplier)
                                 <tr>
                                     <td>{{ $supplier->name }}</td>
@@ -67,16 +71,16 @@
                                     <td>{{ $supplier->phone ?? __('suppliers.not_available') }}</td>
                                     <td>{{ $supplier->address ?? __('suppliers.not_available') }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('suppliers.show', $supplier->id) }}" class="btn btn-sm btn-info me-1">
+                                        <a href="{{ route('suppliers.show', $supplier->id) }}" class="btn btn-info btn-sm mx-1">
                                             <i class="bi bi-eye"></i> {{ __('suppliers.view') }}
                                         </a>
-                                        <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-sm btn-warning me-1">
-                                            <i class="bi bi-pencil-square"></i> {{ __('suppliers.edit') }}
+                                        <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-warning btn-sm mx-1">
+                                            <i class="bi bi-pencil"></i> {{ __('suppliers.edit') }}
                                         </a>
                                         <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('{{ __('suppliers.confirm_delete') }}')">
+                                            <button type="submit" class="btn btn-danger btn-sm mx-1" onclick="return confirm('{{ __('suppliers.confirm_delete') }}')">
                                                 <i class="bi bi-trash"></i> {{ __('suppliers.delete') }}
                                             </button>
                                         </form>

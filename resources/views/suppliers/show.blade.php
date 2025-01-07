@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card mt-5">
                 <div class="card-header">
                     <div class="card-title">
                         <h2>{{ __('suppliers.supplier_products') }}</h2>
@@ -131,6 +131,51 @@
                     {{ $purchases->links() }}
                 </div>
             </div>
+
+            <div class="card mt-5">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2>{{ __('suppliers.debts') }}</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if($debts->isEmpty())
+                        <p class="text-center">{{ __('suppliers.no_debts_found') }}</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped align-middle">
+                                <thead>
+                                <tr>
+                                    <th>{{ __('suppliers.product') }}</th>
+                                    <th>{{ __('suppliers.amount') }}</th>
+                                    <th>{{ __('suppliers.paid') }}</th>
+                                    <th>{{ __('suppliers.remaining') }}</th>
+                                    <th>{{ __('suppliers.date') }}</th>
+                                    <th>{{ __('suppliers.actions') }}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($debts as $debt)
+                                    <tr>
+                                        <td>{{ $debt->product->name ?? __('suppliers.product_not_available') }}</td>
+                                        <td>{{ number_format($debt->amount, 2) }}</td>
+                                        <td>{{ number_format($debt->payments->sum('amount'), 2) }}</td>
+                                        <td>{{ number_format($debt->remainingAmount(), 2) }}</td>
+                                        <td>{{ $debt->created_at->format('Y-m-d') }}</td>
+                                        <td>
+                                            <a href="{{ route('debt.payments', $debt->id) }}" class="btn btn-primary btn-sm">
+                                                {{ __('Record Payment') }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
         </div>
     </div>
 @endsection

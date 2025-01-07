@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Debt;
 use Illuminate\Http\Request;
 use App\Models\Supplier;
 
@@ -76,7 +77,9 @@ class SupplierController extends Controller
             return $purchase->product;
         });
 
-        return view('suppliers.show', compact('supplier', 'products', 'purchases'));
+        $debts = $supplier->debts()->with('product')->latest()->get();
+
+        return view('suppliers.show', compact('supplier', 'products', 'purchases', 'debts'));
     }
 
     public function edit($id)
@@ -123,4 +126,33 @@ class SupplierController extends Controller
 
         return redirect()->route('suppliers.index')->with('success', __('suppliers.supplier_deleted_successfully'));
     }
+
+    public function debts(Supplier $supplier)
+    {
+        $debts = $supplier->debts;
+
+        return view('suppliers.debts', compact('supplier', 'debts'));
+    }
+
+    public function showPaymentsForm(Debt $debt)
+    {
+        return view('suppliers.payments', compact('debt'));
+    }
+
+    public function recordPayment(Request $request, Debt $debt)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1|max:' . $debt->remainingAmount(),
+            'note' => 'nullable|string|max:255',
+        ]);
+
+        $debt->payments()->create([
+            'amount' => $request->amount,
+            'note' => $request->note,
+        ]);
+
+        return redirect()->route('suppliers.show', $debt->supplier_id)
+            ->with('success', 'Payment recorded successfully.');
+    }
+
 }

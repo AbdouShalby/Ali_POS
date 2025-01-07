@@ -3,6 +3,7 @@
 @section('title', '- ' . __('customers.customer_details'))
 
 @section('content')
+    <!-- Toolbar -->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
@@ -28,65 +29,72 @@
         </div>
     </div>
 
+    <!-- Content -->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-            <div class="card card-flush">
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end mb-5">
+                <a href="{{ route('customers.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> {{ __('customers.back_to_list') }}
+                </a>
+                <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-warning ms-3">
+                    <i class="bi bi-pencil-square me-1"></i> {{ __('customers.edit_customer') }}
+                </a>
+            </div>
+
+            <!-- Customer Details -->
+            <div class="card card-flush py-4">
                 <div class="card-header">
-                    <h2>{{ __('customers.customer_information') }}</h2>
-                </div>
-                <div class="card-body row pt-0">
-                    <div class="mb-10 col-md-6">
-                        <label class="form-label fw-bold">{{ __('customers.name') }}:</label>
-                        <p class="form-control-plaintext">{{ $customer->name }}</p>
-                    </div>
-                    <div class="mb-10 col-md-6">
-                        <label class="form-label fw-bold">{{ __('customers.email') }}:</label>
-                        <p class="form-control-plaintext">{{ $customer->email ?? __('customers.not_available') }}</p>
-                    </div>
-                    <div class="mb-10 col-md-6">
-                        <label class="form-label fw-bold">{{ __('customers.phone') }}:</label>
-                        <p class="form-control-plaintext">{{ $customer->phone ?? __('customers.not_available') }}</p>
-                    </div>
-                    <div class="mb-10 col-md-6">
-                        <label class="form-label fw-bold">{{ __('customers.address') }}:</label>
-                        <p class="form-control-plaintext">{{ $customer->address ?? __('customers.not_available') }}</p>
-                    </div>
-                    <div class="mb-10 col-md-12">
-                        <label class="form-label fw-bold">{{ __('customers.notes') }}:</label>
-                        <p class="form-control-plaintext">{{ $customer->notes ?? __('customers.not_available') }}</p>
+                    <div class="card-title">
+                        <h2 class="fs-3 fw-bold text-primary">{{ $customer->name }}</h2>
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-end">
-                    <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-warning me-3">
-                        <i class="bi bi-pencil-square"></i> {{ __('customers.edit') }}
-                    </a>
-                    <a href="{{ route('customers.index') }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> {{ __('customers.back_to_list') }}
-                    </a>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fw-bold">{{ __('customers.email') }}:</label>
+                            <p class="form-control-plaintext">{{ $customer->email ?? __('customers.not_available') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fw-bold">{{ __('customers.phone') }}:</label>
+                            <p class="form-control-plaintext">{{ $customer->phone ?? __('customers.not_available') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fw-bold">{{ __('customers.address') }}:</label>
+                            <p class="form-control-plaintext">{{ $customer->address ?? __('customers.not_available') }}</p>
+                        </div>
+                        <div class="col-md-12 mb-5">
+                            <label class="form-label fw-bold">{{ __('customers.notes') }}:</label>
+                            <p class="form-control-plaintext">{{ $customer->notes ?? __('customers.not_available') }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card card-flush mt-10">
+            <!-- Customer Purchases -->
+            <div class="card card-flush py-4 mt-5">
                 <div class="card-header">
-                    <h2>{{ __('customers.customer_purchases') }}</h2>
+                    <div class="card-title">
+                        <h2>{{ __('customers.customer_purchases') }}</h2>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if($customer->sales->isEmpty())
-                        <div class="alert alert-warning text-center">
+                        <div class="alert alert-warning text-center mb-0">
                             {{ __('customers.no_purchases') }}
                         </div>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                            <table class="table align-middle table-row-dashed fs-6 gy-5">
                                 <thead>
-                                <tr>
+                                <tr class="text-gray-400 fw-bold fs-7 text-uppercase">
                                     <th>{{ __('customers.product_name') }}</th>
                                     <th>{{ __('customers.quantity') }}</th>
                                     <th>{{ __('customers.total_price') }}</th>
                                     <th>{{ __('customers.purchase_date') }}</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="fw-semibold text-gray-600">
                                 @foreach($customer->sales as $sale)
                                     <tr>
                                         <td>{{ $sale->product->name }}</td>

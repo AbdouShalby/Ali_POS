@@ -25,61 +25,62 @@
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert alert-success d-flex align-items-center p-5 mb-5">
+                    <i class="bi bi-check-circle-fill fs-2 text-success me-3"></i>
+                    <div>
+                        {{ session('success') }}
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
-            <div class="d-flex justify-content-between align-items-center mb-5">
-                <form action="{{ route('customers.index') }}" method="GET" class="d-flex align-items-center w-50">
-                    <input type="text" name="search" class="form-control me-3"
-                           placeholder="{{ __('customers.search_placeholder') }}"
-                           value="{{ request('search') }}">
-                    <button type="submit" class="btn btn-primary">{{ __('customers.search') }}</button>
-                </form>
-                <a href="{{ route('customers.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> {{ __('customers.add_new_customer') }}
-                </a>
-            </div>
-
             <div class="card card-flush">
-                <div class="card-header">
-                    <h2>{{ __('customers.customer_list') }}</h2>
+                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                    <h2 class="card-title">{{ __('customers.customer_list') }}</h2>
+                    <div class="card-toolbar">
+                        <form action="{{ route('customers.index') }}" method="GET" class="d-flex align-items-center">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="{{ __('customers.search_by_name') }}" value="{{ request('search') }}">
+                                <button type="submit" class="btn btn-primary d-flex align-items-center">
+                                    <i class="bi bi-search me-2"></i> {{ __('customers.search') }}
+                                </button>
+                            </div>
+                        </form>
+                        <a href="{{ route('customers.create') }}" class="btn btn-primary ms-3">
+                            <i class="bi bi-plus-circle"></i> {{ __('customers.add_new_customer') }}
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body py-4">
                     <div class="table-responsive">
                         <table class="table align-middle table-row-dashed fs-6 gy-5">
                             <thead>
-                            <tr>
+                            <tr class="text-gray-400 fw-bold fs-7 text-uppercase">
                                 <th>{{ __('customers.name') }}</th>
                                 <th>{{ __('customers.email') }}</th>
                                 <th>{{ __('customers.phone') }}</th>
                                 <th>{{ __('customers.address') }}</th>
-                                <th class="text-end">{{ __('customers.actions') }}</th>
+                                <th class="text-center">{{ __('customers.actions') }}</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="fw-semibold text-gray-600">
                             @forelse($customers as $customer)
                                 <tr>
                                     <td>{{ $customer->name }}</td>
                                     <td>{{ $customer->email ?? __('customers.not_available') }}</td>
                                     <td>{{ $customer->phone ?? __('customers.not_available') }}</td>
                                     <td>{{ $customer->address ?? __('customers.not_available') }}</td>
-                                    <td class="text-end">
-                                        <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-sm btn-info">
+                                    <td class="text-center">
+                                        <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-info btn-sm mx-1">
                                             <i class="bi bi-eye"></i> {{ __('customers.view') }}
                                         </a>
-                                        <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-sm btn-warning">
-                                            <i class="bi bi-pencil-square"></i> {{ __('customers.edit') }}
+                                        <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-warning btn-sm mx-1">
+                                            <i class="bi bi-pencil"></i> {{ __('customers.edit') }}
                                         </a>
-                                        <form action="{{ route('customers.destroy', $customer->id) }}"
-                                              method="POST"
-                                              class="d-inline">
+                                        <form action="{{ route('customers.destroy', $customer->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger"
-                                                    onclick="return confirm('{{ __('customers.confirm_delete') }}')">
+                                            <button type="submit" class="btn btn-danger btn-sm mx-1" onclick="return confirm('{{ __('customers.confirm_delete') }}')">
                                                 <i class="bi bi-trash"></i> {{ __('customers.delete') }}
                                             </button>
                                         </form>
@@ -93,7 +94,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $customers->links() }}
+                    <div class="d-flex justify-content-end mt-4">
+                        {{ $customers->links() }}
+                    </div>
                 </div>
             </div>
         </div>

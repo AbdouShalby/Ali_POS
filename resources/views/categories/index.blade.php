@@ -26,11 +26,9 @@
         <div id="kt_app_content_container" class="app-container container-xxl">
             @if(session('success'))
                 <div class="alert alert-success d-flex align-items-center p-5 mb-5">
-                    <span class="svg-icon svg-icon-2hx svg-icon-success me-3">
-                        <i class="bi bi-check-circle-fill fs-2"></i>
-                    </span>
-                    <div class="d-flex flex-column">
-                        <span>{{ session('success') }}</span>
+                    <i class="bi bi-check-circle-fill fs-2 text-success me-3"></i>
+                    <div>
+                        {{ session('success') }}
                     </div>
                     <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -41,12 +39,12 @@
                     <h2 class="card-title">{{ __('categories.category_list') }}</h2>
                     <div class="card-toolbar">
                         <form action="{{ route('categories.index') }}" method="GET" class="d-flex align-items-center">
-                            <div class="input-group me-3">
+                            <div class="input-group">
                                 <input type="text" name="search" class="form-control" placeholder="{{ __('categories.search_by_name') }}" value="{{ request('search') }}">
+                                <button type="submit" class="btn btn-primary d-flex align-items-center">
+                                    <i class="bi bi-search me-2"></i> {{ __('categories.search') }}
+                                </button>
                             </div>
-                            <button type="submit" class="btn btn-primary">
-                                {{ __('categories.search') }}
-                            </button>
                         </form>
                         <a href="{{ route('categories.create') }}" class="btn btn-primary ms-3">
                             <i class="bi bi-plus-circle"></i> {{ __('categories.add_new_category') }}

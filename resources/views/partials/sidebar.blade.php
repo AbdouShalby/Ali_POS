@@ -1,7 +1,7 @@
 <div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
     <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
         <a class="fs-1 fw-bold m-auto text-danger" href="{{ route('home') }}">
-            {{ env('APP_NAME') }}
+            {{ config('app.name') }}
         </a>
     </div>
     <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
@@ -127,70 +127,6 @@
                     </div>
 
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link {{ isset($activePage) && ($activePage == 'sales' || $activePage == 'sales.create' || $activePage == 'sales.history') ? 'active' : '' }}">
-                            <span class="menu-icon">
-                                <i class="ki-solid ki-cheque fs-1 text-primary"></i>
-                            </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'sales' || $activePage == 'sales.create' || $activePage == 'sales.history') ? 'text-primary' : '' }}">{{ __('sidebar.Sales') }}</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <div class="menu-sub menu-sub-accordion">
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'sales' ? 'active' : '' }}" href="{{ route('sales.index') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'sales' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales' ? 'text-primary' : '' }}">{{ __('sidebar.All Sales') }}</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'sales.create' ? 'active' : '' }}" href="{{ route('sales.create') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'sales.create' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'sales.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Sale') }}</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link {{ isset($activePage) && ($activePage == 'purchases' || $activePage == 'purchases.create' || $activePage == 'purchases.history') ? 'active' : '' }}">
-                            <span class="menu-icon">
-                                <i class="ki-solid ki-handcart fs-1 text-primary"></i>
-                            </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'purchases' || $activePage == 'purchases.create' || $activePage == 'purchases.history') ? 'text-primary' : '' }}">{{ __('sidebar.Purchases') }}</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <div class="menu-sub menu-sub-accordion">
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'purchases' ? 'active' : '' }}" href="{{ route('purchases.index') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'purchases' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases' ? 'text-primary' : '' }}">{{ __('sidebar.All Purchases') }}</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'purchases.create' ? 'active' : '' }}" href="{{ route('purchases.create') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'purchases.create' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Purchase') }}</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'purchases.history' ? 'active' : '' }}" href="{{ route('purchases.history') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'purchases.history' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'purchases.history' ? 'text-primary' : '' }}">{{ __('sidebar.Purchase History') }}</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                         <span class="menu-link {{ isset($activePage) && ($activePage == 'external_purchases' || $activePage == 'external_purchases.create') ? 'active' : '' }}">
                             <span class="menu-icon">
                                 <i class="ki-solid ki-handcart fs-1 text-primary"></i>
@@ -305,34 +241,6 @@
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'maintenances.create' ? 'bg-primary' : '' }}"></span>
                                     </span>
                                     <span class="menu-title {{ isset($activePage) && $activePage == 'maintenances.create' ? 'text-primary' : '' }}">{{ __("Maintenance Create") }}</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link {{ isset($activePage) && ($activePage == 'devices' || $activePage == 'devices.create') ? 'active' : '' }}">
-                            <span class="menu-icon">
-                                <i class="ki-solid ki-phone fs-1 text-primary"></i>
-                            </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'devices' || $activePage == 'devices.create') ? 'text-primary' : '' }}">{{ __('sidebar.Phones Details') }}</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <div class="menu-sub menu-sub-accordion">
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'devices' ? 'active' : '' }}" href="{{ route('devices.index') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'devices' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'devices' ? 'text-primary' : '' }}">{{ __('sidebar.All Phones') }}</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'devices.create' ? 'active' : '' }}" href="{{ route('devices.create') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'devices.create' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'devices.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create Phone') }}</span>
                                 </a>
                             </div>
                         </div>

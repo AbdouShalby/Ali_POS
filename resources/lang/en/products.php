@@ -80,6 +80,7 @@ return [
     'ram' => 'RAM',
     'cpu' => 'CPU',
     'gpu' => 'GPU',
+    'imei' => 'IMEI',
     'condition' => 'Condition',
     'with_box' => 'With Box',
     'device_description' => 'Device Description',
@@ -143,4 +144,10 @@ return [
     'warehouse_details' => 'Warehouse Details',
     'warehouse_name' => 'Warehouse Name',
     'quantity' => 'Quantity',
+    'product_qrcode' => 'Product QR Code',
+    'no_image_uploaded' => 'No Image Uploaded',
+    'deleteImage' => 'Delete Image',
+    'confirm_delete_image' => 'Confirm Delete Image',
+    'image_deleted_successfully' => 'Image deleted successfully.',
+    'error_deleting_image' => 'Error Deleting Image.',
 ];

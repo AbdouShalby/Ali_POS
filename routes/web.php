@@ -23,10 +23,20 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+Route::get('/test-qr', function () {
+    return \QrCode::size(300)->generate('Test QR Code');
+});
+
 Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home')->middleware(['auth', 'role:Admin']);
 
     Route::get('warehouses/{warehouse}/products', [WarehouseController::class, 'getProducts']);
+
+    Route::get('suppliers/{supplier}/debts', [SupplierController::class, 'debts'])->name('suppliers.debts');
+
+    Route::get('/debts/{debt}/payments', [SupplierController::class, 'showPaymentsForm'])->name('debt.payments');
+
+    Route::post('/debts/{debt}/payments', [SupplierController::class, 'recordPayment'])->name('debt.record_payment');
 
     Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 
@@ -40,6 +50,8 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::resource('categories', CategoryController::class)->middleware(['auth', 'permission:manage categories']);
 
     Route::get('/products/generate-barcode', [ProductController::class, 'generateBarcode'])->name('products.generateBarcode');
+
+    Route::post('/products/{product}/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
 
     Route::resource('products', ProductController::class)->middleware(['auth', 'permission:manage products']);
 
@@ -65,6 +77,8 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::resource('settings', SettingsController::class)->except(['show'])->middleware(['auth', 'permission:manage settings']);
 
     Route::resource('crypto_gateways', CryptoGatewayController::class)->middleware(['auth', 'permission:manage crypto_gateways']);
+
+    Route::delete('/products/{product}/remove-warehouse/{warehouse}', [ProductController::class, 'removeWarehouse']);
 
     Route::resource('warehouses', WarehouseController::class)->middleware('permission:manage warehouses');
 

@@ -12,6 +12,7 @@ class MobileDetail extends Model
     protected $fillable = [
         'product_id',
         'color',
+        'imei',
         'storage',
         'battery_health',
         'ram',

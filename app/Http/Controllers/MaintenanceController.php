@@ -30,7 +30,7 @@ class MaintenanceController extends Controller
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('maintenances.index', compact('maintenances', 'status', 'search'))->with('activePage', 'maintenances');
     }

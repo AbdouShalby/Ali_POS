@@ -13,6 +13,7 @@ class CreateMobileDetailsTable extends Migration
             $table->unsignedBigInteger('product_id')->unique();
 
             $table->string('color')->nullable();
+            $table->string('imei')->nullable();
             $table->string('storage')->nullable();
             $table->decimal('battery_health', 5, 2)->nullable();
             $table->string('ram')->nullable();

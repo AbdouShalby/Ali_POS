@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Debt;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Warehouse;
@@ -10,10 +11,8 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Picqer\Barcode\BarcodeGeneratorHTML;
-use Picqer\Barcode\BarcodeGeneratorPNG;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ProductController extends Controller
 {
@@ -25,52 +24,27 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->get('search');
-        $category = $request->get('category');
-        $brand = $request->get('brand');
-        $minPrice = $request->get('min_price');
-        $maxPrice = $request->get('max_price');
-        $barcode = $request->get('barcode');
-        $sellingPrice = $request->get('selling_price');
+        $products = Product::filter($request->only([
+            'search', 'category', 'brand', 'min_price', 'max_price', 'barcode', 'selling_price'
+        ]))->orderBy('created_at', 'desc')->paginate(10);
 
-        $products = Product::when($search, function ($query, $search) {
-            return $query->where('name', 'like', '%' . $search . '%');
-        })
-            ->when($barcode, function ($query, $barcode) {
-                return $query->where('barcode', 'like', '%' . $barcode . '%');
-            })
-            ->when($category, function ($query, $category) {
-                return $query->where('category_id', $category);
-            })
-            ->when($brand, function ($query, $brand) {
-                return $query->where('brand_id', $brand);
-            })
-            ->when($minPrice, function ($query, $minPrice) {
-                return $query->where('price', '>=', $minPrice);
-            })
-            ->when($maxPrice, function ($query, $maxPrice) {
-                return $query->where('price', '<=', $maxPrice);
-            })
-            ->when($sellingPrice, function ($query, $sellingPrice) {
-                return $query->where('price', $sellingPrice);
-            })
-            ->orderBy('created_at', 'desc')->paginate(10);
-
-        $categories = Category::all();
-        $brands = Brand::all();
-        return view('products.index', compact('products', 'categories', 'brands', 'search', 'category', 'brand', 'minPrice', 'maxPrice', 'barcode', 'sellingPrice'))
-            ->with('activePage', 'products');
+        return view('products.index', [
+            'products' => $products,
+            'categories' => Category::all(),
+            'brands' => Brand::all(),
+            'search' => $request->get('search'),
+        ])->with('activePage', 'products');
     }
-
 
     public function create()
     {
-        $categories = Category::all();
-        $brands = Brand::all();
-        $suppliers = Supplier::all();
-        $customers = Customer::all();
-        $warehouses = Warehouse::all();
-        return view('products.create', compact('categories', 'brands', 'suppliers', 'customers', 'warehouses'))->with('activePage', 'products.create');
+        return view('products.create', [
+            'categories' => Category::all(),
+            'brands' => Brand::all(),
+            'suppliers' => Supplier::all(),
+            'customers' => Customer::all(),
+            'warehouses' => Warehouse::all()
+        ])->with('activePage', 'products.create');
     }
 
     public function store(Request $request)
@@ -79,10 +53,50 @@ class ProductController extends Controller
             'is_mobile' => $request->has('is_mobile') ? true : false,
         ]);
 
-        // Validation rules
+        $validated = $this->validateProduct($request);
+
+        $files = $this->storeFiles($request);
+
+        $productData = array_merge($validated, $files, [
+            'client_type' => $request->payment_method === 'credit' ? 'supplier' : $request->client_type,
+            'customer_id' => $request->payment_method === 'credit' ? null : ($request->client_type === 'customer' ? $request->customer_id : null),
+            'supplier_id' => $request->payment_method === 'credit' ? $request->supplier_id : ($request->client_type === 'supplier' ? $request->supplier_id : null),
+            'payment_method' => $request->payment_method,
+            'seller_name' => $request->seller_name ?? auth()->user()->name,
+        ]);
+
+        $product = Product::create($productData);
+
+        if ($request->payment_method === 'credit') {
+            Debt::create([
+                'supplier_id' => $request->supplier_id,
+                'product_id' => $product->id,
+                'amount' => $request->price,
+                'note' => 'Debt created for product: ' . $product->name,
+            ]);
+        }
+
+        $this->attachWarehouses($product, $validated['warehouses']);
+
+        if ($request->is_mobile) {
+            $this->storeMobileDetails($product, $request);
+        }
+
+        $this->generateQRCode($product);
+
+        return redirect()->route('products.index')->with('success', __('The Product Has Been Added Successfully.'));
+    }
+
+    protected function validateProduct($request, $product = null)
+    {
         $rules = [
             'name' => 'required|string|max:255',
-            'barcode' => 'required|string|max:255|unique:products,barcode',
+            'barcode' => [
+                'required',
+                'string',
+                'max:255',
+                $product ? 'unique:products,barcode,' . $product->id : 'unique:products,barcode',
+            ],
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'warehouses.*.id' => 'required|exists:warehouses,id',
@@ -93,74 +107,59 @@ class ProductController extends Controller
             'wholesale_price' => 'required|numeric',
             'min_sale_price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => 'nullable|string|max:255',
+            'client_type' => 'nullable|in:customer,supplier',
+            'customer_id' => 'nullable|required_if:client_type,customer|exists:customers,id',
+            'supplier_id' => 'nullable|required_if:client_type,supplier|exists:suppliers,id',
+            'payment_method' => 'nullable|string|in:cash,credit',
             'is_mobile' => 'nullable|boolean',
-            'color' => 'nullable|string|max:255',
-            'storage' => 'nullable|string|max:255',
-            'battery_health' => 'nullable|numeric|min:0|max:100',
-            'ram' => 'nullable|string|max:255',
-            'gpu' => 'nullable|string|max:255',
-            'cpu' => 'nullable|string|max:255',
-            'condition' => 'nullable|string|max:255',
-            'device_description' => 'nullable|string',
-            'has_box' => 'nullable|boolean',
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        return $request->validate($rules);
+    }
 
-        if ($validator->fails()) {
-            Log::error('Validation failed:', $validator->errors()->toArray());
-            return redirect()->back()->withErrors($validator)->withInput();
+    protected function storeFiles($request)
+    {
+        return [
+            'image' => $request->hasFile('image') ? $request->file('image')->store('products/images', 'public') : null,
+            'scan_id' => $request->hasFile('scan_id') ? $request->file('scan_id')->store('products/scan_ids', 'public') : null,
+            'scan_documents' => $request->hasFile('scan_documents') ? $request->file('scan_documents')->store('products/scan_documents', 'public') : null,
+        ];
+    }
+
+    protected function attachWarehouses($product, $warehouses)
+    {
+        $currentWarehouseIds = $product->warehouses->pluck('id')->toArray();
+
+        $newWarehouseIds = collect($warehouses)->pluck('id')->toArray();
+
+        $warehousesToDetach = array_diff($currentWarehouseIds, $newWarehouseIds);
+
+        if (!empty($warehousesToDetach)) {
+            $product->warehouses()->detach($warehousesToDetach);
         }
 
-        $validated = $validator->validated();
-
-        Log::info('Validation passed successfully:', $validated);
-
-        // Handle file uploads
-        $imageName = $request->hasFile('image') ? $request->file('image')->store('products/images', 'public') : null;
-        $scanIdName = $request->hasFile('scan_id') ? $request->file('scan_id')->store('products/scan_ids', 'public') : null;
-        $scanDocumentName = $request->hasFile('scan_documents') ? $request->file('scan_documents')->store('products/scan_documents', 'public') : null;
-
-        $barcode = $request->barcode ?: rand(100000000000, 999999999999);
-
-        // Create product
-        $product = Product::create([
-            'name' => $validated['name'],
-            'barcode' => $barcode,
-            'cost' => $validated['cost'],
-            'price' => $validated['price'],
-            'wholesale_price' => $validated['wholesale_price'],
-            'min_sale_price' => $validated['min_sale_price'],
-            'description' => $request->description,
-            'image' => $imageName,
-            'category_id' => $validated['category_id'],
-            'brand_id' => $validated['brand_id'],
-            'client_type' => $request->client_type ?? null,
-            'customer_id' => $request->client_type === 'customer' ? $request->customer_id : null,
-            'supplier_id' => $request->client_type === 'supplier' ? $request->supplier_id : null,
-            'payment_method' => $request->payment_method ?? null,
-            'seller_name' => $request->seller_name ?? auth()->user()->name,
-            'scan_id' => $scanIdName,
-            'scan_documents' => $scanDocumentName,
-            'is_mobile' => $request->is_mobile ? true : false,
-        ]);
-
-        Log::info('Product created successfully:', $product->toArray());
-
-        // Attach warehouses
-        foreach ($validated['warehouses'] as $warehouse) {
-            $product->warehouses()->attach($warehouse['id'], [
-                'stock' => $warehouse['stock'],
-                'stock_alert' => $warehouse['stock_alert'],
-            ]);
+        foreach ($warehouses as $warehouse) {
+            if ($product->warehouses()->where('warehouse_id', $warehouse['id'])->exists()) {
+                $product->warehouses()->updateExistingPivot($warehouse['id'], [
+                    'stock' => $warehouse['stock'],
+                    'stock_alert' => $warehouse['stock_alert'],
+                ]);
+            } else {
+                $product->warehouses()->attach($warehouse['id'], [
+                    'stock' => $warehouse['stock'],
+                    'stock_alert' => $warehouse['stock_alert'],
+                ]);
+            }
         }
+    }
 
-        Log::info('Warehouses attached successfully to product ID:', [$product->id]);
-
-        // Handle mobile details if applicable
-        if ($request->is_mobile) {
-            $mobileDetailsRules = [
+    protected function storeMobileDetails($product, $request)
+    {
+        try {
+            $rules = [
                 'color' => 'nullable|string|max:255',
+                'imei' => 'nullable|string|max:255',
                 'storage' => 'nullable|string|max:255',
                 'battery_health' => 'nullable|numeric|min:0|max:100',
                 'ram' => 'nullable|string|max:255',
@@ -171,132 +170,136 @@ class ProductController extends Controller
                 'has_box' => 'nullable|boolean',
             ];
 
-            $mobileValidator = Validator::make($request->all(), $mobileDetailsRules);
+            $validated = $request->validate($rules);
 
-            if ($mobileValidator->fails()) {
-                Log::error('Mobile details validation failed:', $mobileValidator->errors()->toArray());
-                return redirect()->back()->withErrors($mobileValidator)->withInput();
+            $product->mobileDetail()->updateOrCreate(
+                ['product_id' => $product->id],
+                $validated
+            );
+        } catch (\Exception $e) {
+            dd('Error in storeMobileDetails: ' . $e->getMessage());
+        }
+    }
+
+    protected function generateQRCode($product)
+    {
+        $qrData = $this->prepareQRData($product);
+
+        if (!empty($qrData)) {
+            try {
+                $qrContent = implode("\n", array_map(fn($key, $value) => "$key: $value", array_keys($qrData), $qrData));
+
+                $qrContent = mb_convert_encoding($qrContent, 'UTF-8', 'auto');
+
+                $qrCodePath = public_path('qrcodes');
+                if (!file_exists($qrCodePath)) {
+                    mkdir($qrCodePath, 0755, true);
+                }
+
+                $fileName = 'qrcodes/' . uniqid() . '.png';
+
+                \QrCode::format('png')
+                    ->encoding('UTF-8')
+                    ->size(300)
+                    ->generate($qrContent, public_path($fileName));
+
+                $product->qrcode = $fileName;
+                $product->save();
+
+                \Log::info("QR Code generated and saved to: " . public_path($fileName));
+            } catch (\Exception $e) {
+                \Log::error("Failed to generate QR Code: " . $e->getMessage());
+                throw new \Exception('Failed to generate QR Code. Please check the logs for more details.');
             }
+        } else {
+            \Log::warning("QR Data is empty. Unable to generate QR Code.");
+        }
+    }
 
-            $mobileValidated = $mobileValidator->validated();
+    protected function prepareQRData($product)
+    {
+        $qrData = [];
 
-            $product->mobileDetail()->create($mobileValidated);
+        $fields = [
+            'name' => 'Name',
+            'price' => 'Price',
+        ];
 
-            Log::info('Mobile details added successfully for product ID:', [$product->id]);
+        foreach ($fields as $field => $label) {
+            if ($product->$field) {
+                $qrData[$label] = $product->$field;
+            }
         }
 
-        return redirect()->route('products.index')->with('success', __('The Product Has Been Added Successfully.'));
+        if ($product->is_mobile && $product->mobileDetail) {
+            $mobileDetails = $product->mobileDetail;
+
+            $mobileFields = [
+                'color' => 'Color',
+                'battery_health' => 'Battery Health',
+                'ram' => 'RAM',
+                'cpu' => 'CPU',
+                'gpu' => 'GPU',
+                'condition' => 'Condition',
+                'imei' => 'IMEI',
+            ];
+
+            foreach ($mobileFields as $field => $label) {
+                if ($mobileDetails->$field) {
+                    $qrData[$label] = $field === 'battery_health'
+                        ? $mobileDetails->$field . '%'
+                        : $mobileDetails->$field;
+                }
+            }
+        }
+
+        return $qrData;
     }
 
     public function show(Product $product)
     {
-        $product = Product::with(['category', 'brand', 'mobileDetail', 'warehouses'])->findOrFail($product->id);
-
-        return view('products.show', compact('product'))->with('activePage', 'products');
+        return view('products.show', [
+            'product' => $product->load(['category', 'brand', 'mobileDetail', 'warehouses'])
+        ])->with('activePage', 'products');
     }
 
     public function edit($id)
     {
-        $product = Product::with(['mobileDetail', 'warehouses'])->findOrFail($id);
-        $categories = Category::all();
-        $brands = Brand::all();
-        $suppliers = Supplier::all();
-        $customers = Customer::all();
-        $warehouses = Warehouse::all();
-
-        return view('products.edit', compact('product', 'categories', 'brands', 'suppliers', 'customers', 'warehouses'))
-            ->with('activePage', 'products');
+        return view('products.edit', [
+            'product' => Product::with(['mobileDetail', 'warehouses'])->findOrFail($id),
+            'categories' => Category::all(),
+            'brands' => Brand::all(),
+            'suppliers' => Supplier::all(),
+            'customers' => Customer::all(),
+            'warehouses' => Warehouse::all(),
+        ])->with('activePage', 'products');
     }
 
     public function update(Request $request, Product $product)
     {
-        $request->merge(['is_mobile' => $request->has('is_mobile')]);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'barcode' => "required|string|max:255|unique:products,barcode,{$product->id}",
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
-            'warehouses.*.id' => 'required|exists:warehouses,id',
-            'warehouses.*.stock' => 'required|numeric|min:0',
-            'warehouses.*.stock_alert' => 'required|numeric|min:0',
-            'cost' => 'required|numeric',
-            'price' => 'required|numeric',
-            'wholesale_price' => 'required|numeric',
-            'min_sale_price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'color' => 'nullable|string|max:255',
-            'storage' => 'nullable|string|max:255',
-            'battery_health' => 'nullable|numeric|min:0|max:100',
-            'ram' => 'nullable|string|max:255',
-            'gpu' => 'nullable|string|max:255',
-            'cpu' => 'nullable|string|max:255',
-            'condition' => 'nullable|string|max:255',
-            'device_description' => 'nullable|string',
-            'has_box' => 'nullable|boolean',
-            'client_type' => 'nullable|string|in:customer,supplier',
-            'customer_id' => 'nullable|exists:customers,id',
-            'supplier_id' => 'nullable|exists:suppliers,id',
-            'payment_method' => 'nullable|string|in:cash,credit',
-            'scan_id' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
-            'scan_documents' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        $request->merge([
+            'is_mobile' => $request->has('is_mobile') ? true : false,
         ]);
 
+        $validated = $this->validateProduct($request, $product);
+
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products/images', 'public');
-            $product->image = $imagePath;
+            $product->image = $request->file('image')->store('products/images', 'public');
         }
 
         if ($request->hasFile('scan_id')) {
-            $scanIdPath = $request->file('scan_id')->store('products/scan_ids', 'public');
-            $product->scan_id = $scanIdPath;
+            $product->scan_id = $request->file('scan_id')->store('products/scan_ids', 'public');
         }
 
         if ($request->hasFile('scan_documents')) {
-            $scanDocumentsPath = $request->file('scan_documents')->store('products/scan_documents', 'public');
-            $product->scan_documents = $scanDocumentsPath;
+            $product->scan_documents = $request->file('scan_documents')->store('products/scan_documents', 'public');
         }
 
-        $product->update([
-            'name' => $validated['name'],
-            'barcode' => $validated['barcode'],
-            'category_id' => $validated['category_id'],
-            'brand_id' => $validated['brand_id'],
-            'cost' => $validated['cost'],
-            'price' => $validated['price'],
-            'wholesale_price' => $validated['wholesale_price'],
-            'min_sale_price' => $validated['min_sale_price'],
-            'description' => $request->description,
-            'client_type' => $validated['client_type'] ?? null,
-            'customer_id' => $validated['client_type'] === 'customer' ? $validated['customer_id'] : null,
-            'supplier_id' => $validated['client_type'] === 'supplier' ? $validated['supplier_id'] : null,
-            'payment_method' => $validated['payment_method'] ?? null,
-            'seller_name' => $request->seller_name ?? null,
-        ]);
-
-        $product->warehouses()->detach();
-        foreach ($validated['warehouses'] as $warehouse) {
-            $product->warehouses()->attach($warehouse['id'], [
-                'stock' => $warehouse['stock'],
-                'stock_alert' => $warehouse['stock_alert'],
-            ]);
-        }
+        $product->update($validated);
+        $this->attachWarehouses($product, $validated['warehouses']);
 
         if ($request->is_mobile) {
-            $product->mobileDetail()->updateOrCreate(
-                ['product_id' => $product->id],
-                [
-                    'color' => $validated['color'],
-                    'storage' => $validated['storage'],
-                    'battery_health' => $validated['battery_health'],
-                    'ram' => $validated['ram'],
-                    'gpu' => $validated['gpu'],
-                    'cpu' => $validated['cpu'],
-                    'condition' => $validated['condition'],
-                    'device_description' => $validated['device_description'],
-                    'has_box' => $validated['has_box'] ?? false,
-                ]
-            );
+            $this->storeMobileDetails($product, $request);
         } else {
             $product->mobileDetail()->delete();
         }
@@ -306,9 +309,7 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-        $product->delete();
-
+        Product::findOrFail($id)->delete();
         return redirect()->route('products.index')->with('success', __('The Product Has Been Deleted Successfully.'));
     }
 
@@ -320,4 +321,61 @@ class ProductController extends Controller
 
         return response()->json(['success' => true, 'barcode' => $barcode], 200, ['Content-Type' => 'application/json']);
     }
+
+    public function deleteImage(Request $request, Product $product)
+    {
+        $imageType = $request->input('image_type');
+
+        $imageFields = [
+            'image' => 'image',
+            'scan_id' => 'scan_id',
+            'scan_documents' => 'scan_documents',
+        ];
+
+        if (!array_key_exists($imageType, $imageFields)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid image type.',
+            ]);
+        }
+
+        $column = $imageFields[$imageType];
+
+        if ($product->$column) {
+            Storage::delete($product->$column);
+
+            $product->$column = null;
+            $product->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image deleted successfully.',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Image not found.',
+        ]);
+    }
+
+    public function removeWarehouse($productId, $warehouseId)
+    {
+        $product = Product::findOrFail($productId);
+
+        if ($product->warehouses()->where('warehouse_id', $warehouseId)->exists()) {
+            $product->warehouses()->detach($warehouseId);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('Warehouse removed successfully.'),
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => __('Warehouse not found.'),
+        ]);
+    }
+
 }

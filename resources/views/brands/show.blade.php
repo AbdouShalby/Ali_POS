@@ -3,6 +3,7 @@
 @section('title', '- ' . __('brands.brand_details'))
 
 @section('content')
+    <!-- Toolbar -->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
@@ -28,24 +29,37 @@
         </div>
     </div>
 
+    <!-- Content -->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-            <div class="d-flex justify-content-end">
-                <a href="{{ route('brands.index') }}" class="btn btn-secondary me-5">{{ __('brands.back_to_list') }}</a>
-                <a href="{{ route('brands.edit', $brand->id) }}" class="btn btn-warning me-5">{{ __('brands.edit_brand') }}</a>
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end mb-5">
+                <a href="{{ route('brands.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> {{ __('brands.back_to_list') }}
+                </a>
+                <a href="{{ route('brands.edit', $brand->id) }}" class="btn btn-warning ms-3">
+                    <i class="bi bi-pencil-square me-1"></i> {{ __('brands.edit_brand') }}
+                </a>
             </div>
-            <div class="card mt-5">
+
+            <!-- Brand Details -->
+            <div class="card card-flush py-4">
                 <div class="card-header">
                     <div class="card-title">
-                        <h2>{{ $brand->name }}</h2>
+                        <h2 class="fs-3 fw-bold text-primary">{{ $brand->name }}</h2>
                     </div>
                 </div>
                 <div class="card-body">
-                    <p class="card-text">{{ $brand->description }}</p>
+                    @if($brand->description)
+                        <p class="card-text fs-5 text-gray-700">{{ $brand->description }}</p>
+                    @else
+                        <p class="card-text fs-5 text-gray-500 fst-italic">{{ __('brands.no_description') }}</p>
+                    @endif
                 </div>
             </div>
 
-            <div class="card mt-5">
+            <!-- Products in Brand -->
+            <div class="card card-flush py-4 mt-5">
                 <div class="card-header">
                     <div class="card-title">
                         <h2>{{ __('brands.products_in_brand') }}</h2>
@@ -53,23 +67,25 @@
                 </div>
                 <div class="card-body">
                     @if($brand->products->isEmpty())
-                        <div class="alert alert-warning text-center">{{ __('brands.no_products_in_brand') }}</div>
+                        <div class="alert alert-warning text-center mb-0">
+                            {{ __('brands.no_products_in_brand') }}
+                        </div>
                     @else
                         <div class="table-responsive">
                             <table class="table align-middle table-row-dashed fs-6 gy-5">
                                 <thead>
-                                <tr>
+                                <tr class="text-gray-400 fw-bold fs-7 text-uppercase">
                                     <th>{{ __('products.name') }}</th>
-                                    <th>{{ __('products.actions') }}</th>
+                                    <th class="text-end">{{ __('products.actions') }}</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="fw-semibold text-gray-600">
                                 @foreach($brand->products as $product)
                                     <tr>
                                         <td>{{ $product->name }}</td>
-                                        <td>
-                                            <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-info">
-                                                {{ __('products.view') }}
+                                        <td class="text-end">
+                                            <a href="{{ route('products.show', $product->id) }}" class="btn btn-info btn-sm">
+                                                <i class="bi bi-eye"></i> {{ __('products.view') }}
                                             </a>
                                         </td>
                                     </tr>

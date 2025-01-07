@@ -30,4 +30,5 @@ return [
     'error' => 'Error',
     'products_in_category' => 'Products in Category',
     'no_products_in_category' => 'No products found in this category.',
+    'no_description' => 'No description provided.',
 ];

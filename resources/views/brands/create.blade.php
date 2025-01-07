@@ -3,6 +3,7 @@
 @section('title', '- ' . __('brands.create_brand'))
 
 @section('content')
+    <!-- Toolbar -->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
@@ -28,44 +29,69 @@
         </div>
     </div>
 
+    <!-- Content -->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
+            <!-- Error Alert -->
             @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>{{ __('brands.error') }}</strong>
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert alert-danger d-flex align-items-center p-5 mb-5">
+                    <span class="svg-icon svg-icon-2hx svg-icon-danger me-4">
+                        <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                    </span>
+                    <div>
+                        <h4 class="alert-heading fw-bold">{{ __('brands.error') }}</h4>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
-            <form action="{{ route('brands.store') }}" method="POST" class="form">
-                @csrf
-                <div class="card card-flush py-4">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <h2>{{ __('brands.create_brand') }}</h2>
-                        </div>
-                    </div>
-                    <div class="card-body pt-0">
-                        <div class="mb-10">
-                            <label class="form-label">{{ __('brands.name') }}</label>
-                            <input type="text" class="form-control" name="name" value="{{ old('name') }}" required>
-                        </div>
-                        <div class="mb-10">
-                            <label class="form-label">{{ __('brands.description') }}</label>
-                            <textarea class="form-control" name="description" rows="3">{{ old('description') }}</textarea>
-                        </div>
-                    </div>
+            <!-- Create Form -->
+            <div class="card card-flush py-4">
+                <div class="card-header">
+                    <h2 class="card-title">{{ __('brands.create_brand') }}</h2>
                 </div>
-                <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-primary">{{ __('brands.save') }}</button>
-                    <a href="{{ route('brands.index') }}" class="btn btn-secondary ms-3">{{ __('brands.cancel') }}</a>
+                <div class="card-body">
+                    <form action="{{ route('brands.store') }}" method="POST">
+                        @csrf
+                        <!-- Name Field -->
+                        <div class="mb-10">
+                            <label for="name" class="form-label fw-bold">{{ __('brands.name') }}</label>
+                            <input
+                                type="text"
+                                class="form-control form-control-solid"
+                                id="name"
+                                name="name"
+                                value="{{ old('name') }}"
+                                required>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="mb-10">
+                            <label for="description" class="form-label fw-bold">{{ __('brands.description') }}</label>
+                            <textarea
+                                class="form-control form-control-solid"
+                                id="description"
+                                name="description"
+                                rows="3">{{ old('description') }}</textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-3">
+                                <i class="bi bi-check-circle"></i> {{ __('brands.save') }}
+                            </button>
+                            <a href="{{ route('brands.index') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> {{ __('brands.cancel') }}
+                            </a>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 @endsection

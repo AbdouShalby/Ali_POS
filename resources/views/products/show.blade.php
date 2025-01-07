@@ -67,6 +67,28 @@
                             </div>
                         </div>
                     @endif
+                    @if($product->qrcode)
+                        <div class="card card-flush py-3">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <h2>{{ __('products.product_qrcode') }}</h2>
+                                </div>
+                            </div>
+                            <div class="card-body text-center pt-0">
+                                <div class="d-inline-block mw-150px overflow-hidden text-center" style="border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
+                                    <img id="qrcode-image" src="{{ asset($product->qrcode) }}" alt="QR Code" style="max-width: 100%; height: auto;">
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-icon btn-primary me-2" onclick="downloadQRCode()">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button id="printQRButton" type="button" class="btn btn-icon btn-secondary">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     <div class="card card-flush py-3">
                         <div class="card-header">
                             <div class="card-title">
@@ -246,6 +268,60 @@
                     path: "{{ asset('media/lottie/no-image.json') }}"
                 });
             });
+
+            function downloadQRCode() {
+                const qrImage = document.getElementById('qrcode-image');
+                const link = document.createElement('a');
+                link.href = qrImage.src;
+                link.download = 'qrcode.png';
+                link.click();
+            }
+
+            document.getElementById('printQRButton').addEventListener('click', function () {
+                const qrImage = document.getElementById('qrcode-image');
+
+                if (!qrImage) {
+                    alert("QR Code image not found!");
+                    return;
+                }
+
+                const printWindow = window.open('', '_blank');
+                printWindow.document.open();
+                printWindow.document.write(`
+        <html>
+            <head>
+                <title>Print QR Code</title>
+                <style>
+                    body {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #fff;
+                    }
+                    img {
+                        max-width: 300px;
+                        height: auto;
+                        display: block;
+                        margin: auto;
+                    }
+                </style>
+            </head>
+            <body>
+                <img src="${qrImage.src}" alt="QR Code">
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    };
+                <\/script>
+            </body>
+        </html>
+    `);
+                printWindow.document.close();
+            });
+
         </script>
     @endsection
 @endsection

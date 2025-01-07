@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Maintenance Receipt') }}</title>
+    <title>{{ __('maintenances.maintenance_receipt') }}</title>
     <style>
         /* Basic page settings */
         body {
@@ -91,25 +91,25 @@
     </div>
 
     <!-- Title -->
-    <h1>{{ __('Maintenance Department') }}</h1>
+    <h1>{{ __('maintenances.maintenance_department') }}</h1>
 
     <!-- Maintenance Information -->
     <div class="info-section">
-        <p><span class="info-label">{{ __('Customer Name') }}:</span> {{ $maintenance->customer_name }}</p>
-        <p><span class="info-label">{{ __('Phone Number') }}:</span> {{ $maintenance->phone_number }}</p>
-        <p><span class="info-label">{{ __('Device Type') }}:</span> {{ $maintenance->device_type }}</p>
-        <p><span class="info-label">{{ __('Issue') }}:</span> {{ $maintenance->problem_description }}</p>
-        <p><span class="info-label">{{ __('Cost') }}:</span> {{ $maintenance->cost ?? __('Not specified') }}</p>
-        <p><span class="info-label">{{ __('Password') }}:</span> {{ $maintenance->password ?? __('Not available') }}</p>
-        <p><span class="info-label">{{ __('Maintenance Date') }}:</span> {{ $maintenance->created_at->format('d/m/Y') }}</p>
-        <p><span class="info-label">{{ __('Time') }}:</span> {{ $maintenance->created_at->format('H:i A') }}</p>
+        <p><span class="info-label">{{ __('maintenances.customer_name') }}:</span> {{ $maintenance->customer_name }}</p>
+        <p><span class="info-label">{{ __('maintenances.phone_number') }}:</span> {{ $maintenance->phone_number }}</p>
+        <p><span class="info-label">{{ __('maintenances.device_type') }}:</span> {{ $maintenance->device_type }}</p>
+        <p><span class="info-label">{{ __('maintenances.issue') }}:</span> {{ $maintenance->problem_description }}</p>
+        <p><span class="info-label">{{ __('maintenances.cost') }}:</span> {{ $maintenance->cost ?? __('maintenances.not_specified') }}</p>
+        <p><span class="info-label">{{ __('maintenances.password') }}:</span> {{ $maintenance->password ?? __('maintenances.not_available') }}</p>
+        <p><span class="info-label">{{ __('maintenances.maintenance_date') }}:</span> {{ $maintenance->created_at->format('d/m/Y') }}</p>
+        <p><span class="info-label">{{ __('maintenances.time') }}:</span> {{ $maintenance->created_at->format('H:i A') }}</p>
     </div>
 
     <!-- Footer note -->
     <p class="footer-note">
-        {{ __('After delivering the device to the maintenance department, please follow up within 15 days.') }}
+        {{ __('maintenances.after_delivering_the_device') }}
         <br>
-        {{ __('Maintenance parts warranty is 3 days - Please bring the receipt when collecting.') }}
+        {{ __('maintenances.maintenance_parts_warranty') }}
     </p>
 </div>
 

@@ -35,6 +35,8 @@ class CreateProductsTable extends Migration
             $table->string('seller_name')->nullable();
             $table->string('scan_id')->nullable();
             $table->string('scan_documents')->nullable();
+
+            $table->string('qrcode')->nullable();
             $table->timestamps();
         });
     }

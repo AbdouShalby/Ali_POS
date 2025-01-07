@@ -33,4 +33,7 @@ return [
     'customer_purchases' => 'Customer Purchases',
     'no_purchases' => 'No Purchases',
     'back_to_list' => 'Back to List',
+    'search_by_name' => 'Search by Name',
+    'customer_information' => 'Customer Information',
+    'update' => 'Update',
 ];
