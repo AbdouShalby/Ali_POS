@@ -33,7 +33,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::get('/cash-register/transaction/{id}', [CashRegisterController::class, 'transactionDetails'])->name('cash-register.transaction');
 
-    Route::get('/cash-register/report', [CashRegisterController::class, 'report'])->name('cash-register.report');
+    Route::get('/cash-register/reports', [CashRegisterController::class, 'reports'])->name('cash-register.reports');
 
     Route::get('/cash-register/charts', [CashRegisterController::class, 'charts'])->name('cash-register.charts');
 

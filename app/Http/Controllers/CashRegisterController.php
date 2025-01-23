@@ -49,10 +49,11 @@ class CashRegisterController extends Controller
         return view('cash-register.transaction-details', compact('transaction'))->with('activePage', 'cash_register');
     }
 
-    public function report(Request $request)
+    public function reports(Request $request)
     {
-        $startDate = $request->start_date;
-        $endDate = $request->end_date;
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $type = $request->input('type', 'all');
 
         $query = CashRegister::query();
 
@@ -60,13 +61,19 @@ class CashRegisterController extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
+        if ($type === 'income') {
+            $query->where('amount', '>', 0);
+        } elseif ($type === 'expense') {
+            $query->where('amount', '<', 0);
+        }
+
         $transactions = $query->orderBy('created_at', 'desc')->get();
 
-        $totalIn = $transactions->where('amount', '>', 0)->sum('amount');
-        $totalOut = $transactions->where('amount', '<', 0)->sum('amount');
-        $netTotal = $totalIn + $totalOut;
+        $totalIncome = $transactions->where('amount', '>', 0)->sum('amount');
+        $totalExpense = $transactions->where('amount', '<', 0)->sum('amount');
+        $netTotal = $totalIncome + $totalExpense;
 
-        return view('cash-register.report', compact('transactions', 'totalIn', 'totalOut', 'netTotal', 'startDate', 'endDate'))->with('activePage', 'cash_register_report');
+        return view('cash-register.reports', compact('transactions', 'totalIncome', 'totalExpense', 'netTotal', 'startDate', 'endDate', 'type'))->with('activePage', 'cash_register_reports');
     }
 
     public function charts()

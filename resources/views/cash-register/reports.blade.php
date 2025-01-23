@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', __('Cash Register Report'))
+@section('title', __('Cash Register Reports'))
 
 @section('content')
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                 <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                    {{ __('Cash Register Report') }}
+                    {{ __('Cash Register Reports') }}
                 </h1>
             </div>
         </div>
@@ -15,16 +15,23 @@
 
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-            <!-- Date Filter -->
-            <form action="{{ route('cash-register.report') }}" method="GET" class="mb-5">
+
+            <form action="{{ route('cash-register.reports') }}" method="GET" class="mb-5">
                 <div class="row g-3">
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" placeholder="{{ __('Start Date') }}">
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" placeholder="{{ __('End Date') }}">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
+                        <select name="type" class="form-control">
+                            <option value="all" {{ request('type') === 'all' ? 'selected' : '' }}>{{ __('All Transactions') }}</option>
+                            <option value="income" {{ request('type') === 'income' ? 'selected' : '' }}>{{ __('Income') }}</option>
+                            <option value="expense" {{ request('type') === 'expense' ? 'selected' : '' }}>{{ __('Expenses') }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-search"></i> {{ __('Generate Report') }}
                         </button>
@@ -32,18 +39,17 @@
                 </div>
             </form>
 
-            <!-- Report Summary -->
             <div class="row mb-5">
                 <div class="col-md-4">
                     <div class="bg-light-success p-5 rounded">
                         <h4>{{ __('Total Income') }}</h4>
-                        <p class="fs-4 fw-semibold">{{ number_format($totalIn, 2) }}</p>
+                        <p class="fs-4 fw-semibold">{{ number_format($totalIncome, 2) }}</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="bg-light-danger p-5 rounded">
                         <h4>{{ __('Total Expenses') }}</h4>
-                        <p class="fs-4 fw-semibold">{{ number_format($totalOut, 2) }}</p>
+                        <p class="fs-4 fw-semibold">{{ number_format($totalExpense, 2) }}</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -54,8 +60,10 @@
                 </div>
             </div>
 
-            <!-- Transactions Table -->
             <div class="card card-flush">
+                <div class="card-header">
+                    <h3 class="card-title">{{ __('Transactions Log') }}</h3>
+                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-row-dashed table-hover align-middle gy-5">

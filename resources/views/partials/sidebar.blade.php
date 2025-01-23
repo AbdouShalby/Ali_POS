@@ -247,11 +247,11 @@
                     </div>
 
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link {{ isset($activePage) && in_array($activePage, ['cash_register', 'cash_register_log', 'cash_register_report', 'cash_register_charts']) ? 'active' : '' }}">
+                        <span class="menu-link {{ isset($activePage) && in_array($activePage, ['cash_register', 'cash_register_log', 'cash_register_reports', 'cash_register_charts']) ? 'active' : '' }}">
                             <span class="menu-icon">
                                 <i class="ki-solid ki-bank fs-1 text-primary"></i>
                             </span>
-                            <span class="menu-title {{ isset($activePage) && in_array($activePage, ['cash_register', 'cash_register_log', 'cash_register_report', 'cash_register_charts']) ? 'text-primary' : '' }}">{{ __('sidebar.cash_register') }}</span>
+                            <span class="menu-title {{ isset($activePage) && in_array($activePage, ['cash_register', 'cash_register_log', 'cash_register_reports', 'cash_register_charts']) ? 'text-primary' : '' }}">{{ __('sidebar.cash_register') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -275,11 +275,11 @@
                             </div>
                             <!-- Cash Register Reports -->
                             <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'cash_register_report' ? 'active' : '' }}" href="{{ route('cash-register.report') }}">
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'cash_register_reports' ? 'active' : '' }}" href="{{ route('cash-register.reports') }}">
                                     <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'cash_register_report' ? 'bg-primary' : '' }}"></span>
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'cash_register_reports' ? 'bg-primary' : '' }}"></span>
                                     </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'cash_register_report' ? 'text-primary' : '' }}">{{ __('sidebar.cash_register_reports') }}</span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'cash_register_reports' ? 'text-primary' : '' }}">{{ __('sidebar.cash_register_reports') }}</span>
                                 </a>
                             </div>
                             <!-- Cash Register Charts -->
