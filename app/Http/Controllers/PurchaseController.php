@@ -96,6 +96,9 @@ class PurchaseController extends Controller
         $purchase->total_amount = $totalAmount;
         $purchase->save();
 
+        $cashController = new CashRegisterController();
+        $cashController->updateBalance(auth()->user()->cash_register_id, $validated['total_amount'], 'purchase', 'Purchase transaction');
+
         return redirect()->route('purchases.index')->with('success', 'تم إضافة فاتورة الشراء بنجاح');
     }
 

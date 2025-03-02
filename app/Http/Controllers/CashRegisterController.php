@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashRegister;
+use App\Models\CashTransaction;
 use Illuminate\Http\Request;
 
 class CashRegisterController extends Controller
@@ -92,6 +93,25 @@ class CashRegisterController extends Controller
         $expenses = $data->pluck('total_expense');
 
         return view('cash-register.charts', compact('months', 'income', 'expenses'))->with('activePage', 'cash_register_charts');
+    }
+
+    public function updateBalance($cashRegisterId, $amount, $type, $description = null) {
+        $cashRegister = CashRegister::findOrFail($cashRegisterId);
+
+        if ($type === 'sale' || $type === 'debt_payment') {
+            $cashRegister->balance += $amount;
+        } else {
+            $cashRegister->balance -= $amount;
+        }
+        $cashRegister->save();
+
+        CashTransaction::create([
+            'cash_register_id' => $cashRegister->id,
+            'user_id' => auth()->id(),
+            'transaction_type' => $type,
+            'amount' => $amount,
+            'description' => $description
+        ]);
     }
 
 }

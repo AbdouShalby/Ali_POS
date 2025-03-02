@@ -101,6 +101,9 @@ class SaleController extends Controller
         $sale->total_amount = $totalAmount;
         $sale->save();
 
+        $cashController = new CashRegisterController();
+        $cashController->updateBalance(auth()->user()->cash_register_id, $validated['total_amount'], 'sale', 'Sale transaction');
+
         return redirect()->route('sales.index')->with('success', 'تم إضافة فاتورة البيع بنجاح');
     }
 

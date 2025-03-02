@@ -8,9 +8,9 @@
         <div id="kt_app_content_container" class="app-container container-xxl">
             <div class="row g-5 gx-xl-12 mb-5 mb-xl-12">
                 <div class="col-xxl-12">
-                    <div class="row g-5 my-5 gx-xl-12">
+                    <div class="row g-5 my-5 gx-xl-12 justify-content-center">
                         <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #F6E5CA">
+                            <div class="card card-flush h-xl-100" style="background-color: #FBE7C6">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('products.index') }}" class="text-white text-decoration-none text-center">
@@ -30,7 +30,27 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #F3D6EF">
+                            <div class="card card-flush h-xl-100" style="background-color: #A0E7E5">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('products.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.All Products Stock') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="productsStockLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="productStockCount">{{ $totalProductsStock . ' ' . __('dashboard.Products')}}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $totalProductsStock }}" title="{{ __('dashboard.Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #B4F8C8">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('crypto_gateways.index') }}" class="text-white text-decoration-none text-center">
@@ -50,69 +70,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #8ed4e1">
-                                <div class="card-header flex-nowrap pt-5">
-                                    <h3 class="card-title align-items-center flex-column m-auto">
-                                        <a href="{{ route('sales.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Sales') }}</span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div class="card-body text-center pt-5 m-auto">
-                                    <div id="salesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
-                                    <div class="text-start">
-                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalSales">${{ number_format($totalSales, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalSales, 2) }}" title="{{ __('dashboard.Copy') }}">
-                                            Copy <i class="bi bi-clipboard"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #c8f1d5">
-                                <div class="card-header flex-nowrap pt-5">
-                                    <h3 class="card-title align-items-center flex-column m-auto">
-                                        <a href="{{ route('purchases.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Purchases') }}</span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div class="card-body text-center pt-5 m-auto">
-                                    <div id="purchasesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
-                                    <div class="text-start">
-                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalPurchases">${{ number_format($totalPurchases, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalPurchases, 2) }}" title="{{ __('dashboard.Copy') }}">
-                                            Copy <i class="bi bi-clipboard"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row g-5 gx-xl-12">
-                        <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #c8f1d5">
-                                <div class="card-header flex-nowrap pt-5">
-                                    <h3 class="card-title align-items-center flex-column m-auto">
-                                        <a href="{{ route('external_purchases.index') }}" class="text-white text-decoration-none text-center">
-                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total External Purchases') }}</span>
-                                        </a>
-                                    </h3>
-                                </div>
-                                <div class="card-body text-center pt-5 m-auto">
-                                    <div id="externalProductsLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
-                                    <div class="text-start">
-                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="externalProductsLottie">${{ number_format($totalExternalPurchases, 2) }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalExternalPurchases, 2) }}" title="{{ __('dashboard.Copy') }}">
-                                            Copy <i class="bi bi-clipboard"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #8ed4e1">
+                            <div class="card card-flush h-xl-100" style="background-color: #FFAEBC">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('suppliers.index') }}" class="text-white text-decoration-none text-center">
@@ -132,7 +90,87 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #F3D6EF">
+                            <div class="card card-flush h-xl-100" style="background-color: #FBE7C6">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('sales.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Sales') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="salesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalSales">${{ number_format($totalSales, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalSales, 2) }}" title="{{ __('dashboard.Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #A0E7E5">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('purchases.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Purchases') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="purchasesLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalPurchases">${{ number_format($totalPurchases, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalPurchases, 2) }}" title="{{ __('dashboard.Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #B4F8C8">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('external_purchases.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total External Purchases') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="externalProductsLottie" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="externalProductsLottie">${{ number_format($totalExternalPurchases, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalExternalPurchases, 2) }}" title="{{ __('dashboard.Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #FFAEBC">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <a href="{{ route('maintenances.index') }}" class="text-white text-decoration-none text-center">
+                                            <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Phones in Maintenance') }}</span>
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="totalPhonesInMaintenance" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalPhonesInMaintenance">{{ $phonesInMaintenance }} {{ __('dashboard.Phones') }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $phonesInMaintenance }}" title="{{ __('dashboard.Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #FBE7C6">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <a href="{{ route('maintenances.index') }}" class="text-white text-decoration-none text-center">
@@ -152,7 +190,25 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card card-flush h-xl-100" style="background-color: #F6E5CA">
+                            <div class="card card-flush h-xl-100" style="background-color: #A0E7E5">
+                                <div class="card-header flex-nowrap pt-5">
+                                    <h3 class="card-title align-items-center flex-column m-auto">
+                                        <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Debt') }}</span>
+                                    </h3>
+                                </div>
+                                <div class="card-body text-center pt-5 m-auto">
+                                    <div id="totalDebt" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
+                                    <div class="text-start">
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="totalDebt">${{ number_format($totalDebt, 2) }}</span>
+                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ number_format($totalDebt, 2) }}" title="{{ __('dashboard.Copy') }}">
+                                            Copy <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-flush h-xl-100" style="background-color: #B4F8C8">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
                                         <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.Total Cash Balance') }}</span>
@@ -715,6 +771,13 @@
                     path: "{{ asset('media/lottie/products.json') }}"
                 });
                 lottie.loadAnimation({
+                    container: document.getElementById('productsStockLottie'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/products-stock.json') }}"
+                });
+                lottie.loadAnimation({
                     container: document.getElementById('cryptoLottie'),
                     renderer: 'svg',
                     loop: true,
@@ -750,11 +813,25 @@
                     path: "{{ asset('media/lottie/suppliers.json') }}"
                 });
                 lottie.loadAnimation({
+                    container: document.getElementById('totalPhonesInMaintenance'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/phones_in_maintenance.json') }}"
+                });
+                lottie.loadAnimation({
                     container: document.getElementById('phonesInMaintenance'),
                     renderer: 'svg',
                     loop: true,
                     autoplay: true,
                     path: "{{ asset('media/lottie/maintenances.json') }}"
+                });
+                lottie.loadAnimation({
+                    container: document.getElementById('totalDebt'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: "{{ asset('media/lottie/debt.json') }}"
                 });
                 lottie.loadAnimation({
                     container: document.getElementById('cashBalance'),
