@@ -33,7 +33,7 @@
                             <div class="card card-flush h-xl-100" style="background-color: #A0E7E5">
                                 <div class="card-header flex-nowrap pt-5">
                                     <h3 class="card-title align-items-center flex-column m-auto">
-                                        <a href="{{ route('products.index') }}" class="text-white text-decoration-none text-center">
+                                        <a href="{{ route('warehouses.index') }}" class="text-white text-decoration-none text-center">
                                             <span class="card-label fw-bold fs-4 text-gray-800">{{ __('dashboard.All Products Stock') }}</span>
                                         </a>
                                     </h3>
@@ -181,10 +181,9 @@
                                 <div class="card-body text-center pt-5 m-auto">
                                     <div id="phonesInMaintenance" style="height: 150px; width: 150px; margin-bottom: 10px;"></div>
                                     <div class="text-start">
-                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center" id="phonesInMaintenance">{{ $phonesInMaintenance }} {{ __('dashboard.Phones') }}</span>
-                                        <button class="btn btn-sm btn-light copy-btn d-block w-100" data-clipboard-text="{{ $phonesInMaintenance }}" title="{{ __('dashboard.Copy') }}">
-                                            Copy <i class="bi bi-clipboard"></i>
-                                        </button>
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center">{{ $maintenanceInProgress  }} {{ __('dashboard.Phones In Progress') }}</span>
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center">{{ $maintenanceCompleted  }} {{ __('dashboard.Phones Completed') }}</span>
+                                        <span class="d-block fw-bold fs-1 text-gray-800 text-center">{{ $maintenancePending  }} {{ __('dashboard.Phones Pending') }}</span>
                                     </div>
                                 </div>
                             </div>

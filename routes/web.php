@@ -13,6 +13,7 @@ use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MobileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
@@ -46,6 +47,20 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/debts/{debt}/payments', [SupplierController::class, 'showPaymentsForm'])->name('debt.payments');
 
     Route::post('/debts/{debt}/payments', [SupplierController::class, 'recordPayment'])->name('debt.record_payment');
+
+    Route::prefix('reports')->middleware(['auth'])->group(function () {
+        Route::get('/sales', [ReportController::class, 'sales'])->name('reports.sales');
+        Route::get('/sales/export/pdf', [ReportController::class, 'exportSalesPDF'])->name('reports.sales.export.pdf');
+        Route::get('/sales/export/excel', [ReportController::class, 'exportSalesExcel'])->name('reports.sales.export.excel');
+
+        Route::get('/purchases', [ReportController::class, 'purchases'])->name('reports.purchases');
+        Route::get('/purchases/export/pdf', [ReportController::class, 'exportPurchasesPDF'])->name('reports.purchases.export.pdf');
+        Route::get('/purchases/export/excel', [ReportController::class, 'exportPurchasesExcel'])->name('reports.purchases.export.excel');
+
+        Route::get('/debts', [ReportController::class, 'debts'])->name('reports.debts');
+        Route::get('/debts/export/pdf', [ReportController::class, 'exportDebtsPDF'])->name('reports.debts.export.pdf');
+        Route::get('/debts/export/excel', [ReportController::class, 'exportDebtsExcel'])->name('reports.debts.export.excel');
+    });
 
     Route::resource('/suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 
