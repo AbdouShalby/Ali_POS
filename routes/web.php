@@ -7,13 +7,16 @@ use App\Http\Controllers\CryptoGatewayController;
 use App\Http\Controllers\CryptoTransactionController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\ExpenseReportController;
 use App\Http\Controllers\ExternalPurchaseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MobileController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
@@ -61,6 +64,13 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
         Route::get('/debts/export/pdf', [ReportController::class, 'exportDebtsPDF'])->name('reports.debts.export.pdf');
         Route::get('/debts/export/excel', [ReportController::class, 'exportDebtsExcel'])->name('reports.debts.export.excel');
     });
+
+    Route::get('/reports/expenses', [ExpenseReportController::class, 'index'])->name('reports.expenses');
+    Route::get('/accounting/revenues', [RevenueController::class, 'index'])->name('accounting.revenues');
+    Route::get('/accounting/payments', [PaymentController::class, 'index'])->name('accounting.payments');
+    Route::get('/accounting/payments/create', [PaymentController::class, 'create'])->name('accounting.payments.create');
+    Route::post('/accounting/payments/store', [PaymentController::class, 'store'])->name('accounting.payments.store');
+    Route::delete('/accounting/payments/{id}', [PaymentController::class, 'destroy'])->name('accounting.payments.destroy');
 
     Route::resource('/suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 

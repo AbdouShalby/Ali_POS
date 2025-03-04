@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('debt_id');
+            $table->foreignId('debt_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('customer_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
+            $table->date('payment_date');
+            $table->enum('payment_type', ['customer', 'supplier']);
             $table->text('note')->nullable();
             $table->timestamps();
-
-            $table->foreign('debt_id')->references('id')->on('debts')->onDelete('cascade');
         });
     }
 

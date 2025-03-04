@@ -13,13 +13,12 @@ return new class extends Migration
     {
         Schema::create('debts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supplier_id');
+            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->nullable()->constrained()->onDelete('cascade');
             $table->decimal('amount', 15, 2);
             $table->text('note')->nullable();
             $table->timestamps();
-
-            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
         });
     }
 

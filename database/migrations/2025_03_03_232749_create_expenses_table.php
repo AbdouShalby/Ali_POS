@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('sales', function (Blueprint $table) {
+        Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->nullable();
-            $table->date('sale_date')->nullable();
-            $table->decimal('total_amount', 15, 2);
-            $table->text('notes')->nullable();
+            $table->string('description');
+            $table->decimal('amount', 10, 2);
+            $table->date('expense_date');
             $table->timestamps();
-
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null');
         });
     }
 
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales');
+        Schema::dropIfExists('expenses');
     }
 };

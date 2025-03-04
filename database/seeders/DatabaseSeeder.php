@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             MobileDetailsTableSeeder::class,
             UsersTableSeeder::class,
             CashRegisterSeeder::class,
+            SalesTableSeeder::class,
+            PurchasesTableSeeder::class,
+            DebtsTableSeeder::class,
         ]);
     }
 }
