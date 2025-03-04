@@ -10,13 +10,10 @@ class CreateCryptoTransactionsTable extends Migration
     {
         Schema::create('crypto_transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('crypto_gateway_id');
-            $table->enum('type', ['buy', 'sell']);
+            $table->foreignId('crypto_gateway_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 15, 8);
-            $table->boolean('includes_fees')->default(false);
+            $table->decimal('profit_percentage', 5, 2)->nullable();
             $table->timestamps();
-
-            $table->foreign('crypto_gateway_id')->references('id')->on('crypto_gateways')->onDelete('cascade');
         });
     }
 

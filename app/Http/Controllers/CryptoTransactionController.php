@@ -39,42 +39,24 @@ class CryptoTransactionController extends Controller
         return view('crypto_transactions.create', compact('gateway'))->with('activePage', 'crypto_transactions');
     }
 
-    public function store(Request $request, $gatewayId)
+    public function store(Request $request)
     {
-        $gateway = CryptoGateway::findOrFail($gatewayId);
-
-        $request->merge([
-            'includes_fees' => $request->has('includes_fees'),
-        ]);
-
         $request->validate([
-            'type' => 'required|in:buy,sell',
-            'amount' => 'required|numeric|min:0.00000001',
-            'includes_fees' => 'boolean',
+            'crypto_gateway_id' => 'required|exists:crypto_gateways,id',
+            'amount' => 'required|numeric',
+            'profit_percentage' => 'nullable|numeric|min:0|max:100'
         ]);
 
-
-        $amount = $request->amount;
-
-        if ($request->type == 'sell') {
-            if ($gateway->balance < $amount) {
-                return redirect()->back()->withErrors('الرصيد غير كافٍ لإتمام عملية البيع');
-            }
-            $gateway->balance -= $amount;
-        } else {
-            $gateway->balance += $amount;
-        }
-
-        $gateway->save();
-
-        CryptoTransaction::create([
-            'crypto_gateway_id' => $gateway->id,
-            'type' => $request->type,
-            'amount' => $amount,
-            'includes_fees' => $request->includes_fees ? true : false,
+        $transaction = CryptoTransaction::create([
+            'crypto_gateway_id' => $request->crypto_gateway_id,
+            'amount' => $request->amount,
+            'profit_percentage' => $request->profit_percentage
         ]);
 
-        return redirect()->route('crypto_gateways.index')->with('success', 'تم تنفيذ العملية بنجاح');
+        $transaction->cryptoGateway->updateBalance($request->amount);
+
+        return redirect()->route('crypto-transactions.index')
+            ->with('success', 'Transaction recorded successfully.');
     }
 
     public function history(Request $request)

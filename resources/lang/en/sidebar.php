@@ -43,4 +43,9 @@ return [
     'cash_register_log' => 'Log',
     'cash_register_reports' => 'Reports',
     'cash_register_charts' => 'Charts',
+    'System Settings' =>  'System Settings',
+    'Financial Reports'  => 'Financial Reports',
+    'Expenses Report'   => 'Expenses Report',
+    'Payments'  => 'Payments',
+    'Revenues'   => 'Revenues',
 ];

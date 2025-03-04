@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SalesTableSeeder::class,
             PurchasesTableSeeder::class,
             DebtsTableSeeder::class,
+            CryptoTransactionSeeder::class,
         ]);
     }
 }

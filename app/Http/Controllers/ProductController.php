@@ -378,4 +378,13 @@ class ProductController extends Controller
         ]);
     }
 
+    public function checkBarcode($barcode)
+    {
+        $exists = Product::where('barcode', $barcode)->exists();
+
+        return response()->json([
+            'exists' => $exists
+        ]);
+    }
+
 }

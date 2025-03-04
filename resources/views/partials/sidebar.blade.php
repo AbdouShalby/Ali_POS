@@ -255,7 +255,6 @@
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
-                            <!-- Cash Register Overview -->
                             <div class="menu-item">
                                 <a class="menu-link {{ isset($activePage) && $activePage == 'cash_register' ? 'active' : '' }}" href="{{ route('cash-register.index') }}">
                                     <span class="menu-bullet">
@@ -264,7 +263,6 @@
                                     <span class="menu-title {{ isset($activePage) && $activePage == 'cash_register' ? 'text-primary' : '' }}">{{ __('sidebar.cash_register_overview') }}</span>
                                 </a>
                             </div>
-                            <!-- Cash Register Log -->
                             <div class="menu-item">
                                 <a class="menu-link {{ isset($activePage) && $activePage == 'cash_register_log' ? 'active' : '' }}" href="{{ route('cash-register.log') }}">
                                     <span class="menu-bullet">
@@ -273,7 +271,6 @@
                                     <span class="menu-title {{ isset($activePage) && $activePage == 'cash_register_log' ? 'text-primary' : '' }}">{{ __('sidebar.cash_register_log') }}</span>
                                 </a>
                             </div>
-                            <!-- Cash Register Reports -->
                             <div class="menu-item">
                                 <a class="menu-link {{ isset($activePage) && $activePage == 'cash_register_reports' ? 'active' : '' }}" href="{{ route('cash-register.reports') }}">
                                     <span class="menu-bullet">
@@ -282,13 +279,62 @@
                                     <span class="menu-title {{ isset($activePage) && $activePage == 'cash_register_reports' ? 'text-primary' : '' }}">{{ __('sidebar.cash_register_reports') }}</span>
                                 </a>
                             </div>
-                            <!-- Cash Register Charts -->
                             <div class="menu-item">
                                 <a class="menu-link {{ isset($activePage) && $activePage == 'cash_register_charts' ? 'active' : '' }}" href="{{ route('cash-register.charts') }}">
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'cash_register_charts' ? 'bg-primary' : '' }}"></span>
                                     </span>
                                     <span class="menu-title {{ isset($activePage) && $activePage == 'cash_register_charts' ? 'text-primary' : '' }}">{{ __('sidebar.cash_register_charts') }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+{{--                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">--}}
+{{--                        <span class="menu-link">--}}
+{{--                            <span class="menu-icon"><i class="ki-solid ki-finance fs-1 text-primary"></i></span>--}}
+{{--                            <span class="menu-title">{{ __('sidebar.Financial Reports') }}</span>--}}
+{{--                            <span class="menu-arrow"></span>--}}
+{{--                        </span>--}}
+{{--                        <div class="menu-sub menu-sub-accordion">--}}
+{{--                            <div class="menu-item">--}}
+{{--                                <a class="menu-link" href="{{ route('reports.expenses') }}">--}}
+{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
+{{--                                    <span class="menu-title">{{ __('sidebar.Expenses Report') }}</span>--}}
+{{--                                </a>--}}
+{{--                            </div>--}}
+{{--                            <div class="menu-item">--}}
+{{--                                <a class="menu-link" href="{{ route('accounting.payments') }}">--}}
+{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
+{{--                                    <span class="menu-title">{{ __('sidebar.Payments') }}</span>--}}
+{{--                                </a>--}}
+{{--                            </div>--}}
+{{--                            <div class="menu-item">--}}
+{{--                                <a class="menu-link" href="{{ route('accounting.revenues') }}">--}}
+{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
+{{--                                    <span class="menu-title">{{ __('sidebar.Revenues') }}</span>--}}
+{{--                                </a>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+
+                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                        <span class="menu-link">
+                            <span class="menu-icon"><i class="ki-solid ki-gear fs-1 text-primary"></i></span>
+                            <span class="menu-title">{{ __('sidebar.System Settings') }}</span>
+                            <span class="menu-arrow"></span>
+                        </span>
+                        <div class="menu-sub menu-sub-accordion">
+{{--                            <div class="menu-item">--}}
+{{--                                <a class="menu-link" href="{{ route('settings.index') }}">--}}
+{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
+{{--                                    <span class="menu-title">{{ __('sidebar.System Settings') }}</span>--}}
+{{--                                </a>--}}
+{{--                            </div>--}}
+                            <div class="menu-item">
+                                <a class="menu-link" href="{{ route('users.index') }}">
+                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                    <span class="menu-title">{{ __('sidebar.Users') }}</span>
                                 </a>
                             </div>
                         </div>

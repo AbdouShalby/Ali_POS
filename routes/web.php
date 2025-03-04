@@ -85,6 +85,8 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::get('/products/generate-barcode', [ProductController::class, 'generateBarcode'])->name('products.generateBarcode');
 
+    Route::get('/products/check-barcode/{barcode}', [ProductController::class, 'checkBarcode'])->name('products.checkBarcode');
+
     Route::post('/products/{product}/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
 
     Route::resource('/products', ProductController::class)->middleware(['auth', 'permission:manage products']);

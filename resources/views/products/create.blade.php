@@ -61,10 +61,11 @@
                                         <div class="mb-10 col-md-7">
                                             <label class="form-label">{{ __('products.barcode') }}</label>
                                             <div class="input-group d-flex align-items-center">
-                                                <input type="text" class="form-control mb-2" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" id="barcode" name="barcode" value="{{ old('barcode') }}" readonly required>
+                                                <input type="text" class="form-control mb-2" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" id="barcode" name="barcode" value="{{ old('barcode') }}" onblur="checkBarcode()" required>
                                                 <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="generateBarcode">{{ __('products.generate') }}</button>
                                                 <button type="button" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;" id="printBarcode">{{ __('products.print') }}</button>
                                             </div>
+                                            <small id="barcode-feedback" class="text-danger d-none">{{ __('products.This barcode already exists!') }}</small>
                                         </div>
                                         <div class="card py-10 mb-10">
                                             <div class="card-header">
@@ -755,6 +756,27 @@
                 var printOptionsModal = bootstrap.Modal.getInstance(document.getElementById('printOptionsModal'));
                 printOptionsModal.hide();
             });
+
+            function checkBarcode() {
+                let barcodeInput = document.getElementById("barcode");
+                let feedback = document.getElementById("barcode-feedback");
+                let barcode = barcodeInput.value.trim();
+
+                if (barcode === "") return;
+
+                fetch(`{{ route('products.checkBarcode', '') }}/${barcode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            feedback.classList.remove("d-none");
+                            barcodeInput.classList.add("is-invalid");
+                        } else {
+                            feedback.classList.add("d-none");
+                            barcodeInput.classList.remove("is-invalid");
+                        }
+                    })
+                    .catch(error => console.error("Error checking barcode:", error));
+            }
         </script>
     @endsection
 

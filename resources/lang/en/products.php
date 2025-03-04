@@ -150,4 +150,5 @@ return [
     'confirm_delete_image' => 'Confirm Delete Image',
     'image_deleted_successfully' => 'Image deleted successfully.',
     'error_deleting_image' => 'Error Deleting Image.',
+    'This barcode already exists!' =>  'This barcode already exists!',
 ];

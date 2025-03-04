@@ -33,4 +33,7 @@ return [
     'balance' => 'Balance',
     'transactions' => 'Transactions',
     'back_to_list' => 'Back to List',
+    'profit_percentage'  => 'Profit Percentage',
+    'profit_amount'  => 'Profit Amount',
+    'positive_for_buy_negative_for_sell'  => 'Positive For Buy Negative for Sell',
 ];
