@@ -58,8 +58,8 @@ class HomeController extends Controller
         $latestCategories = Category::latest()->take(5)->get();
         $latestCustomers = Customer::latest()->take(5)->get();
         $latestSuppliers = Supplier::latest()->take(5)->get();
-        $latestCryptoBuys = CryptoTransaction::where('type', 'buy')->latest()->take(10)->get();
-        $latestCryptoSells = CryptoTransaction::where('type', 'sell')->latest()->take(10)->get();
+        $latestCryptoBuys = CryptoTransaction::orderBy('created_at', 'desc')->limit(10)->get();
+        $latestCryptoSells = CryptoTransaction::orderBy('created_at', 'desc')->limit(10)->get();
         $last7Days = Carbon::now()->subDays(7);
         $incomeLast7Days = CashTransaction::where('transaction_type', 'sale')
             ->where('created_at', '>=', $last7Days)

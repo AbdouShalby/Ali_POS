@@ -553,11 +553,11 @@
                 </div>
             </div>
             <div class="row g-5 g-xl-12 my-1">
-                <div class="col-xxl-6">
+                <div class="col-xxl-12">
                     <div class="card card-flush h-xl-100">
                         <div class="card-header pt-7 m-auto">
                             <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Cryptocurrency Purchases') }}</span>
+                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Cryptocurrency Transactions') }}</span>
                             </h4>
                         </div>
                         <div class="card-body py-3">
@@ -591,62 +591,6 @@
                                                 </td>
                                                 <td class="ps-0">
                                                     <span class="text-gray-900 fw-bold d-block fs-6">{{ $buy->created_at->format('Y-m-d H:i') }}</span>
-                                                </td>
-                                                <td class="text-end">
-                                                    <a href="{{ route('crypto_transactions.history') }}" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
-                                                        <i class="ki-duotone ki-arrow-right fs-2">
-                                                            <span class="path1"></span>
-                                                            <span class="path2"></span>
-                                                        </i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xxl-6">
-                    <div class="card card-flush h-xl-100">
-                        <div class="card-header pt-7 m-auto">
-                            <h4 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-gray-800">{{ __('dashboard.Latest 10 Cryptocurrency Sales') }}</span>
-                            </h4>
-                        </div>
-                        <div class="card-body py-3">
-                            <div class="table-responsive">
-                                @if($latestCryptoSells->isEmpty())
-                                    <div class="text-center text-gray-500 fs-6 mt-5">
-                                        {{ __('dashboard.There Are No Purchases Yet') }}
-                                    </div>
-                                @else
-                                    <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
-                                        <thead>
-                                        <tr class="border-bottom-1">
-                                            <th class="p-0 min-w-175px">{{ __('dashboard.Transaction Number') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('dashboard.Payment Gateway') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('dashboard.Amount') }}</th>
-                                            <th class="p-0 min-w-175px">{{ __('dashboard.Date') }}</th>
-                                            <th class="p-0 min-w-50px"></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($latestCryptoSells as $sell)
-                                            <tr>
-                                                <td class="ps-0">
-                                                    <a href="{{ route('crypto_transactions.history') }}" class="text-gray-900 fw-bold text-hover-primary mb-1 fs-6">{{ $sell->id }}</a>
-                                                </td>
-                                                <td class="ps-0">
-                                                    <span class="text-gray-900 fw-bold d-block fs-6">{{ $sell->cryptoGateway->name ?? 'Undefined' }}</span>
-                                                </td>
-                                                <td class="ps-0">
-                                                    <span class="text-gray-900 fw-bold d-block fs-6">{{ number_format($sell->amount, 8) }}</span>
-                                                </td>
-                                                <td class="ps-0">
-                                                    <span class="text-gray-900 fw-bold d-block fs-6">{{ $sell->created_at->format('Y-m-d H:i') }}</span>
                                                 </td>
                                                 <td class="text-end">
                                                     <a href="{{ route('crypto_transactions.history') }}" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">

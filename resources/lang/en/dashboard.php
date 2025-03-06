@@ -48,6 +48,7 @@ return [
     'Suppliers Name' => 'Suppliers Name',
     'There Are No Suppliers Yet' => 'There Are No Suppliers Yet',
     'Latest 10 Cryptocurrency Purchases' => 'Latest 10 Cryptocurrency Purchases',
+    'Latest 10 Cryptocurrency Transactions' => 'Latest 10 Cryptocurrency Transactions',
     'Transaction Number' => 'Transaction Number',
     'Payment Gateway' => 'Payment Gateway',
     'Amount' => 'Amount',
