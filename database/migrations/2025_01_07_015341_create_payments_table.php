@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
-            $table->date('payment_date');
+            $table->date('payment_date')->nullable();
             $table->enum('payment_type', ['customer', 'supplier']);
             $table->text('note')->nullable();
             $table->timestamps();

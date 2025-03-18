@@ -95,4 +95,21 @@
             </div>
         </div>
     </div>
+
+    @section('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            @if(session('success'))
+            Swal.fire({
+                title: "{{ __('products.success') }}",
+                text: "{{ session('success') }}",
+                icon: "success",
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "{{ __('products.ok') }}"
+            });
+            @endif
+        </script>
+    @endsection
+
 @endsection

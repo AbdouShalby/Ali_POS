@@ -9,7 +9,17 @@ class Debt extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['supplier_id', 'product_id', 'amount', 'note'];
+    protected $fillable = [
+        'supplier_id',
+        'customer_id',
+        'product_id',
+        'amount',
+        'paid',
+        'status',
+        'note',
+    ];
+
+    protected $appends = ['remaining'];
 
     public function supplier()
     {
@@ -18,7 +28,7 @@ class Debt extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class);
     }
 
     public function payments()
@@ -26,10 +36,9 @@ class Debt extends Model
         return $this->hasMany(Payment::class);
     }
 
-    public function remainingAmount()
+    public function getRemainingAttribute()
     {
-        $totalPayments = $this->payments->sum('amount');
-        return $this->amount - $totalPayments;
+        return $this->amount - $this->payments()->sum('amount');
     }
 
 }

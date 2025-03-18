@@ -32,11 +32,15 @@ class BrandController extends Controller
 
         $brand = Brand::create($validatedData);
 
-        return response()->json([
-            'success' => true,
-            'message' => __('brands.brand_added_successfully'),
-            'brand' => $brand,
-        ]);
+        if ($request->expectsJson() || $request->ajax() || $request->header('Accept') === 'application/json') {
+            return response()->json([
+                'success' => true,
+                'message' => __('brands.brand_added_successfully'),
+                'brand' => $brand,
+            ]);
+        }
+
+        return redirect()->route('brands.index')->with('success', __('brands.brand_added_successfully', ['name' => $brand->name]));
     }
 
     public function show($id)
@@ -69,7 +73,7 @@ class BrandController extends Controller
             ]);
         }
 
-        return redirect()->route('brands.index')->with('success', __('brands.brand_updated_successfully'));
+        return redirect()->route('brands.index')->with('success', __('brands.brand_updated_successfully', ['name' => $brand->name]));
     }
 
     public function destroy(Request $request, $id)
@@ -84,6 +88,6 @@ class BrandController extends Controller
             ]);
         }
 
-        return redirect()->route('brands.index')->with('success', __('brands.brand_deleted_successfully'));
+        return redirect()->route('brands.index')->with('success', __('brands.brand_deleted_successfully', ['name' => $brandName]));
     }
 }

@@ -14,7 +14,6 @@ return [
     'delete' => 'Delete',
     'update' => 'Update',
     'no_categories_found' => 'No Categories Found.',
-    'confirm_delete' => 'Are you sure you want to delete this category?',
     'add' => 'Add',
     'save' => 'Save',
     'cancel' => 'Cancel',
@@ -31,4 +30,8 @@ return [
     'products_in_category' => 'Products in Category',
     'no_products_in_category' => 'No products found in this category.',
     'no_description' => 'No description provided.',
+    'category_added_successfully' => 'The category ":name" has been added successfully!',
+    'category_updated_successfully' => 'The category ":name" has been updated successfully!',
+    'category_deleted_successfully' => 'The category ":name" has been deleted successfully!',
+    'confirm_delete' => 'Are you sure you want to delete this category?',
 ];

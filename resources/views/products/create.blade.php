@@ -664,10 +664,16 @@
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
                     },
                     body: formData,
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err });
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             const categorySelect = document.getElementById('category_id');
@@ -681,8 +687,9 @@
                             modal.hide();
 
                             form.reset();
+                            toastr.success(data.message);
                         } else {
-                            alert(data.message || 'Error saving category.');
+                            toastr.error(data.message || 'Error saving category.');
                         }
                     })
                     .catch(error => console.error('Error:', error));

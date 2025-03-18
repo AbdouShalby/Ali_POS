@@ -66,6 +66,9 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
     Route::resource('/customers', CustomerController::class)->middleware(['auth', 'permission:manage customers']);
 
+    // **Debt Routes**
+    Route::get('/debt/{debt}/payments-history', [SupplierController::class, 'paymentHistory'])->name('debt.paymentHistory');
+
     // **Device Routes**
     Route::resource('/devices', DeviceController::class)->middleware(['auth', 'permission:manage devices']);
 

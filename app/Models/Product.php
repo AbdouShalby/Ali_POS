@@ -18,8 +18,6 @@ class Product extends Model
         'price',
         'wholesale_price',
         'min_sale_price',
-        'quantity',
-        'min_sale_quantity',
         'stock_alert',
         'brand_id',
         'category_id',
@@ -98,4 +96,10 @@ class Product extends Model
                 $query->where('price', $sellingPrice);
             });
     }
+
+    public function purchaseItems()
+    {
+        return $this->hasMany(PurchaseItem::class);
+    }
+
 }

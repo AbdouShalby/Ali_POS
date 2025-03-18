@@ -24,16 +24,6 @@
 
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-            @if(session('success'))
-                <div class="alert alert-success d-flex align-items-center p-5 mb-5">
-                    <i class="bi bi-check-circle-fill fs-2 text-success me-3"></i>
-                    <div>
-                        {{ session('success') }}
-                    </div>
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
             <div class="card card-flush">
                 <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                     <h2 class="card-title">{{ __('categories.category_list') }}</h2>
@@ -76,8 +66,8 @@
                                         <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm mx-1" onclick="return confirm('{{ __('categories.confirm_delete') }}')">
-                                                <i class="bi bi-trash"></i> {{ __('categories.delete') }}
+                                            <button type="button" class="btn btn-danger" onclick="deleteConfirmation(event, this)">
+                                                <i class="bi bi-trash"></i>  {{ __('categories.delete') }}
                                             </button>
                                         </form>
                                     </td>
@@ -97,4 +87,38 @@
             </div>
         </div>
     </div>
+
+    @section('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            function deleteConfirmation(event, button) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: "{{ __('brands.confirm_delete') }}",
+                    text: "{{ __('products.delete_confirmation_message') }}",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "{{ __('products.yes_delete') }}",
+                    cancelButtonText: "{{ __('products.cancel') }}"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        button.closest('form').submit();
+                    }
+                });
+            }
+
+            @if(session('success'))
+            Swal.fire("{{ __('products.success') }}", "{{ session('success') }}", "success");
+            @endif
+
+            @if(session('error'))
+            Swal.fire("{{ __('products.error') }}", "{{ session('error') }}", "error");
+            @endif
+        </script>
+    @endsection
+
 @endsection

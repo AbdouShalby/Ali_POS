@@ -33,16 +33,21 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
+            'description' => 'nullable|string|max:255',
         ]);
 
         $category = Category::create($validatedData);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Category added successfully.',
-            'category' => $category,
-        ]);
+        if ($request->expectsJson() || $request->ajax() || $request->header('Accept') === 'application/json') {
+            return response()->json([
+                'success' => true,
+                'message' => __('categories.category_added_successfully'),
+                'category' => $category,
+            ]);
+        }
+
+        return redirect()->route('categories.index')->with('success', __('categories.category_added_successfully', ['name' => $category->name]));
     }
 
     public function show($id)
@@ -67,7 +72,7 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->update($validated);
 
-        return redirect()->route('categories.index')->with('success', 'تم تحديث القسم بنجاح');
+        return redirect()->route('categories.index')->with('success', __('categories.category_updated_successfully', ['name' => $category->name]));
     }
 
     public function destroy($id)
@@ -75,6 +80,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return redirect()->route('categories.index')->with('success', 'تم حذف القسم بنجاح');
+        return redirect()->route('categories.index')->with('success', __('categories.category_deleted_successfully', ['name' => $category->name]));
     }
 }

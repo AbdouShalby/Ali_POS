@@ -14,10 +14,10 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->string('barcode')->nullable()->unique();
 
-            $table->decimal('cost', 15, 2);
-            $table->decimal('price', 15, 2);
-            $table->decimal('wholesale_price', 15, 2);
-            $table->decimal('min_sale_price', 15, 2);
+            $table->decimal('cost', 15, 2)->default(0);
+            $table->decimal('price', 15, 2)->default(0);
+            $table->decimal('wholesale_price', 15, 2)->default(0);
+            $table->decimal('min_sale_price', 15, 2)->default(0);
 
             $table->string('image')->nullable();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');

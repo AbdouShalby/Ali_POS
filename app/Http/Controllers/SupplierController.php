@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Debt;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 use App\Models\Supplier;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class SupplierController extends Controller
 {
@@ -59,10 +62,10 @@ class SupplierController extends Controller
     {
         $supplier = Supplier::findOrFail($id);
 
-        $query = $supplier->purchases()->with('product');
+        $query = Purchase::where('supplier_id', $supplier->id)->with('purchaseItems.product');
 
         if ($request->filled('search')) {
-            $query->whereHas('product', function ($productQuery) use ($request) {
+            $query->whereHas('purchaseItems.product', function ($productQuery) use ($request) {
                 $productQuery->where('name', 'LIKE', "%{$request->search}%");
             });
         }
@@ -71,15 +74,19 @@ class SupplierController extends Controller
             $query->whereBetween('created_at', [$request->from, $request->to]);
         }
 
-        $purchases = $query->paginate(10);
-
-        $products = $purchases->map(function ($purchase) {
-            return $purchase->product;
+        $purchaseItems = $query->get()->flatMap(function ($purchase) {
+            return $purchase->purchaseItems;
         });
 
-        $debts = $supplier->debts()->with('product')->latest()->get();
+        $perPage = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentPageItems = $purchaseItems->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $products = new LengthAwarePaginator($currentPageItems, $purchaseItems->count(), $perPage);
+        $products->setPath(request()->url());
 
-        return view('suppliers.show', compact('supplier', 'products', 'purchases', 'debts'));
+        $debts = $supplier->debts()->with('product')->paginate(10);
+
+        return view('suppliers.show', compact('supplier', 'products', 'debts'));
     }
 
     public function edit($id)
@@ -142,17 +149,34 @@ class SupplierController extends Controller
     public function recordPayment(Request $request, Debt $debt)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:1|max:' . $debt->remainingAmount(),
-            'note' => 'nullable|string|max:255',
+            'amount' => 'required|numeric|min:1',
+            'payment_date' => 'required|date',
         ]);
 
-        $debt->payments()->create([
+        $payment = $debt->payments()->create([
             'amount' => $request->amount,
-            'note' => $request->note,
+            'payment_date' => $request->payment_date,
+            'note' => $request->note ?? null,
+            'payment_type' => 'supplier',
         ]);
+
+        $debt->paid += $request->amount;
+        $debt->save();
+
+        if ($debt->remaining <= 0) {
+            $debt->status = 'paid';
+            $debt->save();
+        }
 
         return redirect()->route('suppliers.show', $debt->supplier_id)
             ->with('success', 'Payment recorded successfully.');
+    }
+
+    public function paymentHistory(Debt $debt)
+    {
+        $payments = $debt->payments()->orderBy('payment_date', 'desc')->get();
+
+        return view('suppliers.payment_history', compact('debt', 'payments'));
     }
 
 }

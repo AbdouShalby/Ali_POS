@@ -108,27 +108,29 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @forelse($products as $product)
+                            @foreach($products as $item)
                                 <tr>
-                                    <td>{{ $product->name }}</td>
-                                    <td>{{ $product->quantity }}</td>
-                                    <td>{{ number_format($product->price, 2) }}</td>
+                                    <td>{{ optional($item->product)->name ?? __('products.undefined') }}</td>
+                                    <td>{{ $item->quantity }}</td>
+                                    <td>{{ number_format($item->price, 2) }}</td>
                                     <td>
-                                        <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-info">
-                                            <i class="bi bi-eye"></i> {{ __('products.view') }}
-                                        </a>
+                                        @if(optional($item->product)->id)
+                                            <a href="{{ route('products.show', $item->product->id) }}" class="btn btn-sm btn-info">
+                                                <i class="bi bi-eye"></i> {{ __('products.view') }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">{{ __('products.undefined') }}</span>
+                                        @endif
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">{{ __('suppliers.no_products_found') }}</td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
 
-                    {{ $purchases->links() }}
+                    <div class="mt-3">
+                        {{ $products->links() }}
+                    </div>
                 </div>
             </div>
 
@@ -157,20 +159,30 @@
                                 <tbody>
                                 @foreach($debts as $debt)
                                     <tr>
-                                        <td>{{ $debt->product->name ?? __('suppliers.product_not_available') }}</td>
+                                        <td>{{ optional($debt->product)->name ?? __('suppliers.product_not_available') }}</td>
                                         <td>{{ number_format($debt->amount, 2) }}</td>
-                                        <td>{{ number_format($debt->payments->sum('amount'), 2) }}</td>
-                                        <td>{{ number_format($debt->remainingAmount(), 2) }}</td>
+                                        <td>{{ number_format($debt->paid, 2) }}</td>
+                                        <td>{{ number_format($debt->remaining, 2) }}</td>
                                         <td>{{ $debt->created_at->format('Y-m-d') }}</td>
                                         <td>
                                             <a href="{{ route('debt.payments', $debt->id) }}" class="btn btn-primary btn-sm">
                                                 {{ __('Record Payment') }}
                                             </a>
+
+                                            @if($debt->payments()->exists())
+                                                <a href="{{ route('debt.paymentHistory', $debt->id) }}" class="btn btn-info btn-sm">
+                                                    {{ __('View Payment History') }}
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div class="mt-3">
+                            {{ $debts->links() }}
                         </div>
                     @endif
                 </div>

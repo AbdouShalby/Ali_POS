@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CashRegisterSeeder::class,
             SalesTableSeeder::class,
             PurchasesTableSeeder::class,
+            PurchaseItemsTableSeeder::class,
             DebtsTableSeeder::class,
             CryptoTransactionSeeder::class,
         ]);

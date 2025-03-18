@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Purchase;
 use App\Models\Supplier;
-use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PurchaseFactory extends Factory
 {
@@ -13,12 +13,23 @@ class PurchaseFactory extends Factory
     public function definition()
     {
         return [
-            'supplier_id' => Supplier::inRandomOrder()->first()->id ?? Supplier::factory(),
-            'total_amount' => $this->faker->randomFloat(2, 100, 5000),
-            'invoice_number' => strtoupper($this->faker->unique()->bothify('INV-#####')),
-            'purchase_date' => $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'supplier_id' => Supplier::factory(),
+            'invoice_number' => $this->faker->unique()->numerify('INV#####'),
+            'purchase_date' => $this->faker->date(),
+            'total_amount' => 0,
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Purchase $purchase) {
+            $items = \App\Models\PurchaseItem::factory()->count(3)->create(['purchase_id' => $purchase->id]);
+
+            $totalAmount = $items->sum(function ($item) {
+                return $item->quantity * $item->price;
+            });
+
+            $purchase->update(['total_amount' => $totalAmount]);
+        });
     }
 }

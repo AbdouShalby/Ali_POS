@@ -78,8 +78,8 @@
                                         <form action="{{ route('brands.destroy', $brand->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger mx-1" onclick="return confirm('{{ __('brands.confirm_delete') }}')">
-                                                <i class="bi bi-trash"></i> {{ __('brands.delete') }}
+                                            <button type="button" class="btn btn-danger" onclick="deleteConfirmation(event, this)">
+                                                {{ __('brands.delete') }}
                                             </button>
                                         </form>
                                     </td>
@@ -99,4 +99,38 @@
             </div>
         </div>
     </div>
+
+    @section('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            function deleteConfirmation(event, button) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: "{{ __('brands.confirm_delete') }}",
+                    text: "{{ __('products.delete_confirmation_message') }}",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "{{ __('products.yes_delete') }}",
+                    cancelButtonText: "{{ __('products.cancel') }}"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        button.closest('form').submit();
+                    }
+                });
+            }
+
+            @if(session('success'))
+            Swal.fire("{{ __('products.success') }}", "{{ session('success') }}", "success");
+            @endif
+
+            @if(session('error'))
+            Swal.fire("{{ __('products.error') }}", "{{ session('error') }}", "error");
+            @endif
+        </script>
+    @endsection
+
 @endsection

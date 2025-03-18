@@ -11,7 +11,12 @@
 
             <div class="mb-3">
                 <label for="amount" class="form-label">Payment Amount</label>
-                <input type="number" name="amount" id="amount" class="form-control" step="0.01" min="1" max="{{ $debt->remainingAmount() }}" required>
+                <input type="number" name="amount" id="amount" class="form-control" step="0.01" min="1" max="{{ $debt->getRemainingAttribute() }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="payment_date" class="form-label">Payment Date</label>
+                <input type="date" name="payment_date" id="payment_date" class="form-control" required>
             </div>
 
             <div class="mb-3">

@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\Debt;
-use App\Models\Customer;
-use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Debt;
+use App\Models\Product;
+use App\Models\Supplier;
 
 class DebtFactory extends Factory
 {
@@ -13,13 +13,18 @@ class DebtFactory extends Factory
 
     public function definition()
     {
+        $amount = $this->faker->randomFloat(2, 100, 10000);
+        $paid = 0;
+        $status = ($paid >= $amount) ? 'paid' : 'unpaid';
+
         return [
-            'customer_id' => Customer::inRandomOrder()->first()->id ?? Customer::factory(),
-            'supplier_id' => Supplier::inRandomOrder()->first()->id ?? Supplier::factory(),
-            'amount' => $this->faker->randomFloat(2, 20, 1000),
-            'status' => $this->faker->randomElement(['unpaid', 'paid']),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'amount' => $amount,
+            'paid' => $paid,
+            'remaining' => $amount - $paid,
+            'status' => $status,
+            'supplier_id' => Supplier::inRandomOrder()->first()->id,
+            'product_id' => Product::inRandomOrder()->first()->id,
+            'note' => $this->faker->sentence,
         ];
     }
 }
