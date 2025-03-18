@@ -325,6 +325,7 @@
                         <div class="mb-3">
                             <label for="brand_name" class="form-label">{{ __('products.brand_name') }}</label>
                             <input type="text" class="form-control" id="brand_name" name="name" required>
+                            <small id="brand-error" class="text-danger d-none">{{ __('products.brand_already_exists') }}</small>
                         </div>
                         <button type="submit" class="btn btn-primary">{{ __('products.add') }}</button>
                     </form>
@@ -463,8 +464,8 @@
                     allSelects.forEach((select) => {
                         const currentValue = select.value;
                         select.innerHTML = `
-                <option value="">{{ __('Select Warehouse') }}</option>
-            `;
+                            <option value="">{{ __('Select Warehouse') }}</option>
+                        `;
 
                         @foreach($warehouses as $warehouse)
                         if (!selectedWarehouses.includes("{{ $warehouse->id }}") || currentValue === "{{ $warehouse->id }}") {
@@ -472,7 +473,7 @@
                         }
                         @endforeach
 
-                            select.value = currentValue;
+                        select.value = currentValue;
                     });
                 }
 
@@ -480,16 +481,16 @@
                     const newWarehouseEntry = document.createElement('div');
                     newWarehouseEntry.classList.add('input-group', 'mb-2', 'warehouse-entry');
                     newWarehouseEntry.innerHTML = `
-            <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
-                <option value="">{{ __('Select Warehouse') }}</option>
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                @endforeach
-                    </select>
-                    <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('Stock') }}" required>
-            <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('Stock Alert') }}" required>
-            <button type="button" class="btn btn-danger remove-warehouse">{{ __('Remove') }}</button>
-        `;
+                        <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
+                            <option value="">{{ __('Select Warehouse') }}</option>
+                            @foreach($warehouses as $warehouse)
+                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            @endforeach
+                                </select>
+                                <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('Stock') }}" required>
+                        <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('Stock Alert') }}" required>
+                        <button type="button" class="btn btn-danger remove-warehouse">{{ __('Remove') }}</button>
+                    `;
                     warehouseContainer.appendChild(newWarehouseEntry);
 
                     warehouseIndex++;
@@ -619,11 +620,17 @@
                 fetch('{{ route('brands.store') }}', {
                     method: 'POST',
                     headers: {
+                        'Accept': 'application/json', // تأكيد أن الرد سيكون JSON
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     },
                     body: formData,
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err });
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             const brandSelect = document.getElementById('brand_id');
@@ -641,7 +648,10 @@
                             alert(data.message || 'Error saving brand.');
                         }
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert(error.message || 'Something went wrong. Please try again.');
+                    });
             });
 
             document.getElementById('addCategoryForm').addEventListener('submit', function (event) {

@@ -84,7 +84,7 @@ class ProductController extends Controller
 
         $this->generateQRCode($product);
 
-        return redirect()->route('products.index')->with('success', __('The Product Has Been Added Successfully.'));
+        return redirect()->route('products.index')->with('success', __('products.product_added_successfully', ['name' => $product->name]));
     }
 
     protected function validateProduct($request, $product = null)
@@ -304,7 +304,7 @@ class ProductController extends Controller
             $product->mobileDetail()->delete();
         }
 
-        return redirect()->route('products.index')->with('success', __('Product updated successfully.'));
+        return redirect()->route('products.index')->with('success', __('products.product_updated_successfully', ['name' => $product->name]));
     }
 
     public function destroy($id)
@@ -378,13 +378,20 @@ class ProductController extends Controller
         ]);
     }
 
-    public function checkBarcode($barcode)
+    public function checkBarcode(Request $request)
     {
-        $exists = Product::where('barcode', $barcode)->exists();
+        $barcode = $request->barcode;
+        $productId = $request->product_id;
 
-        return response()->json([
-            'exists' => $exists
-        ]);
+        $query = Product::where('barcode', $barcode);
+
+        if (!empty($productId)) {
+            $query->where('id', '!=', $productId);
+        }
+
+        $exists = $query->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 
 }

@@ -151,4 +151,12 @@ return [
     'image_deleted_successfully' => 'Image deleted successfully.',
     'error_deleting_image' => 'Error Deleting Image.',
     'This barcode already exists!' =>  'This barcode already exists!',
+    'are_you_sure' => 'Are you sure?',
+    'delete_confirmation_message' => 'You won’t be able to revert this! Do you want to delete?',
+    'yes_delete' => 'Yes, delete!',
+    'success' => 'Success!',
+    'error' => 'Error!',
+    'product_added_successfully' => 'The product ":name" has been added successfully!',
+    'product_updated_successfully' => 'The product ":name" has been updated successfully!',
+    'product_deleted_successfully' => 'The product ":name" has been deleted successfully!',
 ];

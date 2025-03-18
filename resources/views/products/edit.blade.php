@@ -29,8 +29,8 @@
     </div>
 
     <div id="kt_app_content" class="app-content flex-column-fluid">
-        <div id="kt_app_content_container" class="app-container container-xxl">
-            <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data" class="form d-flex flex-column flex-lg-row">
+        <div id="kt_app_content_container" class="app-container container-xxl pb-0">
+            <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data" class="form d-flex flex-column flex-lg-row mb-0 pb-0">
                 @csrf
                 @method('PUT')
 
@@ -67,8 +67,26 @@
                                         <div class="mb-10 col-md-7">
                                             <label class="form-label">{{ __('products.barcode') }}</label>
                                             <div class="input-group d-flex align-items-center">
-                                                <input type="text" class="form-control mb-2" id="barcode" name="barcode" value="{{ old('barcode', $product->barcode) }}" readonly required>
+                                                <input type="text" class="form-control mb-2"
+                                                       style="border-top-right-radius: 0; border-bottom-right-radius: 0;"
+                                                       id="barcode" name="barcode"
+                                                       value="{{ old('barcode', $product->barcode) }}"
+                                                       onblur="checkBarcode()" required>
+
+                                                <button type="button" class="btn btn-primary"
+                                                        style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;"
+                                                        id="generateBarcode">
+                                                    {{ __('products.generate') }}
+                                                </button>
+
+                                                <button type="button" class="btn btn-primary"
+                                                        style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; margin-top: -7px;"
+                                                        id="printBarcode">
+                                                    {{ __('products.print') }}
+                                                </button>
                                             </div>
+
+                                            <small id="barcode-feedback" class="text-danger d-none">{{ __('products.This barcode already exists!') }}</small>
                                         </div>
                                         <!-- Warehouses -->
                                         <div class="card py-10 mb-10">
@@ -140,25 +158,35 @@
                                         </div>
                                         <div class="mb-5 col-md-4">
                                             <label class="form-label">{{ __('products.category') }}</label>
-                                            <select class="form-select" id="category_id" name="category_id" required>
-                                                <option value="">{{ __('products.choose_category') }}</option>
-                                                @foreach($categories as $category)
-                                                    <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                                        {{ $category->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="d-flex align-items-center">
+                                                <select class="form-select me-2" id="category_id" name="category_id" required>
+                                                    <option value="">{{ __('products.choose_category') }}</option>
+                                                    @foreach($categories as $category)
+                                                        <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                                            {{ $category->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                                    {{ __('products.add') }}
+                                                </button>
+                                            </div>
                                         </div>
                                         <div class="mb-5 col-md-4">
                                             <label class="form-label">{{ __('products.brand') }}</label>
-                                            <select class="form-select" id="brand_id" name="brand_id" required>
-                                                <option value="">{{ __('products.choose_brand') }}</option>
-                                                @foreach($brands as $brand)
-                                                    <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
-                                                        {{ $brand->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="d-flex align-items-center">
+                                                <select class="form-select me-2" id="brand_id" name="brand_id" required>
+                                                    <option value="">{{ __('products.choose_brand') }}</option>
+                                                    @foreach($brands as $brand)
+                                                        <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
+                                                            {{ $brand->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal">
+                                                    {{ __('products.add') }}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -292,7 +320,7 @@
                                             </select>
                                         </div>
 
-                                        <div class="mb-10 col-md-4" id="customer_section" style="display: none;">
+                                        <div class="mb-10 col-md-4" id="customer_section" style="display: {{ old('client_type', $product->client_type) === 'customer' ? 'block' : 'none' }};">
                                             <label class="form-label">{{ __('products.select_customer') }}</label>
                                             <select class="form-select" id="customer_id" name="customer_id">
                                                 <option value="">{{ __('products.choose_customer') }}</option>
@@ -304,7 +332,7 @@
                                             </select>
                                         </div>
 
-                                        <div class="mb-10 col-md-4" id="supplier_section" style="display: none;">
+                                        <div class="mb-10 col-md-4" id="supplier_section" style="display: {{ old('client_type', $product->client_type) === 'supplier' ? 'block' : 'none' }};">
                                             <label class="form-label">{{ __('products.select_supplier') }}</label>
                                             <select class="form-select" id="supplier_id" name="supplier_id">
                                                 <option value="">{{ __('products.choose_supplier') }}</option>
@@ -320,12 +348,55 @@
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end mt-4">
+                    <div class="d-flex justify-content-end mt-2 mb-2">
                         <button type="submit" class="btn btn-success me-3">{{ __('products.save') }}</button>
                         <a href="{{ route('products.index') }}" class="btn btn-secondary">{{ __('products.cancel') }}</a>
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">{{ __('products.add_new_category') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="category_name" class="form-label">{{ __('products.category_name') }}</label>
+                            <input type="text" class="form-control" id="category_name" name="name" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">{{ __('products.add') }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addBrandModal" tabindex="-1" aria-labelledby="addBrandModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBrandModalLabel">{{ __('products.add_new_brand') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addBrandForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="brand_name" class="form-label">{{ __('products.brand_name') }}</label>
+                            <input type="text" class="form-control" id="brand_name" name="name" required>
+                            <small id="brand-error" class="text-danger d-none">{{ __('products.brand_already_exists') }}</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">{{ __('products.add') }}</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -336,19 +407,16 @@
                 const detailsTab = document.getElementById('detailsTab');
                 const detailsContent = document.getElementById('kt_ecommerce_add_product_details');
 
-                isMobileCheckbox.addEventListener('change', function () {
-                    const isChecked = this.checked;
+                function toggleDetailsSection() {
+                    const isChecked = isMobileCheckbox.checked || "{{ $product->mobileDetail ? 'true' : 'false' }}" === "true";
+
                     detailsTab.style.display = isChecked ? 'block' : 'none';
                     detailsContent.style.display = isChecked ? 'block' : 'none';
-                });
-
-                if (isMobileCheckbox.checked) {
-                    detailsTab.style.display = 'block';
-                    detailsContent.style.display = 'block';
-                } else {
-                    detailsTab.style.display = 'none';
-                    detailsContent.style.display = 'none';
                 }
+
+                toggleDetailsSection();
+
+                isMobileCheckbox.addEventListener('change', toggleDetailsSection);
             });
 
             document.addEventListener('DOMContentLoaded', function () {
@@ -361,16 +429,16 @@
                     newEntry.classList.add('input-group', 'mb-2', 'warehouse-entry');
 
                     newEntry.innerHTML = `
-            <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
-                <option value="">{{ __('products.select_warehouse') }}</option>
-                @foreach($warehouses as $availableWarehouse)
-                    <option value="{{ $availableWarehouse->id }}">{{ $availableWarehouse->name }}</option>
-                @endforeach
-                    </select>
-                    <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('products.stock') }}" required>
-            <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('products.stock_alert') }}" required>
-            <button type="button" class="btn btn-danger remove-warehouse">{{ __('products.remove') }}</button>
-        `;
+                        <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
+                            <option value="">{{ __('products.select_warehouse') }}</option>
+                            @foreach($warehouses as $availableWarehouse)
+                                <option value="{{ $availableWarehouse->id }}">{{ $availableWarehouse->name }}</option>
+                            @endforeach
+                                </select>
+                                <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('products.stock') }}" required>
+                        <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('products.stock_alert') }}" required>
+                        <button type="button" class="btn btn-danger remove-warehouse">{{ __('products.remove') }}</button>
+                    `;
 
                     warehouseContainer.appendChild(newEntry);
 
@@ -420,8 +488,20 @@
                 const customerSection = document.getElementById('customer_section');
                 const supplierSection = document.getElementById('supplier_section');
 
-                // Function to toggle client type based on payment method
-                function toggleClientTypeBasedOnPayment() {
+                function toggleClientType() {
+                    if (clientTypeSelect.value === 'customer') {
+                        customerSection.style.display = 'block';
+                        supplierSection.style.display = 'none';
+                    } else if (clientTypeSelect.value === 'supplier') {
+                        customerSection.style.display = 'none';
+                        supplierSection.style.display = 'block';
+                    } else {
+                        customerSection.style.display = 'none';
+                        supplierSection.style.display = 'none';
+                    }
+                }
+
+                function handlePaymentMethodChange() {
                     if (paymentMethodSelect.value === 'credit') {
                         clientTypeSelect.value = 'supplier';
                         clientTypeSelect.setAttribute('disabled', true);
@@ -429,15 +509,16 @@
                         supplierSection.style.display = 'block';
                     } else {
                         clientTypeSelect.removeAttribute('disabled');
-                        clientTypeSelect.value = '';
-                        customerSection.style.display = 'none';
-                        supplierSection.style.display = 'none';
+                        toggleClientType();
                     }
                 }
 
-                toggleClientTypeBasedOnPayment();
+                toggleClientType();
+                handlePaymentMethodChange();
 
-                paymentMethodSelect.addEventListener('change', toggleClientTypeBasedOnPayment);
+                clientTypeSelect.addEventListener('change', toggleClientType);
+
+                paymentMethodSelect.addEventListener('change', handlePaymentMethodChange);
             });
 
             document.addEventListener('DOMContentLoaded', function () {
@@ -464,7 +545,7 @@
                                 .then((data) => {
                                     if (data.success) {
                                         alert(data.message);
-                                        location.reload(); // Reload to reflect changes
+                                        location.reload();
                                     } else {
                                         alert(data.message || 'Error deleting image.');
                                     }
@@ -475,6 +556,108 @@
                 });
             });
 
+            function checkBarcode() {
+                let barcodeInput = document.getElementById("barcode");
+                let feedback = document.getElementById("barcode-feedback");
+                let barcode = barcodeInput.value.trim();
+                let productId = "{{ $product->id ?? '' }}";
+
+                if (barcode === "") return;
+
+                fetch(`{{ route('products.checkBarcode', '') }}/${barcode}?product_id=${productId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            feedback.classList.remove("d-none");
+                            barcodeInput.classList.add("is-invalid");
+                        } else {
+                            feedback.classList.add("d-none");
+                            barcodeInput.classList.remove("is-invalid");
+                        }
+                    })
+                    .catch(error => console.error("Error checking barcode:", error));
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                document.getElementById("barcode").addEventListener("input", checkBarcode);
+            });
+
+            document.getElementById('addCategoryForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const form = document.getElementById('addCategoryForm');
+                const formData = new FormData(form);
+
+                fetch('{{ route('categories.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const categorySelect = document.getElementById('category_id');
+                            const newOption = document.createElement('option');
+                            newOption.value = data.category.id;
+                            newOption.textContent = data.category.name;
+                            newOption.selected = true;
+                            categorySelect.appendChild(newOption);
+
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
+                            modal.hide();
+
+                            form.reset();
+                        } else {
+                            alert(data.message || 'Error saving category.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            document.getElementById('addBrandForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const form = document.getElementById('addBrandForm');
+                const formData = new FormData(form);
+
+                fetch('{{ route('brands.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const brandSelect = document.getElementById('brand_id');
+                            const newOption = document.createElement('option');
+                            newOption.value = data.brand.id;
+                            newOption.textContent = data.brand.name;
+                            newOption.selected = true;
+                            brandSelect.appendChild(newOption);
+
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('addBrandModal'));
+                            modal.hide();
+
+                            form.reset();
+                        } else {
+                            alert(data.message || 'Error saving brand.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
         </script>
     @endsection
+
+    <style>
+        #kt_ecommerce_add_product_details:not(.show) {
+            display: none !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
 @endsection

@@ -71,5 +71,15 @@
     <script src="{{ asset('js/custom/authentication/sign-in/general.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @yield('scripts')
+
+    @section('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                @if(session('success'))
+                toastr.success("{{ session('success') }}");
+                @endif
+            });
+        </script>
+    @endsection
 </body>
 </html>

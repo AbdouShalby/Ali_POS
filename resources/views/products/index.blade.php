@@ -95,10 +95,12 @@
                                                 <li><a class="dropdown-item text-info" href="{{ route('products.show', $product->id) }}">{{ __('products.show') }}</a></li>
                                                 <li><a class="dropdown-item text-success" href="{{ route('products.edit', $product->id) }}">{{ __('products.edit') }}</a></li>
                                                 <li>
-                                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="d-inline">
+                                                    <button type="button" class="dropdown-item text-danger" onclick="deleteConfirmation(event, this)">
+                                                        {{ __('products.delete') }}
+                                                    </button>
+                                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="d-none">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="dropdown-item text-danger">{{ __('products.delete') }}</button>
                                                     </form>
                                                 </li>
                                                 @if($product->mobileDetail)
@@ -152,6 +154,37 @@
     </div>
 
     @section('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            function deleteConfirmation(event, button) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: "{{ __('products.are_you_sure') }}",
+                    text: "{{ __('products.delete_confirmation_message') }}",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "{{ __('products.yes_delete') }}",
+                    cancelButtonText: "{{ __('products.cancel') }}"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        button.nextElementSibling.submit();
+                    }
+                });
+            }
+
+            @if(session('success'))
+            Swal.fire("{{ __('products.success') }}", "{{ session('success') }}", "success");
+            @endif
+
+            @if(session('error'))
+            Swal.fire("{{ __('products.error') }}", "{{ session('error') }}", "error");
+            @endif
+        </script>
+
         <script>
             @if(session('success'))
             toastr.success("{{ session('success') }}");

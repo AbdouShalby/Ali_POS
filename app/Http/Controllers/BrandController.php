@@ -32,15 +32,11 @@ class BrandController extends Controller
 
         $brand = Brand::create($validatedData);
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => __('brands.brand_added_successfully'),
-                'brand' => $brand,
-            ]);
-        }
-
-        return redirect()->route('brands.index')->with('success', __('brands.brand_added_successfully'));
+        return response()->json([
+            'success' => true,
+            'message' => __('brands.brand_added_successfully'),
+            'brand' => $brand,
+        ]);
     }
 
     public function show($id)
