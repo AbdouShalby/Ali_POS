@@ -77,13 +77,9 @@
                                         <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-warning btn-sm mx-1">
                                             <i class="bi bi-pencil"></i> {{ __('suppliers.edit') }}
                                         </a>
-                                        <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm mx-1" onclick="return confirm('{{ __('suppliers.confirm_delete') }}')">
-                                                <i class="bi bi-trash"></i> {{ __('suppliers.delete') }}
-                                            </button>
-                                        </form>
+                                        <button class="btn btn-danger btn-sm deleteSupplier" data-id="{{ $supplier->id }}">
+                                            <i class="bi bi-trash"></i> {{ __('suppliers.delete') }}
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -101,4 +97,63 @@
             </div>
         </div>
     </div>
+
+    @section('scripts')
+        <script>
+            window.translations = @json(trans('suppliers'));
+        </script>
+        <script>
+            $(document).ready(function () {
+                $(document).on('click', '.deleteSupplier', function (e) {
+                    e.preventDefault();
+
+                    let button = $(this);
+                    let supplierId = button.data('id');
+                    let deleteUrl = `/suppliers/${supplierId}`;
+
+                    Swal.fire({
+                        title: window.translations.confirm_delete_title,
+                        text: window.translations.confirm_delete_message,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: window.translations.yes_delete,
+                        cancelButtonText: window.translations.cancel
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: deleteUrl,
+                                type: "POST",
+                                data: {
+                                    _method: "DELETE",
+                                    _token: $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        Swal.fire({
+                                            title: window.translations.deleted,
+                                            text: window.translations.supplier_deleted_successfully,
+                                            icon: "success",
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        });
+
+                                        button.closest('tr').fadeOut(500, function () {
+                                            $(this).remove();
+                                        });
+                                    } else {
+                                        Swal.fire(window.translations.error_title, window.translations.delete_failed, "error");
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire(window.translations.error_title, window.translations.delete_failed, "error");
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    @endsection
 @endsection
