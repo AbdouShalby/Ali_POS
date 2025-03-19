@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             PurchaseItemsTableSeeder::class,
             DebtsTableSeeder::class,
             CryptoTransactionSeeder::class,
+            MaintenanceSeeder::class,
         ]);
     }
 }

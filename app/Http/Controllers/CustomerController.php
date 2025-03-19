@@ -56,12 +56,14 @@ class CustomerController extends Controller
 
     public function show(Request $request, $id)
     {
-        $customer = Customer::findOrFail($id);
+        $customer = Customer::with('sales.saleItems.product')->findOrFail($id);
 
-        $salesQuery = $customer->sales();
+        $salesQuery = $customer->sales()->with('saleItems.product');
 
         if ($request->filled('search')) {
-            $salesQuery->where('product_name', 'LIKE', "%{$request->search}%");
+            $salesQuery->whereHas('saleItems.product', function ($query) use ($request) {
+                $query->where('name', 'LIKE', "%{$request->search}%");
+            });
         }
 
         if ($request->filled('from') && $request->filled('to')) {

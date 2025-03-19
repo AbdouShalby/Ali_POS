@@ -95,13 +95,15 @@
                                 </tr>
                                 </thead>
                                 <tbody class="fw-semibold text-gray-600">
-                                @foreach($customer->sales as $sale)
-                                    <tr>
-                                        <td>{{ $sale->product->name }}</td>
-                                        <td>{{ $sale->quantity }}</td>
-                                        <td>{{ $sale->total_price }}</td>
-                                        <td>{{ $sale->created_at->format('Y-m-d') }}</td>
-                                    </tr>
+                                @foreach($sales as $sale)
+                                    @foreach($sale->saleItems as $item)
+                                        <tr>
+                                            <td>{{ optional($item->product)->name ?? __('customers.product_not_found') }}</td>
+                                            <td>{{ $item->quantity }}</td>
+                                            <td>{{ $item->price * $item->quantity }}</td>
+                                            <td>{{ $sale->created_at->format('Y-m-d') }}</td>
+                                        </tr>
+                                    @endforeach
                                 @endforeach
                                 </tbody>
                             </table>

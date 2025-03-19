@@ -191,34 +191,6 @@
                     </div>
 
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link {{ isset($activePage) && ($activePage == 'users' || $activePage == 'users.create') ? 'active' : '' }}">
-                            <span class="menu-icon">
-                                <i class="ki-solid ki-profile-circle fs-1 text-primary"></i>
-                            </span>
-                            <span class="menu-title {{ isset($activePage) && ($activePage == 'users' || $activePage == 'users.create') ? 'text-primary' : '' }}">{{ __('sidebar.Users') }}</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <div class="menu-sub menu-sub-accordion">
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'users' ? 'active' : '' }}" href="{{ route('users.index') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'users' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users' ? 'text-primary' : '' }}">{{ __('sidebar.All Users') }}</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a class="menu-link {{ isset($activePage) && $activePage == 'users.create' ? 'active' : '' }}" href="{{ route('users.create') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'users.create' ? 'bg-primary' : '' }}"></span>
-                                    </span>
-                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create User') }}</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                         <span class="menu-link {{ isset($activePage) && ($activePage == 'maintenances' || $activePage == 'maintenances.create') ? 'active' : '' }}">
                             <span class="menu-icon">
                                 <i class="ki-solid ki-data fs-1 text-primary"></i>
@@ -290,56 +262,33 @@
                         </div>
                     </div>
 
-{{--                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">--}}
-{{--                        <span class="menu-link">--}}
-{{--                            <span class="menu-icon"><i class="ki-solid ki-finance fs-1 text-primary"></i></span>--}}
-{{--                            <span class="menu-title">{{ __('sidebar.Financial Reports') }}</span>--}}
-{{--                            <span class="menu-arrow"></span>--}}
-{{--                        </span>--}}
-{{--                        <div class="menu-sub menu-sub-accordion">--}}
-{{--                            <div class="menu-item">--}}
-{{--                                <a class="menu-link" href="{{ route('reports.expenses') }}">--}}
-{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
-{{--                                    <span class="menu-title">{{ __('sidebar.Expenses Report') }}</span>--}}
-{{--                                </a>--}}
-{{--                            </div>--}}
-{{--                            <div class="menu-item">--}}
-{{--                                <a class="menu-link" href="{{ route('accounting.payments') }}">--}}
-{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
-{{--                                    <span class="menu-title">{{ __('sidebar.Payments') }}</span>--}}
-{{--                                </a>--}}
-{{--                            </div>--}}
-{{--                            <div class="menu-item">--}}
-{{--                                <a class="menu-link" href="{{ route('accounting.revenues') }}">--}}
-{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
-{{--                                    <span class="menu-title">{{ __('sidebar.Revenues') }}</span>--}}
-{{--                                </a>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link">
-                            <span class="menu-icon"><i class="ki-solid ki-gear fs-1 text-primary"></i></span>
-                            <span class="menu-title">{{ __('sidebar.System Settings') }}</span>
+                        <span class="menu-link {{ isset($activePage) && ($activePage == 'users' || $activePage == 'users.create') ? 'active' : '' }}">
+                            <span class="menu-icon">
+                                <i class="ki-solid ki-profile-circle fs-1 text-primary"></i>
+                            </span>
+                            <span class="menu-title {{ isset($activePage) && ($activePage == 'users' || $activePage == 'users.create') ? 'text-primary' : '' }}">{{ __('sidebar.Users') }}</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
-{{--                            <div class="menu-item">--}}
-{{--                                <a class="menu-link" href="{{ route('settings.index') }}">--}}
-{{--                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>--}}
-{{--                                    <span class="menu-title">{{ __('sidebar.System Settings') }}</span>--}}
-{{--                                </a>--}}
-{{--                            </div>--}}
                             <div class="menu-item">
-                                <a class="menu-link" href="{{ route('users.index') }}">
-                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                                    <span class="menu-title">{{ __('sidebar.Users') }}</span>
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'users' ? 'active' : '' }}" href="{{ route('users.index') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'users' ? 'bg-primary' : '' }}"></span>
+                                    </span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users' ? 'text-primary' : '' }}">{{ __('sidebar.All Users') }}</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'users.create' ? 'active' : '' }}" href="{{ route('users.create') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'users.create' ? 'bg-primary' : '' }}"></span>
+                                    </span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'users.create' ? 'text-primary' : '' }}">{{ __('sidebar.Create User') }}</span>
                                 </a>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

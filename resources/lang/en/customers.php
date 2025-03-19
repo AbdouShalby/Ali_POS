@@ -36,4 +36,8 @@ return [
     'search_by_name' => 'Search by Name',
     'customer_information' => 'Customer Information',
     'update' => 'Update',
+    'product_name'  => 'Product Name',
+    'quantity' =>  'Quantity',
+    'total_price'  => 'Total Price',
+    'purchase_date'  => 'Purchase Date',
 ];
