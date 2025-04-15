@@ -15,6 +15,11 @@ class Sale extends Model
         'sale_date',
         'total_amount',
         'notes',
+        'user_id',
+        'discount',
+        'tax',
+        'tax_percent',
+        'payment_method',
     ];
 
     public function customer()
@@ -30,5 +35,20 @@ class Sale extends Model
     public function saleItems()
     {
         return $this->hasMany(SaleItem::class);
+    }
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+    
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'sale_items', 'sale_id', 'product_id');
     }
 }

@@ -70,21 +70,47 @@ class MaintenanceController extends Controller
 
     public function update(Request $request, $id)
     {
-        $maintenance = Maintenance::findOrFail($id);
+        try {
+            $maintenance = Maintenance::findOrFail($id);
 
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:15',
-            'device_type' => 'required|string|max:255',
-            'problem_description' => 'required|string',
-            'cost' => 'nullable|numeric|min:0',
-            'password' => 'nullable|string|max:255',
-            'status' => 'required|in:in_maintenance,completed,delivered',
-        ]);
+            $validated = $request->validate([
+                'customer_name' => 'required|string|max:255',
+                'phone_number' => 'required|string|max:15',
+                'device_type' => 'required|string|max:255',
+                'problem_description' => 'required|string',
+                'cost' => 'nullable|numeric|min:0',
+                'password' => 'nullable|string|max:255',
+                'status' => 'required|in:in_maintenance,completed,delivered',
+            ]);
+            
+            // تسجيل البيانات المرسلة للتحقق من المشكلة
+            \Illuminate\Support\Facades\Log::info('Maintenance Update Data', [
+                'id' => $id,
+                'request_data' => $request->all(),
+                'old_status' => $maintenance->status,
+                'new_status' => $request->status
+            ]);
+            
+            // تحديث البيانات بشكل صريح بدلاً من استخدام update($request->all())
+            $maintenance->fill($validated);
+            $result = $maintenance->save();
+            
+            // تسجيل نتيجة الحفظ
+            \Illuminate\Support\Facades\Log::info('Maintenance Update Result', [
+                'save_result' => $result,
+                'new_maintenance_data' => $maintenance->toArray()
+            ]);
 
-        $maintenance->update($request->all());
-
-        return redirect()->route('maintenances.index')->with('success', 'تم تحديث عملية الصيانة بنجاح');
+            return redirect()->route('maintenances.index')->with('success', 'تم تحديث عملية الصيانة بنجاح');
+        } catch (\Exception $e) {
+            // تسجيل الخطأ في حالة حدوثه
+            \Illuminate\Support\Facades\Log::error('Maintenance Update Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->back()->withInput()->with('error', 'حدث خطأ أثناء تحديث عملية الصيانة: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)

@@ -48,4 +48,9 @@ return [
     'Expenses Report'   => 'تقرير المصروفات',
     'Payments'  => 'المدفوعات',
     'Revenues'   => 'الإيرادات',
+    'Reports' => 'التقارير',
+    'Sales Reports' => 'تقرير المبيعات',
+    'Detailed Sales' => 'تفاصيل المبيعات',
+    'Purchase Reports' => 'تقرير المشتريات',
+    'Debts Reports' => 'تقرير المدين',
 ];

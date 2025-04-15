@@ -214,5 +214,31 @@ class SaleController extends Controller
 
         return view('sales.history', compact('sales', 'search', 'dateFrom', 'dateTo'))->with('activePage', 'sales.history');
     }
+    
+    /**
+     * عرض منتجات البيع بتنسيق JSON للاستخدام في AJAX
+     */
+    public function getProducts($id)
+    {
+        $sale = Sale::with(['saleItems.product'])->findOrFail($id);
+        
+        // تحضير البيانات للعرض
+        $products = [];
+        foreach ($sale->saleItems as $item) {
+            $products[] = [
+                'id' => $item->product->id,
+                'name' => $item->product->name,
+                'pivot' => [
+                    'quantity' => (int)$item->quantity,
+                    'price' => (float)$item->price
+                ]
+            ];
+        }
+        
+        return response()->json([
+            'success' => true,
+            'products' => $products
+        ]);
+    }
 
 }

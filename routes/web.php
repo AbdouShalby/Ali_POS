@@ -10,6 +10,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ExpenseReportController;
 use App\Http\Controllers\ExternalPurchaseController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\POSController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MobileController;
 use App\Http\Controllers\PaymentController;
@@ -45,6 +46,14 @@ Auth::routes();
 Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    
+    // POS Routes
+    Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
+    Route::get('/pos/warehouse-products', [POSController::class, 'getWarehouseProducts'])->name('pos.warehouse-products');
+    Route::get('/pos/search-barcode', [POSController::class, 'searchByBarcode'])->name('pos.search-barcode');
+    Route::get('/pos/search-products', [POSController::class, 'searchProducts'])->name('pos.search-products');
+    Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
+    Route::get('/pos/receipt/{id}', [POSController::class, 'printReceipt'])->name('pos.receipt');
 
     // **Accounting Routes**
     Route::get('/accounting/payments', [PaymentController::class, 'index'])->name('accounting.payments');
@@ -112,6 +121,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     // **Reports Routes**
     Route::prefix('reports')->group(function () {
         Route::get('/sales', [ReportController::class, 'sales'])->name('reports.sales');
+        Route::get('/detailed-sales', [ReportController::class, 'detailedSales'])->name('reports.detailed_sales');
         Route::get('/sales/export/pdf', [ReportController::class, 'exportSalesPDF'])->name('reports.sales.export.pdf');
         Route::get('/sales/export/excel', [ReportController::class, 'exportSalesExcel'])->name('reports.sales.export.excel');
 
@@ -126,6 +136,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     // **Sale Routes**
     Route::get('/sales/history', [SaleController::class, 'history'])->name('sales.history');
+    Route::get('/sales/{id}/products', [SaleController::class, 'getProducts'])->name('sales.products');
     Route::resource('/sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
 
     // **Settings Routes**

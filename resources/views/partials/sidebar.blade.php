@@ -263,6 +263,50 @@
                     </div>
 
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                        <span class="menu-link {{ isset($activePage) && in_array($activePage, ['reports.sales', 'reports.purchases', 'reports.debts']) ? 'active' : '' }}">
+                            <span class="menu-icon">
+                                <i class="ki-solid ki-chart fs-1 text-primary"></i>
+                            </span>
+                            <span class="menu-title {{ isset($activePage) && in_array($activePage, ['reports.sales', 'reports.purchases', 'reports.debts']) ? 'text-primary' : '' }}">{{ __('sidebar.Reports') }}</span>
+                            <span class="menu-arrow"></span>
+                        </span>
+                        <div class="menu-sub menu-sub-accordion">
+                            <div class="menu-item">
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'reports.sales' ? 'active' : '' }}" href="{{ route('reports.sales') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'reports.sales' ? 'bg-primary' : '' }}"></span>
+                                    </span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'reports.sales' ? 'text-primary' : '' }}">{{ __('sidebar.Sales Reports') }}</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'reports.detailed_sales' ? 'active' : '' }}" href="{{ route('reports.detailed_sales') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'reports.detailed_sales' ? 'bg-primary' : '' }}"></span>
+                                    </span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'reports.detailed_sales' ? 'text-primary' : '' }}">{{ __('sidebar.Detailed Sales') }}</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'reports.purchases' ? 'active' : '' }}" href="{{ route('reports.purchases') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'reports.purchases' ? 'bg-primary' : '' }}"></span>
+                                    </span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'reports.purchases' ? 'text-primary' : '' }}">{{ __('sidebar.Purchase Reports') }}</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ isset($activePage) && $activePage == 'reports.debts' ? 'active' : '' }}" href="{{ route('reports.debts') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot {{ isset($activePage) && $activePage == 'reports.debts' ? 'bg-primary' : '' }}"></span>
+                                    </span>
+                                    <span class="menu-title {{ isset($activePage) && $activePage == 'reports.debts' ? 'text-primary' : '' }}">{{ __('sidebar.Debts Reports') }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                         <span class="menu-link {{ isset($activePage) && ($activePage == 'users' || $activePage == 'users.create') ? 'active' : '' }}">
                             <span class="menu-icon">
                                 <i class="ki-solid ki-profile-circle fs-1 text-primary"></i>

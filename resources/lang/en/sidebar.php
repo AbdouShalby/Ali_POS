@@ -48,4 +48,9 @@ return [
     'Expenses Report'   => 'Expenses Report',
     'Payments'  => 'Payments',
     'Revenues'   => 'Revenues',
+    'Reports' => 'Reports',
+    'Sales Reports' => 'Sales Reports',
+    'Detailed Sales' => 'Detailed Sales',
+    'Purchase Reports' => 'Purchase Reports',
+    'Debts Reports' => 'Debts Reports',
 ];
