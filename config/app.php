@@ -23,7 +23,7 @@ return [
     'timezone' => 'UTC',
 
 
-    'locale' => 'en',
+    'locale' => env('APP_LOCALE', 'en'),
 
 
     'fallback_locale' => 'en',
@@ -55,7 +55,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
-        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ])->toArray(),
 

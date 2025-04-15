@@ -1,0 +1,439 @@
+/**
+ * RTL Support for Ali POS System
+ * Arabic Language Support
+ */
+
+/* ========== Base RTL Settings ========== */
+html[dir="rtl"],
+body.rtl {
+    direction: rtl;
+    text-align: right;
+    font-family: 'Cairo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* ========== Layout Structure ========== */
+/* Sidebar */
+body.rtl .app-sidebar, body[dir="rtl"] .app-sidebar, body[dir="rtl"] .aside, body[dir="rtl"] .sidebar {
+    right: 0 !important;
+    left: auto !important;
+    position: fixed;
+    direction: rtl;
+    box-shadow: 0 0 30px rgba(0,0,0,0.08);
+    z-index: 1030;
+}
+
+body.rtl .app-wrapper, body[dir="rtl"] .app-wrapper, body[dir="rtl"] .main-wrapper, body[dir="rtl"] .main-content {
+    padding-right: 265px !important;
+    padding-left: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    direction: rtl;
+    text-align: right;
+}
+@media (max-width: 991.98px) {
+    body[dir="rtl"] .app-sidebar, body[dir="rtl"] .aside, body[dir="rtl"] .sidebar {
+        right: -100%;
+        left: auto;
+    }
+    body[dir="rtl"] .app-sidebar.open, body[dir="rtl"] .aside.open, body[dir="rtl"] .sidebar.open {
+        right: 0;
+    }
+    body[dir="rtl"] .app-wrapper, body[dir="rtl"] .main-wrapper, body[dir="rtl"] .main-content {
+        padding-right: 0 !important;
+    }
+}
+
+body.rtl.app-sidebar-minimize:not(.app-sidebar-hover) .app-wrapper {
+    padding-right: 75px;
+    padding-left: 0;
+}
+
+/* Main Content */
+body.rtl .app-main, body[dir="rtl"] .app-main {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    direction: rtl;
+}
+
+body.rtl .app-content, body[dir="rtl"] .app-content {
+    padding-right: 30px;
+    padding-left: 0;
+    direction: rtl;
+}
+@media (max-width: 991.98px) {
+    body[dir="rtl"] .app-content {
+        padding-right: 10px;
+        padding-left: 0;
+    }
+}
+
+body.rtl #kt_app_content_container {
+    direction: rtl;
+}
+
+/* ========== Sidebar Elements ========== */
+body.rtl .app-sidebar-menu {
+    padding-right: 0;
+}
+
+body.rtl .menu-title {
+    text-align: right;
+}
+
+body.rtl .menu-item .menu-link, body[dir="rtl"] .menu-item .menu-link {
+    padding-right: 15px;
+    padding-left: 0;
+    text-align: right;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+body.rtl .menu-arrow,
+body.rtl .ki-arrow-right,
+body.rtl .ki-double-arrow-next {
+    transform: rotate(180deg);
+}
+
+body.rtl .menu-sub-accordion {
+    padding-right: 25px;
+    padding-left: 0;
+}
+
+/* ========== Cards and Containers ========== */
+body.rtl .card {
+    direction: rtl;
+    text-align: right;
+}
+
+body.rtl .card-header {
+    text-align: right;
+}
+
+body.rtl .card-body {
+    text-align: right;
+}
+
+body.rtl .card-footer {
+    text-align: right;
+}
+
+body.rtl .container,
+body.rtl .container-fluid,
+body.rtl .container-xxl,
+body.rtl .container-xl,
+body.rtl .container-lg,
+body.rtl .container-md,
+body.rtl .container-sm {
+    direction: rtl;
+    text-align: right;
+}
+
+/* ========== Tables ========== */
+body.rtl table.dataTable thead th,
+body.rtl table.dataTable tbody td {
+    text-align: right;
+}
+
+body.rtl .dataTables_wrapper .dataTables_filter {
+    float: left;
+    text-align: left;
+}
+
+body.rtl .dataTables_wrapper .dataTables_length {
+    float: right;
+    text-align: right;
+}
+
+/* ========== Form Elements ========== */
+body.rtl .form-control {
+    text-align: right;
+}
+
+body.rtl .form-select {
+    padding-right: 0.75rem;
+    padding-left: 2rem;
+    background-position: left 0.75rem center;
+}
+
+body.rtl .form-check {
+    padding-right: 1.5em;
+    padding-left: 0;
+}
+
+body.rtl .form-check .form-check-input {
+    float: right;
+    margin-right: -1.5em;
+    margin-left: 0;
+}
+
+/* ========== Margin & Padding Helpers ========== */
+body.rtl .me-1 {
+    margin-left: 0.25rem !important;
+    margin-right: 0 !important;
+}
+
+body.rtl .me-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+
+body.rtl .me-3 {
+    margin-left: 0.75rem !important;
+    margin-right: 0 !important;
+}
+
+body.rtl .me-4 {
+    margin-left: 1rem !important;
+    margin-right: 0 !important;
+}
+
+body.rtl .me-5 {
+    margin-left: 1.25rem !important;
+    margin-right: 0 !important;
+}
+
+body.rtl .ms-1 {
+    margin-right: 0.25rem !important;
+    margin-left: 0 !important;
+}
+
+body.rtl .ms-2 {
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+}
+
+body.rtl .ms-3 {
+    margin-right: 0.75rem !important;
+    margin-left: 0 !important;
+}
+
+body.rtl .ms-4 {
+    margin-right: 1rem !important;
+    margin-left: 0 !important;
+}
+
+body.rtl .ms-5 {
+    margin-right: 1.25rem !important;
+    margin-left: 0 !important;
+}
+
+/* ========== Float & Text Alignment ========== */
+body.rtl .float-start {
+    float: right !important;
+}
+
+body.rtl .float-end {
+    float: left !important;
+}
+
+body.rtl .text-start {
+    text-align: right !important;
+}
+
+body.rtl .text-end {
+    text-align: left !important;
+}
+
+/* ========== Dropdown Menus ========== */
+body.rtl .dropdown-menu {
+    text-align: right;
+}
+
+body.rtl .dropdown-item {
+    text-align: right;
+}
+
+/* ========== Breadcrumbs ========== */
+body.rtl .breadcrumb {
+    padding-right: 0;
+    padding-left: 0;
+    direction: rtl;
+}
+
+body.rtl .breadcrumb-item+.breadcrumb-item::before {
+    float: right;
+    padding-left: 0.5rem;
+    padding-right: 0;
+}
+
+/* ========== Dashboard Specific Styles ========== */
+body.rtl .row {
+    direction: rtl;
+}
+
+body.rtl .dashboard-stat-card {
+    direction: rtl;
+    text-align: right;
+}
+
+/* ========== Buttons ========== */
+body.rtl .btn-group > .btn:not(:first-child),
+body.rtl .btn-group > .btn-group:not(:first-child) {
+    margin-right: -1px;
+    margin-left: 0;
+}
+
+body.rtl .btn-group > .btn:not(:last-child):not(.dropdown-toggle),
+body.rtl .btn-group > .btn-group:not(:last-child) > .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+body.rtl .btn-group > .btn:nth-child(n+3),
+body.rtl .btn-group > :not(.btn-check) + .btn,
+body.rtl .btn-group > .btn-group:not(:first-child) > .btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+/* ========== Modal Dialogs ========== */
+body.rtl .modal-header .btn-close {
+    margin: -0.5rem auto -0.5rem -0.5rem;
+}
+
+/* ========== Pagination ========== */
+body.rtl .page-item:first-child .page-link {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+body.rtl .page-item:last-child .page-link {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+/* ========== RTL Header/Navbar Fix ========== */
+body[dir="rtl"] .app-header,
+body.rtl .app-header,
+body[dir="rtl"] #kt_app_header,
+body.rtl #kt_app_header {
+    direction: rtl;
+    text-align: right;
+    padding-left: 0 !important;
+}
+
+body[dir="rtl"] .app-header .container,
+body[dir="rtl"] .app-header .container-fluid,
+body[dir="rtl"] #kt_app_header_container.container,
+body[dir="rtl"] #kt_app_header_container.container-fluid {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    padding-right: 2rem !important;
+    padding-left: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    direction: rtl;
+    justify-content: flex-end !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+body[dir="rtl"] .app-header {
+    padding-left: 0 !important;
+}
+
+
+@media (max-width: 991.98px) {
+    body[dir="rtl"] .app-header .app-container,
+    body[dir="rtl"] #kt_app_header_container {
+        padding-right: 0 !important;
+    }
+}
+
+/* ====== RTL Sidebar on Right ====== */
+body[dir="rtl"] .app-sidebar {
+    right: 0 !important;
+    left: auto !important;
+    border-right: none !important;
+    border-left: 1px solid #222 !important;
+}
+
+/* ====== RTL Header: No right gap ====== */
+@media (min-width: 992px) {
+  [dir="rtl"][data-kt-app-header-fixed="true"][data-kt-app-sidebar-fixed="true"][data-kt-app-sidebar-push-header="true"] .app-header,
+  [dir="rtl"][data-kt-app-header-fixed="true"][data-kt-app-sidebar-sticky="on"][data-kt-app-sidebar-push-header="true"] .app-header,
+  body.rtl[data-kt-app-header-fixed="true"][data-kt-app-sidebar-fixed="true"][data-kt-app-sidebar-push-header="true"] .app-header,
+  body.rtl[data-kt-app-header-fixed="true"][data-kt-app-sidebar-sticky="on"][data-kt-app-sidebar-push-header="true"] .app-header {
+      right: 0 !important;
+      left: 0px !important;
+  }
+}
+
+/* ====== RTL Content: Margin on right only ====== */
+body[dir="rtl"] .app-main,
+body[dir="rtl"] .app-content {
+    margin-right: var(--bs-app-sidebar-width) !important;
+    margin-left: 0 !important;
+    float: right !important;
+}
+
+body[dir="rtl"] .app-main,
+body[dir="rtl"] .app-content {
+    margin-top: 70px !important;
+}
+
+
+@media (min-width: 992px) {
+  [dir="rtl"] .app-header {
+      margin-right: 0 !important;
+      margin-left: 0 !important;
+      padding-right: 0 !important;
+      padding-left: 0 !important;
+  }
+}
+
+body[dir="rtl"] .app-sidebar {
+    z-index: 1000 !important;
+}
+
+body[dir="rtl"] .app-header .app-container,
+body[dir="rtl"] #kt_app_header_container,
+body.rtl .app-header .app-container,
+body.rtl #kt_app_header_container {
+    flex-direction: row-reverse !important;
+    justify-content: flex-end !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+body[dir="rtl"] .app-header-menu,
+body[dir="rtl"] .app-navbar,
+body.rtl .app-header-menu,
+body.rtl .app-navbar {
+    flex-direction: row-reverse !important;
+    text-align: right;
+}
+body[dir="rtl"] .app-navbar-item {
+    margin-left: 1rem !important;
+    margin-right: 0 !important;
+}
+body[dir="rtl"] .app-navbar-item.ms-1,
+body[dir="rtl"] .app-navbar-item.ms-md-4 {
+    margin-right: 1rem !important;
+    margin-left: 0 !important;
+}
+body[dir="rtl"] .app-navbar-item.me-2,
+body[dir="rtl"] .app-navbar-item.me-n2 {
+    margin-left: 1rem !important;
+    margin-right: 0 !important;
+}
+@media (max-width: 991.98px) {
+    body[dir="rtl"] .app-header .app-container,
+    body[dir="rtl"] #kt_app_header_container {
+        flex-direction: column !important;
+        align-items: flex-end !important;
+    }
+}

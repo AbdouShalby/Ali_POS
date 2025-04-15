@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'transactions_today' => 'معاملات صندوق النقد اليوم',
+    'dashboard' => 'لوحة التحكم',
+    'search_placeholder' => 'البحث في المعاملات...',
+    'search' => 'بحث',
+    'transactions_list' => 'قائمة المعاملات',
+    'transaction_type' => 'نوع المعاملة',
+    'amount' => 'المبلغ',
+    'balance' => 'الرصيد',
+    'description' => 'الوصف',
+    'date' => 'التاريخ',
+    'Daily Report' => 'التقرير اليومي',
+    'Daily Report for :date' => 'التقرير اليومي لتاريخ :date',
+    'Dashboard' => 'لوحة التحكم',
+    'Report Summary' => 'ملخص التقرير',
+    'Total Income' => 'إجمالي الدخل',
+    'Total Expenses' => 'إجمالي المصروفات',
+    'Ending Balance' => 'الرصيد النهائي',
+    'Transactions List' => 'قائمة المعاملات',
+    'Date' => 'التاريخ',
+    'Transaction Type' => 'نوع المعاملة',
+    'Amount' => 'المبلغ',
+    'Balance' => 'الرصيد',
+    'Description' => 'الوصف',
+    'No transactions found' => 'لم يتم العثور على معاملات',
+];

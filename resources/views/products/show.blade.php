@@ -45,7 +45,7 @@
                                 @if(empty($product->image))
                                     <div class="image-input-wrapper w-150px h-150px" id="noImageLottie"></div>
                                 @else
-                                    <div class="image-input-wrapper w-150px h-150px" style="background-image: url({{ Storage::url($product->image) }})"></div>
+                                    <div class="image-input-wrapper w-150px h-150px" style="background-image: url({{ asset('storage/' . $product->image) }})"></div>
                                 @endif
                             </div>
                         </div>
@@ -64,6 +64,11 @@
                                 <div class="mt-2">
                                     <strong>{{ $product->barcode }}</strong>
                                 </div>
+                                <div class="mt-3">
+                                    <button id="printBarcode" type="button" class="btn btn-icon btn-primary">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -76,7 +81,7 @@
                             </div>
                             <div class="card-body text-center pt-0">
                                 <div class="d-inline-block mw-150px overflow-hidden text-center" style="border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
-                                    <img id="qrcode-image" src="{{ asset($product->qrcode) }}" alt="QR Code" style="max-width: 100%; height: auto;">
+                                    <img id="qrcode-image" src="{{ asset('storage/' . $product->qrcode) }}" alt="QR Code" style="max-width: 100%; height: auto;">
                                 </div>
                                 <div class="mt-3">
                                     <button class="btn btn-icon btn-primary me-2" onclick="downloadQRCode()">
@@ -212,6 +217,34 @@
                                                 <label class="form-label">{{ __('products.device_description') }}</label>
                                                 <textarea class="form-control mb-2 min-h-100px" placeholder="{{ __('products.empty_field') }}" readonly>{{ $product->mobileDetail->device_description }}</textarea>
                                             </div>
+                                            
+                                            @if($product->scan_id)
+                                            <div class="mb-10 col-md-6">
+                                                <label class="form-label">{{ __('products.scan_id') }}</label>
+                                                <div class="border rounded p-3 text-center">
+                                                    <img src="{{ asset('storage/' . $product->scan_id) }}" alt="{{ __('products.scan_id') }}" class="img-fluid mb-2" style="max-height: 200px;">
+                                                    <div class="mt-2">
+                                                        <a href="{{ asset('storage/' . $product->scan_id) }}" class="btn btn-sm btn-primary" download>
+                                                            <i class="fas fa-download me-1"></i> {{ __('products.download') }}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($product->scan_documents)
+                                            <div class="mb-10 col-md-6">
+                                                <label class="form-label">{{ __('products.scan_documents') }}</label>
+                                                <div class="border rounded p-3 text-center">
+                                                    <img src="{{ asset('storage/' . $product->scan_documents) }}" alt="{{ __('products.scan_documents') }}" class="img-fluid mb-2" style="max-height: 200px;">
+                                                    <div class="mt-2">
+                                                        <a href="{{ asset('storage/' . $product->scan_documents) }}" class="btn btn-sm btn-primary" download>
+                                                            <i class="fas fa-download me-1"></i> {{ __('products.download') }}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -254,6 +287,45 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="printOptionsModal" tabindex="-1" aria-labelledby="printOptionsLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="printOptionsLabel">{{ __('products.print_options') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="paperSize">{{ __('products.select_labels_per_sheet') }}</label>
+                        <select class="form-select" id="paperSize" required>
+                            <option value="40">{{ __('products.40_per_sheet') }}</option>
+                            <option value="30">{{ __('products.30_per_sheet') }}</option>
+                            <option value="24">{{ __('products.24_per_sheet') }}</option>
+                            <option value="20">{{ __('products.20_per_sheet') }}</option>
+                            <option value="18">{{ __('products.18_per_sheet') }}</option>
+                            <option value="14">{{ __('products.14_per_sheet') }}</option>
+                            <option value="12">{{ __('products.12_per_sheet') }}</option>
+                            <option value="10">{{ __('products.10_per_sheet') }}</option>
+                            <option value="custom">{{ __('products.custom') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customLabelCountContainer" style="display: none;">
+                        <label for="customLabelCount">{{ __('products.enter_custom_number_of_labels_per_page_(1-40):') }}</label>
+                        <input type="number" id="customLabelCount" min="1" max="40" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="labelContent" class="form-label">{{ __('products.label_content') }}</label>
+                        <input type="text" class="form-control" id="labelContent" placeholder="{{ __('products.enter_content_to_appear_on_the_label') }}" value="{{ __('products.product_name_price_and_barcode') }}" disabled>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('products.cancel') }}</button>
+                    <button type="button" class="btn btn-primary" id="confirmPrint">{{ __('products.print') }}</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -307,6 +379,7 @@
                         display: block;
                         margin: auto;
                     }
+                    p { font-size: 12px; margin: 0; }
                 </style>
             </head>
             <body>
@@ -322,6 +395,102 @@
                 printWindow.document.close();
             });
 
+            document.getElementById('printBarcode').addEventListener('click', function() {
+                const barcodeValue = "{{ $product->barcode }}";
+                if (!barcodeValue) {
+                    alert("{{ __('products.barcode_not_found') }}");
+                    return;
+                }
+                
+                const printOptionsModal = new bootstrap.Modal(document.getElementById('printOptionsModal'));
+                printOptionsModal.show();
+            });
+
+            document.getElementById('printOptionsModal').addEventListener('shown.bs.modal', function () {
+                const paperSizeSelect = document.getElementById('paperSize');
+                const customLabelCountContainer = document.getElementById('customLabelCountContainer');
+
+                paperSizeSelect.addEventListener('change', function () {
+                    if (paperSizeSelect.value === 'custom') {
+                        customLabelCountContainer.style.display = 'block';
+                    } else {
+                        customLabelCountContainer.style.display = 'none';
+                    }
+                });
+            });
+
+            document.getElementById('confirmPrint').addEventListener('click', function () {
+                const paperSizeSelect = document.getElementById('paperSize');
+                const customLabelCount = document.getElementById('customLabelCount');
+                let paperSize = paperSizeSelect.value;
+                
+                if (paperSize === 'custom') {
+                    if (customLabelCount.value === '' || customLabelCount.value < 1 || customLabelCount.value > 40) {
+                        alert("{{ __('products.please_enter_valid_custom_label_count') }}");
+                        return;
+                    }
+                    paperSize = customLabelCount.value;
+                }
+
+                const barcodeValue = "{{ $product->barcode }}";
+                const productName = "{{ $product->name }}";
+                const productPrice = "{{ $product->price }}";
+
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Print Barcode</title>
+                        <style>
+                            body { display: flex; flex-wrap: wrap; padding: 0; margin: 0; }
+                            .label { 
+                                width: calc(100% / ${Math.ceil(Math.sqrt(paperSize))}); 
+                                text-align: center; 
+                                padding: 10px;
+                                box-sizing: border-box;
+                            }
+                            img { max-width: 100%; height: auto; }
+                            p { font-size: 12px; margin: 0; }
+                        </style>
+                    </head>
+                    <body>
+                        ${Array.from({ length: parseInt(paperSize) }).map((_, index) => `
+                            <div class="label">
+                                <p>${productName}</p>
+                                <img id="barcode-${index}" />
+                                <p>${productPrice}</p>
+                            </div>
+                        `).join('')}
+                        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                for (let i = 0; i < ${paperSize}; i++) {
+                                    JsBarcode("#barcode-" + i, "${barcodeValue}", {
+                                        format: "CODE128",
+                                        displayValue: true
+                                    });
+                                }
+                                window.print();
+                            });
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+
+                // Cerrar el modal después de imprimir
+                const printOptionsModal = bootstrap.Modal.getInstance(document.getElementById('printOptionsModal'));
+                printOptionsModal.hide();
+            });
+
+            document.getElementById('paperSize').addEventListener('change', function () {
+                const customLabelCountContainer = document.getElementById('customLabelCountContainer');
+                if (this.value === 'custom') {
+                    customLabelCountContainer.style.display = 'block';
+                } else {
+                    customLabelCountContainer.style.display = 'none';
+                }
+            });
         </script>
     @endsection
 @endsection

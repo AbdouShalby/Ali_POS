@@ -25,6 +25,20 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
+
+// Language Switch Route
+Route::get('/language/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'ar'])) {
+        Session::put('locale', $locale);
+        App::setLocale($locale);
+        Config::set('app.locale', $locale);
+        session(['text_direction' => $locale == 'ar' ? 'rtl' : 'ltr']);
+    }
+    return redirect()->back();
+})->name('language.switch');
 
 Auth::routes();
 

@@ -287,22 +287,29 @@
                         <div class="separator my-2"></div>
                         <div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start" data-kt-menu-offset="-15px, 0">
                             <a href="#" class="menu-link px-5">
-                                <span class="menu-title position-relative">{{ __('Language') }}
-                                <span class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0">{{ __('English') }}
-                                <img class="w-15px h-15px rounded-1 ms-2" src="{{ asset('media/flags/united-states.svg') }}" alt="" /></span></span>
+                                <span class="menu-title position-relative">{{ __('general.language') }}
+                                <span class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0">
+                                    @if(app()->getLocale() == 'ar')
+                                        {{ __('general.arabic') }}
+                                        <img class="w-15px h-15px rounded-1 ms-2" src="{{ asset('media/flags/egypt.svg') }}" alt="" />
+                                    @else
+                                        {{ __('general.english') }}
+                                        <img class="w-15px h-15px rounded-1 ms-2" src="{{ asset('media/flags/united-states.svg') }}" alt="" />
+                                    @endif
+                                </span></span>
                             </a>
                             <div class="menu-sub menu-sub-dropdown w-175px py-4">
                                 <div class="menu-item px-3">
-                                    <a href="account/settings.html" class="menu-link d-flex px-5 active">
+                                    <a href="{{ route('language.switch', 'en') }}" class="menu-link d-flex px-5 {{ app()->getLocale() == 'en' ? 'active' : '' }}">
                                         <span class="symbol symbol-20px me-4">
                                             <img class="rounded-1" src="{{ asset('media/flags/united-states.svg') }}" alt="" />
-                                        </span>{{ __('English') }}</a>
+                                        </span>{{ __('general.english') }}</a>
                                 </div>
                                 <div class="menu-item px-3">
-                                    <a href="account/settings.html" class="menu-link d-flex px-5">
+                                    <a href="{{ route('language.switch', 'ar') }}" class="menu-link d-flex px-5 {{ app()->getLocale() == 'ar' ? 'active' : '' }}">
                                         <span class="symbol symbol-20px me-4">
                                             <img class="rounded-1" src="{{ asset('media/flags/egypt.svg') }}" alt="" />
-                                        </span>{{ __('Arabic') }}</a>
+                                        </span>{{ __('general.arabic') }}</a>
                                 </div>
                             </div>
                         </div>
