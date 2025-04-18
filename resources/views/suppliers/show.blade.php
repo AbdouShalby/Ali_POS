@@ -3,191 +3,295 @@
 @section('title', '- ' . __('suppliers.supplier_details'))
 
 @section('content')
-    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+    <!-- Toolbar -->
+    <div class="app-toolbar py-4 py-lg-6" id="kt_app_toolbar">
+        <div class="app-container container-xxl d-flex flex-stack flex-wrap gap-4">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                    {{ __('suppliers.supplier_details') }}
+                <h1 class="page-heading d-flex text-dark fw-bold fs-2 flex-column justify-content-center my-0">
+                    {{ $supplier->name }}
                 </h1>
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                     <li class="breadcrumb-item text-muted">
                         <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('suppliers.dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
                     </li>
                     <li class="breadcrumb-item text-muted">
                         <a href="{{ route('suppliers.index') }}" class="text-muted text-hover-primary">{{ __('suppliers.all_suppliers') }}</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
                     </li>
-                    <li class="breadcrumb-item text-muted">{{ $supplier->name }}</li>
+                    <li class="breadcrumb-item text-muted">{{ __('suppliers.supplier_details') }}</li>
                 </ul>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-pencil-square fs-5 me-2"></i>
+                    {{ __('suppliers.edit') }}
+                </a>
+                <button type="button" onclick="deleteSupplier({{ $supplier->id }})" class="btn btn-sm btn-danger">
+                    <i class="bi bi-trash fs-5 me-2"></i>
+                    {{ __('suppliers.delete') }}
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="kt_app_content" class="app-content flex-column-fluid">
-        <div id="kt_app_content_container" class="app-container container-xxl">
-            <div class="d-flex justify-content-between align-items-center mb-5">
-                <div>
-                    <a href="{{ route('suppliers.index') }}" class="btn btn-secondary me-3">
-                        <i class="bi bi-arrow-left"></i> {{ __('suppliers.back_to_list') }}
-                    </a>
-                    <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-warning">
-                        <i class="bi bi-pencil"></i> {{ __('suppliers.edit_supplier') }}
-                    </a>
-                </div>
-            </div>
+    <!-- Content -->
+    <div class="app-content flex-column-fluid" id="kt_app_content">
+        <div class="app-container container-xxl">
+            <div class="row g-7">
+                <!-- Supplier Information -->
+                <div class="col-xl-4">
+                    <div class="card card-flush h-100">
+                        <div class="card-header">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold text-gray-800">{{ __('suppliers.basic_information') }}</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="d-flex flex-center flex-column mb-5">
+                                <div class="symbol symbol-100px symbol-circle mb-7">
+                                    <span class="symbol-label fs-1 fw-bold text-primary bg-light-primary">
+                                        {{ strtoupper(substr($supplier->name, 0, 1)) }}
+                                    </span>
+                                </div>
+                                <a href="#" class="fs-3 text-gray-800 text-hover-primary fw-bold mb-1">
+                                    {{ $supplier->name }}
+                                </a>
+                                <div class="fs-5 fw-semibold text-muted mb-6">{{ __('suppliers.id') }}: {{ $supplier->id }}</div>
+                            </div>
+                            <div class="separator separator-dashed my-5"></div>
+                            <div class="d-flex flex-column gap-5">
+                                @if($supplier->phone)
+                                <div class="d-flex flex-row">
+                                    <div class="d-flex align-items-center me-5">
+                                        <i class="bi bi-telephone-fill fs-3 text-primary me-3"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <div class="text-gray-400 fs-7">{{ __('suppliers.phone') }}</div>
+                                        <a href="tel:{{ $supplier->phone }}" class="text-gray-800 fs-6 fw-bold">{{ $supplier->phone }}</a>
+                                    </div>
+                                </div>
+                                @endif
 
-            <div class="card mt-5">
-                <div class="card-header">
-                    <div class="card-title">
-                        <h2>{{ $supplier->name }}</h2>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center mb-4">
-                                <i class="bi bi-envelope-fill text-primary me-3 fs-4"></i>
-                                <span><strong>{{ __('suppliers.email') }}:</strong> {{ $supplier->email ?? __('suppliers.not_available') }}</span>
-                            </div>
-                            <div class="d-flex align-items-center mb-4">
-                                <i class="bi bi-telephone-fill text-success me-3 fs-4"></i>
-                                <span><strong>{{ __('suppliers.phone') }}:</strong> {{ $supplier->phone ?? __('suppliers.not_available') }}</span>
-                            </div>
-                            <div class="d-flex align-items-center mb-4">
-                                <i class="bi bi-geo-alt-fill text-danger me-3 fs-4"></i>
-                                <span><strong>{{ __('suppliers.address') }}:</strong> {{ $supplier->address ?? __('suppliers.not_available') }}</span>
+                                @if($supplier->email)
+                                <div class="d-flex flex-row">
+                                    <div class="d-flex align-items-center me-5">
+                                        <i class="bi bi-envelope-fill fs-3 text-primary me-3"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <div class="text-gray-400 fs-7">{{ __('suppliers.email') }}</div>
+                                        <a href="mailto:{{ $supplier->email }}" class="text-gray-800 fs-6 fw-bold">{{ $supplier->email }}</a>
+                                    </div>
+                                </div>
+                                @endif
+
+                                @if($supplier->address)
+                                <div class="d-flex flex-row">
+                                    <div class="d-flex align-items-center me-5">
+                                        <i class="bi bi-geo-alt-fill fs-3 text-primary me-3"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <div class="text-gray-400 fs-7">{{ __('suppliers.address') }}</div>
+                                        <div class="text-gray-800 fs-6 fw-bold">{{ $supplier->address }}</div>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center mb-4">
-                                <i class="bi bi-card-text text-warning me-3 fs-4"></i>
-                                <span><strong>{{ __('suppliers.notes') }}:</strong> {{ $supplier->notes ?? __('suppliers.not_available') }}</span>
+                    </div>
+                </div>
+
+                <!-- Statistics & Recent Purchases -->
+                <div class="col-xl-8">
+                    <!-- Statistics -->
+                    <div class="card card-flush mb-7">
+                        <div class="card-header">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold text-gray-800">{{ __('suppliers.statistics') }}</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="row g-5 g-xl-8">
+                                <!-- Total Purchases -->
+                                <div class="col-xl-4">
+                                    <div class="card card-dashed h-100">
+                                        <div class="card-body d-flex justify-content-between flex-column">
+                                            <div class="d-flex flex-column">
+                                                <span class="fs-7 text-gray-400 mb-1">{{ __('suppliers.total_purchases') }}</span>
+                                                <span class="fs-2hx fw-bold text-gray-800">{{ number_format($statistics['total_purchases'], 2) }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-column mt-3">
+                                                <div class="d-flex align-items-center fs-7 fw-bold text-gray-400">
+                                                    {{ $statistics['purchases_count'] }} {{ __('suppliers.purchases') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Last Purchase -->
+                                <div class="col-xl-4">
+                                    <div class="card card-dashed h-100">
+                                        <div class="card-body d-flex justify-content-between flex-column">
+                                            <div class="d-flex flex-column">
+                                                <span class="fs-7 text-gray-400 mb-1">{{ __('suppliers.last_purchase') }}</span>
+                                                @if($statistics['last_purchase'])
+                                                    @php
+                                                        $lastPurchaseTotal = 0;
+                                                        foreach ($statistics['last_purchase']->purchaseItems as $item) {
+                                                            $lastPurchaseTotal += $item->quantity * $item->price;
+                                                        }
+                                                    @endphp
+                                                    <span class="fs-2hx fw-bold text-gray-800">{{ number_format($lastPurchaseTotal, 2) }}</span>
+                                                    <div class="d-flex align-items-center flex-column mt-3">
+                                                        <div class="d-flex align-items-center fs-7 fw-bold text-gray-400">
+                                                            {{ $statistics['last_purchase']->created_at->diffForHumans() }}
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <span class="fs-2hx fw-bold text-gray-400">{{ __('suppliers.no_purchases') }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Average Purchase -->
+                                <div class="col-xl-4">
+                                    <div class="card card-dashed h-100">
+                                        <div class="card-body d-flex justify-content-between flex-column">
+                                            <div class="d-flex flex-column">
+                                                <span class="fs-7 text-gray-400 mb-1">{{ __('suppliers.average_purchase') }}</span>
+                                                <span class="fs-2hx fw-bold text-gray-800">{{ number_format($statistics['average_purchase'], 2) }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-column mt-3">
+                                                <div class="d-flex align-items-center fs-7 fw-bold text-gray-400">
+                                                    {{ __('suppliers.per_purchase') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Purchases -->
+                    <div class="card card-flush">
+                        <div class="card-header">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold text-gray-800">{{ __('suppliers.purchase_history') }}</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                    <thead>
+                                        <tr class="fw-bold text-muted">
+                                            <th class="min-w-150px">{{ __('suppliers.invoice_number') }}</th>
+                                            <th class="min-w-140px">{{ __('suppliers.date') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.total_items') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.total_amount') }}</th>
+                                            <th class="min-w-100px text-end">{{ __('suppliers.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($purchases as $purchase)
+                                            @php
+                                                $purchaseTotal = 0;
+                                                foreach ($purchase->purchaseItems as $item) {
+                                                    $purchaseTotal += $item->quantity * $item->price;
+                                                }
+                                            @endphp
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ route('purchases.show', $purchase->id) }}" class="text-gray-800 text-hover-primary fw-bold">
+                                                        {{ $purchase->invoice_number }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ $purchase->created_at->format('Y-m-d') }}</td>
+                                                <td>{{ $purchase->purchaseItems->count() }}</td>
+                                                <td class="fw-bold">{{ number_format($purchaseTotal, 2) }}</td>
+                                                <td class="text-end">
+                                                    <a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" title="{{ __('suppliers.view_purchase') }}">
+                                                        <i class="bi bi-eye-fill fs-4"></i>
+                                                    </a>
+                                                    <a href="{{ route('purchases.print', $purchase->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" title="{{ __('suppliers.print_purchase') }}">
+                                                        <i class="bi bi-printer-fill fs-4"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center py-5">
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <i class="bi bi-cart-x fs-3x text-gray-400 mb-3"></i>
+                                                        <div class="fs-6 fw-bold text-gray-800 mb-1">{{ __('suppliers.no_purchases') }}</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            @if($purchases->hasPages())
+                                <div class="d-flex justify-content-center mt-5">
+                                    {{ $purchases->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="card mt-5">
-                <div class="card-header">
-                    <div class="card-title">
-                        <h2>{{ __('suppliers.supplier_products') }}</h2>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h2 class="fw-bold m-0">{{ __('suppliers.delete_supplier') }}</h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i>
                     </div>
                 </div>
-                <div class="card-body">
-                    <form method="GET" action="{{ route('suppliers.show', $supplier->id) }}" class="mb-4">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <input type="text" name="search" class="form-control" placeholder="{{ __('suppliers.search_by_name') }}" value="{{ request('search') }}">
+                <div class="modal-body text-center py-8">
+                    <form id="kt_modal_delete_form" class="form" action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div class="mb-10">
+                            <i class="bi bi-exclamation-triangle text-warning fs-5x mb-7"></i>
+                            <div class="text-gray-800 fs-2x fw-bold mb-3">{{ __('suppliers.delete_confirmation') }}</div>
+                            <div class="text-muted fs-6">
+                                {{ __('suppliers.delete_warning') }}
                             </div>
-                            <div class="col-md-4">
-                                <input type="date" name="from" class="form-control" value="{{ request('from') }}">
-                            </div>
-                            <div class="col-md-4">
-                                <input type="date" name="to" class="form-control" value="{{ request('to') }}">
-                            </div>
-                            <div class="col-md-12 mt-3">
-                                <button type="submit" class="btn btn-primary">{{ __('suppliers.filter') }}</button>
-                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                {{ __('suppliers.cancel') }}
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>
+                                {{ __('suppliers.delete') }}
+                            </button>
                         </div>
                     </form>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped align-middle">
-                            <thead>
-                            <tr>
-                                <th>{{ __('products.name') }}</th>
-                                <th>{{ __('products.quantity') }}</th>
-                                <th>{{ __('products.price') }}</th>
-                                <th>{{ __('products.actions') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($products as $item)
-                                <tr>
-                                    <td>{{ optional($item->product)->name ?? __('products.undefined') }}</td>
-                                    <td>{{ $item->quantity }}</td>
-                                    <td>{{ number_format($item->price, 2) }}</td>
-                                    <td>
-                                        @if(optional($item->product)->id)
-                                            <a href="{{ route('products.show', $item->product->id) }}" class="btn btn-sm btn-info">
-                                                <i class="bi bi-eye"></i> {{ __('products.view') }}
-                                            </a>
-                                        @else
-                                            <span class="text-muted">{{ __('products.undefined') }}</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-3">
-                        {{ $products->links() }}
-                    </div>
                 </div>
             </div>
-
-            <div class="card mt-5">
-                <div class="card-header">
-                    <div class="card-title">
-                        <h2>{{ __('suppliers.debts') }}</h2>
-                    </div>
-                </div>
-                <div class="card-body">
-                    @if($debts->isEmpty())
-                        <p class="text-center">{{ __('suppliers.no_debts_found') }}</p>
-                    @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped align-middle">
-                                <thead>
-                                <tr>
-                                    <th>{{ __('suppliers.product') }}</th>
-                                    <th>{{ __('suppliers.amount') }}</th>
-                                    <th>{{ __('suppliers.paid') }}</th>
-                                    <th>{{ __('suppliers.remaining') }}</th>
-                                    <th>{{ __('suppliers.date') }}</th>
-                                    <th>{{ __('suppliers.actions') }}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach($debts as $debt)
-                                    <tr>
-                                        <td>{{ optional($debt->product)->name ?? __('suppliers.product_not_available') }}</td>
-                                        <td>{{ number_format($debt->amount, 2) }}</td>
-                                        <td>{{ number_format($debt->paid, 2) }}</td>
-                                        <td>{{ number_format($debt->remaining, 2) }}</td>
-                                        <td>{{ $debt->created_at->format('Y-m-d') }}</td>
-                                        <td>
-                                            <a href="{{ route('debt.payments', $debt->id) }}" class="btn btn-primary btn-sm">
-                                                {{ __('Record Payment') }}
-                                            </a>
-
-                                            @if($debt->payments()->exists())
-                                                <a href="{{ route('debt.paymentHistory', $debt->id) }}" class="btn btn-info btn-sm">
-                                                    {{ __('View Payment History') }}
-                                                </a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="mt-3">
-                            {{ $debts->links() }}
-                        </div>
-                    @endif
-                </div>
-            </div>
-
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    function deleteSupplier(id) {
+        const modal = document.getElementById('deleteModal');
+        new bootstrap.Modal(modal).show();
+    }
+</script>
+@endpush

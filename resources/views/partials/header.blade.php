@@ -23,6 +23,17 @@
             </div>
             <div class="app-navbar flex-shrink-0">
                 <div class="app-navbar-item ms-1 ms-md-4">
+                    <a href="{{ route('pos.fullscreen') }}" target="_blank" class="btn btn-primary">
+                        <i class="ki-duotone ki-basket fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                        </i>
+                        {{ __('pos.point_of_sale') }}
+                    </a>
+                </div>
+                <div class="app-navbar-item ms-1 ms-md-4">
                     <div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" id="kt_menu_item_wow">
                         <i class="ki-duotone ki-notification-status fs-2">
                             <span class="path1"></span>

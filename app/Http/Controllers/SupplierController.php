@@ -58,35 +58,43 @@ class SupplierController extends Controller
         return redirect()->route('suppliers.index')->with('success', __('suppliers.supplier_added_successfully'));
     }
 
-    public function show(Request $request, $id)
+    public function show($id)
     {
-        $supplier = Supplier::findOrFail($id);
-
-        $query = Purchase::where('supplier_id', $supplier->id)->with('purchaseItems.product');
-
-        if ($request->filled('search')) {
-            $query->whereHas('purchaseItems.product', function ($productQuery) use ($request) {
-                $productQuery->where('name', 'LIKE', "%{$request->search}%");
-            });
+        $supplier = Supplier::with(['purchases.purchaseItems.product'])->findOrFail($id);
+        
+        // Get supplier's purchases with pagination
+        $purchases = $supplier->purchases()
+            ->with('purchaseItems.product')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+        
+        // Calculate statistics
+        $totalPurchases = 0;
+        $purchasesCount = 0;
+        $lastPurchase = null;
+        
+        foreach ($supplier->purchases as $purchase) {
+            $purchaseTotal = 0;
+            foreach ($purchase->purchaseItems as $item) {
+                $purchaseTotal += $item->quantity * $item->price;
+            }
+            
+            $totalPurchases += $purchaseTotal;
+            $purchasesCount++;
+            
+            if (!$lastPurchase || $purchase->created_at > $lastPurchase->created_at) {
+                $lastPurchase = $purchase;
+            }
         }
-
-        if ($request->filled('from') && $request->filled('to')) {
-            $query->whereBetween('created_at', [$request->from, $request->to]);
-        }
-
-        $purchaseItems = $query->get()->flatMap(function ($purchase) {
-            return $purchase->purchaseItems;
-        });
-
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentPageItems = $purchaseItems->slice(($currentPage - 1) * $perPage, $perPage)->all();
-        $products = new LengthAwarePaginator($currentPageItems, $purchaseItems->count(), $perPage);
-        $products->setPath(request()->url());
-
-        $debts = $supplier->debts()->with('product')->paginate(10);
-
-        return view('suppliers.show', compact('supplier', 'products', 'debts'));
+        
+        $statistics = [
+            'total_purchases' => $totalPurchases,
+            'purchases_count' => $purchasesCount,
+            'last_purchase' => $lastPurchase,
+            'average_purchase' => $purchasesCount > 0 ? $totalPurchases / $purchasesCount : 0,
+        ];
+        
+        return view('suppliers.show', compact('supplier', 'purchases', 'statistics'));
     }
 
     public function edit($id)

@@ -7,6 +7,9 @@ return [
     'search_products' => 'Search Products',
     'scan_barcode' => 'Scan Barcode',
     'all' => 'All',
+    'all_categories' => 'All Categories',
+    'all_brands' => 'All Brands',
+    'warehouse' => 'Warehouse',
 
     // Products
     'products' => 'Products',
@@ -14,24 +17,35 @@ return [
     'stock' => 'Stock',
     'add' => 'Add',
     'price' => 'Price',
+    'no_products_found' => 'No products found',
 
     // Filters
     'categories' => 'Categories',
     'brands' => 'Brands',
     'filter_by_category' => 'Filter by Category',
     'filter_by_brand' => 'Filter by Brand',
+    'product_added_to_cart' => 'Product Added To Cart',
+    'product_removed_from_cart' => 'Product Remoced From Cart',
 
     // Cart
-    'cart' => 'Cart',
-    'cart_empty' => 'Cart is empty',
-    'subtotal' => 'Subtotal',
-    'discount' => 'Discount',
-    'tax' => 'Tax',
-    'tax_percent' => 'Tax (%)',
-    'total' => 'Total',
-    'clear_cart' => 'Clear Cart',
-    'checkout' => 'Checkout',
-    'empty_cart' => 'Cart is empty',
+    'cart' => [
+        'title' => 'Cart',
+        'items' => 'Items',
+        'empty' => 'Cart is empty',
+        'product_added' => 'Product added to cart',
+        'product_removed' => 'Product removed from cart',
+        'quantity_updated' => 'Quantity updated',
+        'clear_confirm' => 'Are you sure you want to clear the cart?',
+        'cleared' => 'Cart cleared successfully',
+        'out_of_stock' => 'Out of stock',
+        'in_stock' => 'In stock',
+        'discount_amount' => 'Discount Amount',
+        'tax_percent' => 'Tax (%)',
+        'subtotal' => 'Subtotal',
+        'tax_amount' => 'Tax Amount',
+        'total' => 'Total',
+        'checkout' => 'Check Out'
+    ],
 
     // Customers and Payment
     'customer' => 'Customer',
@@ -45,6 +59,8 @@ return [
     // Receipt
     'sale_confirmation' => 'Sale Confirmation',
     'sale_completed' => 'Sale completed successfully',
+    'sale_completed_successfully' => 'Sale completed successfully',
+    'total' => 'Total',
     'invoice_number' => 'Invoice Number',
     'date' => 'Date',
     'print_receipt' => 'Print Receipt',

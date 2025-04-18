@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Warehouse;
+use App\Models\CashRegister;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -306,19 +307,36 @@ class POSController extends Controller
         DB::beginTransaction();
         
         try {
+            $subtotal = 0;
+            foreach ($request->items as $item) {
+                $subtotal += $item['quantity'] * $item['price'];
+            }
+
+            // حساب الخصم والضريبة
+            $discount = $request->discount ?? 0;
+            $afterDiscount = $subtotal - $discount;
+            
+            // حساب الضريبة كنسبة مئوية
+            $taxPercent = $request->tax ?? 0;
+            $taxAmount = ($afterDiscount * $taxPercent) / 100;
+            
+            // إجمالي الفاتورة
+            $totalAmount = $afterDiscount + $taxAmount;
+            
             // إنشاء فاتورة البيع
             $sale = Sale::create([
                 'customer_id' => $request->customer_id,
                 'sale_date' => now(),
-                'total_amount' => 0, // سيتم تحديثه لاحقًا
-                'discount' => $request->discount ?? 0,
-                'tax' => $request->tax ?? 0,
-                'payment_method' => $request->payment_method,
+                'subtotal' => $subtotal,
+                'discount_amount' => $discount,
+                'tax_percentage' => $taxPercent,
+                'tax_amount' => $taxAmount,
+                'total_amount' => $totalAmount,
                 'notes' => $request->notes,
                 'user_id' => Auth::id(),
+                'warehouse_id' => $request->warehouse_id,
             ]);
             
-            $totalAmount = 0;
             $warehouseId = $request->warehouse_id;
             
             // إضافة عناصر الفاتورة
@@ -347,79 +365,32 @@ class POSController extends Controller
                     ->decrement('stock', $quantity);
                 
                 // إضافة عنصر الفاتورة
-                SaleItem::create([
-                    'sale_id' => $sale->id,
+                $sale->saleDetails()->create([
                     'product_id' => $productId,
                     'quantity' => $quantity,
-                    'price' => $price,
-                    'total' => $price * $quantity,
+                    'unit_price' => $price,
+                    'total_price' => $price * $quantity,
                 ]);
-                
-                $totalAmount += $price * $quantity;
             }
-            
-            // تطبيق الخصم والضريبة
-            $finalAmount = $totalAmount;
-            if ($request->discount) {
-                $finalAmount -= $request->discount;
-            }
-            
-            // حساب الضريبة كنسبة مئوية
-            $taxPercent = $request->tax_percent ?? 0;
-            $taxAmount = $request->tax_amount ?? 0;
-            
-            if ($taxPercent > 0) {
-                // إذا تم توفير نسبة الضريبة، نستخدمها لحساب قيمة الضريبة
-                $taxAmount = ($finalAmount) * ($taxPercent / 100);
-            }
-            
-            $finalAmount += $taxAmount;
-            
-            // تحديث إجمالي الفاتورة
-            $sale->total_amount = $finalAmount;
-            $sale->tax = $taxAmount; // تخزين قيمة الضريبة المحسوبة
-            $sale->tax_percent = $taxPercent; // تخزين نسبة الضريبة
-            $sale->save();
             
             // إضافة المبلغ للخزنة إذا كان الدفع نقدي
             if ($request->payment_method === 'cash') {
-                try {
-                    // التحقق من وجود جدول الخزنة
-                    if (Schema::hasTable('cash_registers')) {
-                        // التحقق من وجود خزنة مفتوحة للمستخدم الحالي
-                        $cashRegister = DB::table('cash_registers')
-                            ->where('user_id', Auth::id())
-                            ->where('status', 'open')
-                            ->latest()
-                            ->first();
-                        
-                        if ($cashRegister) {
-                            // إضافة معاملة للخزنة
-                            DB::table('cash_register_transactions')->insert([
-                                'cash_register_id' => $cashRegister->id,
-                                'amount' => $finalAmount,
-                                'type' => 'income',
-                                'details' => 'عملية بيع #' . $sale->id,
-                                'sale_id' => $sale->id,
-                                'created_at' => now(),
-                                'updated_at' => now()
-                            ]);
-                            
-                            // تحديث رصيد الخزنة
-                            DB::table('cash_registers')
-                                ->where('id', $cashRegister->id)
-                                ->increment('balance', $finalAmount);
-                            
-                            \Log::info('Added sale amount to cash register: ' . $finalAmount);
-                        } else {
-                            \Log::warning('No open cash register found for user: ' . Auth::id());
-                        }
-                    } else {
-                        \Log::warning('Cash registers table not found in database');
-                    }
-                } catch (\Exception $e) {
-                    \Log::error('Error adding amount to cash register: ' . $e->getMessage());
-                    // لا نريد إلغاء عملية البيع إذا فشلت إضافة المبلغ للخزنة
+                // إنشاء سجل صندوق نقدي جديد إذا لم يكن موجوداً
+                $cashRegister = CashRegister::firstOrCreate(
+                    ['id' => 1],
+                    ['transaction_type' => 'initial', 'amount' => 0, 'balance' => 0]
+                );
+
+                // تحديث رصيد الصندوق
+                CashRegister::updateBalance(
+                    'sale',
+                    $totalAmount,
+                    'Sale #' . $sale->id
+                );
+
+                // تحديث cash_register_id للمستخدم إذا لم يكن معيناً
+                if (!Auth::user()->cash_register_id) {
+                    Auth::user()->update(['cash_register_id' => $cashRegister->id]);
                 }
             }
             
@@ -433,6 +404,7 @@ class POSController extends Controller
             
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error in checkout: ' . $e->getMessage());
             return response()->json([
                 'error' => 'حدث خطأ أثناء إتمام عملية البيع: ' . $e->getMessage()
             ], 500);
@@ -448,5 +420,29 @@ class POSController extends Controller
             ->findOrFail($id);
             
         return view('pos.receipt', compact('sale'));
+    }
+
+    public function fullscreen()
+    {
+        $products = Product::with(['category', 'brand', 'warehouses'])
+            ->whereHas('warehouses', function($query) {
+                $query->where('stock', '>', 0);
+            })
+            ->get();
+
+        $categories = Category::all();
+        $brands = Brand::all();
+        $customers = Customer::all();
+        $warehouses = Warehouse::all();
+        $defaultWarehouse = Warehouse::first();
+
+        return view('pos.fullscreen', compact(
+            'products',
+            'categories',
+            'brands',
+            'customers',
+            'warehouses',
+            'defaultWarehouse'
+        ));
     }
 }

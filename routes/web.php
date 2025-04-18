@@ -24,6 +24,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\CustomerSalesController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -54,6 +55,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/pos/search-products', [POSController::class, 'searchProducts'])->name('pos.search-products');
     Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
     Route::get('/pos/receipt/{id}', [POSController::class, 'printReceipt'])->name('pos.receipt');
+    Route::get('/pos/fullscreen', [POSController::class, 'fullscreen'])->name('pos.fullscreen');
 
     // **Accounting Routes**
     Route::get('/accounting/payments', [PaymentController::class, 'index'])->name('accounting.payments');
@@ -117,6 +119,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/purchases/history', [PurchaseController::class, 'history'])->name('purchases.history');
     Route::resource('/purchases', PurchaseController::class)->middleware(['auth', 'permission:manage purchases']);
     Route::resource('/external_purchases', ExternalPurchaseController::class)->middleware(['auth', 'permission:manage external_purchases']);
+    Route::get('purchases/{purchase}/print', [PurchaseController::class, 'print'])->name('purchases.print');
 
     // **Reports Routes**
     Route::prefix('reports')->group(function () {
@@ -137,6 +140,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     // **Sale Routes**
     Route::get('/sales/history', [SaleController::class, 'history'])->name('sales.history');
     Route::get('/sales/{id}/products', [SaleController::class, 'getProducts'])->name('sales.products');
+    Route::get('/sales/{id}/print', [SaleController::class, 'print'])->name('sales.print');
     Route::resource('/sales', SaleController::class)->middleware(['auth', 'permission:manage sales']);
 
     // **Settings Routes**
@@ -157,4 +161,18 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     // **Warehouse Routes**
     Route::get('/warehouses/{warehouse}/products', [WarehouseController::class, 'getProducts']);
     Route::resource('/warehouses', WarehouseController::class)->middleware('permission:manage warehouses');
+
+    // Customer Sales Routes
+    Route::get('/customers/{customer}/sales', [CustomerSalesController::class, 'index'])->name('customers.sales');
+    Route::get('/customers/{customer}/sales/export/pdf', [CustomerSalesController::class, 'exportPdf'])->name('customers.sales.export.pdf');
+    Route::get('/customers/{customer}/sales/export/excel', [CustomerSalesController::class, 'exportExcel'])->name('customers.sales.export.excel');
+
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    Route::prefix('sales')->group(function () {
+        Route::get('export/pdf/{sale}', [SaleController::class, 'exportPdf'])->name('sales.export.pdf');
+        Route::get('export/excel/{sale}', [SaleController::class, 'exportExcel'])->name('sales.export.excel');
+    });
 });

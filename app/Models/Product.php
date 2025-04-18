@@ -42,6 +42,15 @@ class Product extends Model
         'qrcode'
     ];
 
+    protected $casts = [
+        'price' => 'float',
+        'cost' => 'float',
+        'wholesale_price' => 'float',
+        'min_sale_price' => 'float',
+        'is_mobile' => 'boolean',
+        'has_box' => 'boolean',
+    ];
+
     public function category()
     {
         return $this->belongsTo(Category::class);

@@ -2,6 +2,7 @@
 
 return [
     'dashboard' => 'Dashboard',
+    'product' => 'Product',
     'print' => 'Print',
     'print_options' => 'Print Options',
     'select_labels_per_sheet' => 'Select Labels Per Sheet',

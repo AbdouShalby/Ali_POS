@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -15,15 +16,33 @@ class CustomerController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->get('search');
+        $query = Customer::query();
 
-        $customers = Customer::when($search, function ($query, $search) {
-            return $query->where('name', 'LIKE', "%$search%")
-                ->orWhere('email', 'LIKE', "%$search%")
-                ->orWhere('phone', 'LIKE', "%$search%");
-        })->paginate(10);
+        // البحث
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
 
-        return view('customers.index', compact('customers', 'search'))->with('activePage', 'customers');
+        // الترتيب
+        if ($request->has('order')) {
+            $orderBy = $request->order;
+            $query->orderBy($orderBy);
+        } else {
+            $query->latest();
+        }
+
+        // إحصائيات العملاء
+        $totalSales = \App\Models\Sale::sum('total_amount');
+        $averagePurchase = \App\Models\Sale::avg('total_amount') ?? 0;
+
+        $customers = $query->paginate(10);
+
+        return view('customers.index', compact('customers', 'totalSales', 'averagePurchase'));
     }
 
     public function create()
@@ -54,25 +73,33 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('success', __('customers.customer_added_successfully'));
     }
 
-    public function show(Request $request, $id)
+    public function show(Customer $customer)
     {
-        $customer = Customer::with('sales.saleItems.product')->findOrFail($id);
+        // Get recent purchases with pagination
+        $purchases = $customer->sales()->latest()->take(10)->get();
 
-        $salesQuery = $customer->sales()->with('saleItems.product');
+        // Calculate totals and statistics
+        $totals = $customer->sales()
+            ->select([
+                DB::raw('COUNT(*) as total_sales'),
+                DB::raw('SUM(total_amount) as total_amount'),
+                DB::raw('AVG(total_amount) as average_purchase'),
+                DB::raw('MAX(created_at) as last_purchase_date')
+            ])
+            ->first();
 
-        if ($request->filled('search')) {
-            $salesQuery->whereHas('saleItems.product', function ($query) use ($request) {
-                $query->where('name', 'LIKE', "%{$request->search}%");
-            });
-        }
+        // Format the statistics
+        $total_purchases = $totals->total_sales ?? 0;
+        $average_purchase = number_format($totals->average_purchase ?? 0, 2);
+        $last_purchase = $totals->last_purchase_date;
 
-        if ($request->filled('from') && $request->filled('to')) {
-            $salesQuery->whereBetween('created_at', [$request->from, $request->to]);
-        }
-
-        $sales = $salesQuery->paginate(10);
-
-        return view('customers.show', compact('customer', 'sales'))->with('activePage', 'customers');
+        return view('customers.show', compact(
+            'customer',
+            'purchases',
+            'total_purchases',
+            'average_purchase',
+            'last_purchase'
+        ));
     }
 
     public function edit($id)

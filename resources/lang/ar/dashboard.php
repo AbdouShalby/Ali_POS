@@ -56,4 +56,14 @@ return [
     'Latest 10 Cryptocurrency Sales' => 'آخر 10 مبيعات بالعملات الرقمية',
     'Copy completed successfully!' => 'تم النسخ بنجاح!',
     'Copy failed' => 'فشل النسخ',
+    'phone' => 'الهاتف',
+    'email' => 'البريد الإلكتروني',
+    'tax_number' => 'رقم الضريبة',
+    // Company Information
+    'company_info' => 'معلومات الشركة',
+    'company_name' => 'اسم الشركة',
+    'company_address' => 'عنوان الشركة',
+    'phone' => 'رقم الهاتف',
+    'email' => 'البريد الإلكتروني',
+    'tax_number' => 'الرقم الضريبي',
 ];

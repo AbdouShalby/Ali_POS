@@ -71,15 +71,20 @@ class WarehouseController extends Controller
     {
         try {
             // جلب المنتجات مع المخزون
-            $products = $warehouse->products()->get()->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'stock' => $product->pivot->stock, // تأكد من أن علاقة pivot تحتوي على stock
-                ];
-            });
+            $products = $warehouse->products()
+                ->withPivot('stock')
+                ->where('product_warehouse.stock', '>', 0)
+                ->get()
+                ->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'stock' => $product->pivot->stock,
+                        'price' => (float) $product->price // إضافة السعر
+                    ];
+                });
 
-            return response()->json($products, 200); // إرسال JSON
+            return response()->json($products);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }

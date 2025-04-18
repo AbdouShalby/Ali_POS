@@ -3,10 +3,11 @@
 @section('title', '- ' . __('suppliers.all_suppliers'))
 
 @section('content')
-    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+    <!-- Toolbar -->
+    <div class="app-toolbar py-4 py-lg-6" id="kt_app_toolbar">
+        <div class="app-container container-xxl d-flex flex-stack flex-wrap gap-4">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-2 flex-column justify-content-center my-0">
                     {{ __('suppliers.all_suppliers') }}
                 </h1>
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -14,146 +15,267 @@
                         <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('suppliers.dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
                     </li>
                     <li class="breadcrumb-item text-muted">{{ __('suppliers.all_suppliers') }}</li>
                 </ul>
             </div>
-        </div>
-    </div>
-
-    <div id="kt_app_content" class="app-content flex-column-fluid">
-        <div id="kt_app_content_container" class="app-container container-xxl">
-            @if(session('success'))
-                <div class="alert alert-success d-flex align-items-center p-5 mb-5">
-                    <i class="bi bi-check-circle-fill fs-2 text-success me-3"></i>
-                    <div>
-                        {{ session('success') }}
-                    </div>
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <div class="card card-flush">
-                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-                    <h2 class="card-title">{{ __('suppliers.supplier_list') }}</h2>
-                    <div class="card-toolbar">
-                        <form action="{{ route('suppliers.index') }}" method="GET" class="d-flex align-items-center">
-                            <div class="input-group">
-                                <input type="text" name="search" class="form-control" placeholder="{{ __('suppliers.search_by_name') }}" value="{{ request('search') }}">
-                                <button type="submit" class="btn btn-primary d-flex align-items-center">
-                                    <i class="bi bi-search me-2"></i> {{ __('suppliers.search') }}
-                                </button>
-                            </div>
-                        </form>
-                        <a href="{{ route('suppliers.create') }}" class="btn btn-primary ms-3">
-                            <i class="bi bi-plus-circle"></i> {{ __('suppliers.add_new_supplier') }}
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body py-4">
-                    <div class="table-responsive">
-                        <table class="table align-middle table-row-dashed fs-6 gy-5">
-                            <thead>
-                            <tr class="text-gray-400 fw-bold fs-7 text-uppercase">
-                                <th>{{ __('suppliers.name') }}</th>
-                                <th>{{ __('suppliers.email') }}</th>
-                                <th>{{ __('suppliers.phone') }}</th>
-                                <th>{{ __('suppliers.address') }}</th>
-                                <th class="text-center">{{ __('suppliers.actions') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody class="fw-semibold text-gray-600">
-                            @forelse($suppliers as $supplier)
-                                <tr>
-                                    <td>{{ $supplier->name }}</td>
-                                    <td>{{ $supplier->email ?? __('suppliers.not_available') }}</td>
-                                    <td>{{ $supplier->phone ?? __('suppliers.not_available') }}</td>
-                                    <td>{{ $supplier->address ?? __('suppliers.not_available') }}</td>
-                                    <td class="text-center">
-                                        <a href="{{ route('suppliers.show', $supplier->id) }}" class="btn btn-info btn-sm mx-1">
-                                            <i class="bi bi-eye"></i> {{ __('suppliers.view') }}
-                                        </a>
-                                        <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-warning btn-sm mx-1">
-                                            <i class="bi bi-pencil"></i> {{ __('suppliers.edit') }}
-                                        </a>
-                                        <button class="btn btn-danger btn-sm deleteSupplier" data-id="{{ $supplier->id }}">
-                                            <i class="bi bi-trash"></i> {{ __('suppliers.delete') }}
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">{{ __('suppliers.no_suppliers_found') }}</td>
-                                </tr>
-                            @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-end mt-4">
-                        {{ $suppliers->links() }}
-                    </div>
-                </div>
+            <div class="d-flex align-items-center">
+                <a href="{{ route('suppliers.create') }}" class="btn btn-primary d-flex align-items-center">
+                    <i class="bi bi-plus-circle fs-5 me-2"></i>
+                    {{ __('suppliers.add_supplier') }}
+                </a>
             </div>
         </div>
     </div>
 
-    @section('scripts')
-        <script>
-            window.translations = @json(trans('suppliers'));
-        </script>
-        <script>
-            $(document).ready(function () {
-                $(document).on('click', '.deleteSupplier', function (e) {
-                    e.preventDefault();
+    <!-- Content -->
+    <div class="app-content flex-column-fluid" id="kt_app_content">
+        <div class="app-container container-xxl">
+            <!-- Search and Filters -->
+            <div class="card mb-7">
+                <div class="card-body">
+                    <form id="kt_search_form" class="form">
+                        <div class="row g-8">
+                            <div class="col-lg-5">
+                                <div class="input-group input-group-solid">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="bi bi-search fs-4 text-gray-500"></i>
+                                    </span>
+                                    <input type="text" class="form-control form-control-solid ps-3" 
+                                        placeholder="{{ __('suppliers.search_placeholder') }}" 
+                                        name="search" value="{{ request('search') }}">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <select class="form-select form-select-solid" name="status" data-control="select2" data-placeholder="{{ __('suppliers.all_statuses') }}">
+                                    <option value="">{{ __('suppliers.all_statuses') }}</option>
+                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                                        {{ __('suppliers.active') }}
+                                    </option>
+                                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                                        {{ __('suppliers.inactive') }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3">
+                                <select class="form-select form-select-solid" name="sort" data-control="select2" data-placeholder="{{ __('suppliers.sort_by') }}">
+                                    <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>
+                                        {{ __('suppliers.sort_by_name_asc') }}
+                                    </option>
+                                    <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>
+                                        {{ __('suppliers.sort_by_name_desc') }}
+                                    </option>
+                                    <option value="created_desc" {{ request('sort') == 'created_desc' ? 'selected' : '' }}>
+                                        {{ __('suppliers.sort_by_date_desc') }}
+                                    </option>
+                                    <option value="created_asc" {{ request('sort') == 'created_asc' ? 'selected' : '' }}>
+                                        {{ __('suppliers.sort_by_date_asc') }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-1">
+                                <button type="submit" class="btn btn-icon btn-primary w-100 h-100">
+                                    <i class="bi bi-funnel fs-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-                    let button = $(this);
-                    let supplierId = button.data('id');
-                    let deleteUrl = `/suppliers/${supplierId}`;
+            <!-- Suppliers Table -->
+            <div class="card">
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table table-row-bordered table-row-dashed gy-4 align-middle">
+                            <thead>
+                                <tr class="fs-6 fw-bold text-gray-800 border-bottom border-gray-200">
+                                    <th class="w-25px pe-2"></th>
+                                    <th class="min-w-200px">{{ __('suppliers.name') }}</th>
+                                    <th class="min-w-150px">{{ __('suppliers.phone') }}</th>
+                                    <th class="min-w-150px">{{ __('suppliers.email') }}</th>
+                                    <th class="min-w-100px text-end pe-4">{{ __('suppliers.actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-700">
+                                @forelse($suppliers as $supplier)
+                                    <tr>
+                                        <td>
+                                            <div class="symbol symbol-40px symbol-circle">
+                                                <span class="symbol-label bg-light-primary text-primary fw-bold">
+                                                    {{ strtoupper(substr($supplier->name, 0, 1)) }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <a href="{{ route('suppliers.show', $supplier->id) }}" 
+                                                    class="text-gray-800 text-hover-primary fs-5 fw-bold mb-1">
+                                                    {{ $supplier->name }}
+                                                </a>
+                                                <span class="text-muted fw-semibold">{{ __('suppliers.id') }}: {{ $supplier->id }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-telephone fs-4 text-gray-500 me-2"></i>
+                                                <a href="tel:{{ $supplier->phone }}" class="text-gray-700 text-hover-primary">
+                                                    {{ $supplier->phone }}
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-envelope fs-4 text-gray-500 me-2"></i>
+                                                <a href="mailto:{{ $supplier->email }}" class="text-gray-700 text-hover-primary">
+                                                    {{ $supplier->email }}
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-flex justify-content-end flex-shrink-0 gap-2">
+                                                <a href="{{ route('suppliers.show', $supplier->id) }}" 
+                                                    class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm"
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="top" 
+                                                    title="{{ __('suppliers.view_details') }}">
+                                                    <i class="bi bi-eye-fill fs-4"></i>
+                                                </a>
+                                                <a href="{{ route('suppliers.edit', $supplier->id) }}" 
+                                                    class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm"
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="top" 
+                                                    title="{{ __('suppliers.edit') }}">
+                                                    <i class="bi bi-pencil-fill fs-4"></i>
+                                                </a>
+                                                <button type="button" 
+                                                    class="btn btn-icon btn-bg-light btn-active-color-danger btn-sm"
+                                                    onclick="deleteSupplier({{ $supplier->id }})"
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="top" 
+                                                    title="{{ __('suppliers.delete') }}">
+                                                    <i class="bi bi-trash-fill fs-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-10">
+                                            <div class="d-flex flex-column align-items-center py-8">
+                                                <i class="bi bi-people fs-1 text-gray-400 mb-5"></i>
+                                                <h3 class="fs-2x fw-bold text-gray-800 mb-2">{{ __('suppliers.no_suppliers_found') }}</h3>
+                                                <div class="fs-6 text-gray-600">{{ __('suppliers.try_different_search') }}</div>
+                                                <a href="{{ route('suppliers.create') }}" class="btn btn-primary mt-5">
+                                                    <i class="bi bi-plus-circle me-2"></i>
+                                                    {{ __('suppliers.add_supplier') }}
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @if($suppliers->hasPages())
+                    <div class="card-footer py-5">
+                        <div class="d-flex justify-content-center">
+                            {{ $suppliers->links('pagination::bootstrap-5') }}
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
 
-                    Swal.fire({
-                        title: window.translations.confirm_delete_title,
-                        text: window.translations.confirm_delete_message,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: window.translations.yes_delete,
-                        cancelButtonText: window.translations.cancel
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: deleteUrl,
-                                type: "POST",
-                                data: {
-                                    _method: "DELETE",
-                                    _token: $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function (response) {
-                                    if (response.success) {
-                                        Swal.fire({
-                                            title: window.translations.deleted,
-                                            text: window.translations.supplier_deleted_successfully,
-                                            icon: "success",
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        });
-
-                                        button.closest('tr').fadeOut(500, function () {
-                                            $(this).remove();
-                                        });
-                                    } else {
-                                        Swal.fire(window.translations.error_title, window.translations.delete_failed, "error");
-                                    }
-                                },
-                                error: function () {
-                                    Swal.fire(window.translations.error_title, window.translations.delete_failed, "error");
-                                }
-                            });
-                        }
-                    });
-                });
-            });
-        </script>
-    @endsection
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h2 class="fw-bold m-0">{{ __('suppliers.delete_supplier') }}</h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i>
+                    </div>
+                </div>
+                <div class="modal-body text-center py-8">
+                    <form id="kt_modal_delete_form" class="form" action="" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div class="mb-10">
+                            <i class="bi bi-exclamation-triangle text-warning fs-5x mb-7"></i>
+                            <div class="text-gray-800 fs-2x fw-bold mb-3">{{ __('suppliers.delete_confirmation') }}</div>
+                            <div class="text-muted fs-6">
+                                {{ __('suppliers.delete_warning') }}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                {{ __('suppliers.cancel') }}
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>
+                                {{ __('suppliers.delete') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Initialize Select2
+    $('select[data-control="select2"]').select2({
+        minimumResultsForSearch: -1
+    });
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover'
+        })
+    });
+
+    // Delete supplier function
+    function deleteSupplier(id) {
+        const modal = document.getElementById('deleteModal');
+        const form = document.getElementById('kt_modal_delete_form');
+        form.action = `/suppliers/${id}`;
+        new bootstrap.Modal(modal).show();
+    }
+
+    // Form validation
+    var form = document.getElementById('kt_search_form');
+    var validator = FormValidation.formValidation(form, {
+        fields: {
+            'search': {
+                validators: {
+                    regexp: {
+                        regexp: /^[a-zA-Z0-9\s\-\_\.]+$/,
+                        message: '{{ __("suppliers.invalid_search") }}'
+                    }
+                }
+            }
+        },
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap: new FormValidation.plugins.Bootstrap5({
+                rowSelector: '.row > div',
+                eleInvalidClass: '',
+                eleValidClass: ''
+            })
+        }
+    });
+
+    // Auto submit form on change
+    $('select[name="status"], select[name="sort"]').change(function() {
+        $('#kt_search_form').submit();
+    });
+</script>
+@endpush

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ' - ' . __('reports.detailed_sales_report'))
+@section('title', ' - ' . $customer->name . ' - ' . __('reports.sales_report'))
 
 @section('styles')
 <link href="{{ asset('plugins/custom/datatables/datatables.bundle.css') }}" rel="stylesheet" type="text/css" />
@@ -13,13 +13,6 @@
         transform: translateY(-5px);
         box-shadow: 0 0.5rem 1.5rem 0.5rem rgba(0, 0, 0, 0.08);
     }
-    .payment-method-card {
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    .payment-method-card .card-body {
-        padding: 1.5rem;
-    }
     .chart-container {
         height: 350px;
     }
@@ -30,22 +23,13 @@
 <div class="card card-custom">
     <div class="card-header">
         <div class="card-title">
-            <h3 class="card-label">{{ __('reports.detailed_sales_report') }}</h3>
+            <h3 class="card-label">{{ $customer->name }} - {{ __('reports.sales_report') }}</h3>
         </div>
         <div class="card-toolbar">
-            <div class="dropdown me-2">
-                <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    {{ app()->getLocale() == 'ar' ? 'العربية' : 'English' }}
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-                    <li><a class="dropdown-item {{ app()->getLocale() == 'ar' ? 'active' : '' }}" href="{{ route('language.switch', ['locale' => 'ar']) }}">العربية</a></li>
-                    <li><a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}" href="{{ route('language.switch', ['locale' => 'en']) }}">English</a></li>
-                </ul>
-            </div>
-            <a href="{{ route('reports.sales.export.pdf') }}" class="btn btn-sm btn-light-primary me-2">
+            <a href="{{ route('customers.sales.export.pdf', $customer->id) }}" class="btn btn-sm btn-light-primary me-2">
                 <i class="bi bi-file-pdf"></i> {{ __('reports.export_pdf') }}
             </a>
-            <a href="{{ route('reports.sales.export.excel') }}" class="btn btn-sm btn-light-success">
+            <a href="{{ route('customers.sales.export.excel', $customer->id) }}" class="btn btn-sm btn-light-success">
                 <i class="bi bi-file-excel"></i> {{ __('reports.export_excel') }}
             </a>
         </div>
@@ -54,16 +38,16 @@
     <div class="card-body">
         <!-- Filters -->
         <div class="mb-7">
-            <form action="{{ route('reports.detailed_sales') }}" method="GET" class="row g-3">
-                <div class="col-md-2">
+            <form action="{{ route('customers.sales', $customer->id) }}" method="GET" class="row g-3">
+                <div class="col-md-3">
                     <label class="form-label">{{ __('reports.from_date') }}</label>
                     <input type="date" class="form-control" name="from" value="{{ request('from') }}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label">{{ __('reports.to_date') }}</label>
                     <input type="date" class="form-control" name="to" value="{{ request('to') }}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label">{{ __('reports.payment_method') }}</label>
                     <select class="form-select" name="payment_method">
                         <option value="">{{ __('reports.all') }}</option>
@@ -72,25 +56,7 @@
                         <option value="bank_transfer" {{ request('payment_method') == 'bank_transfer' ? 'selected' : '' }}>{{ __('reports.bank_transfer') }}</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">{{ __('reports.warehouse') }}</label>
-                    <select class="form-select" name="warehouse_id">
-                        <option value="">{{ __('reports.all') }}</option>
-                        @foreach(\App\Models\Warehouse::all() as $warehouse)
-                            <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">{{ __('reports.customer') }}</label>
-                    <select class="form-select" name="customer_id">
-                        <option value="">{{ __('reports.all') }}</option>
-                        @foreach(\App\Models\Customer::all() as $customer)
-                            <option value="{{ $customer->id }}" {{ request('customer_id') == $customer->id ? 'selected' : '' }}>{{ $customer->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
+                <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-search me-1"></i> {{ __('reports.search') }}
                     </button>
@@ -170,73 +136,16 @@
             </div>
         </div>
 
-        <!-- Charts -->
-        <div class="row g-5 g-xl-8 mb-8">
-            <div class="col-xl-6">
-                <div class="card card-xl-stretch mb-xl-8">
-                    <div class="card-header border-0 pt-5">
-                        <h3 class="card-title align-items-start flex-column">
-                            <span class="card-label fw-bold fs-3 mb-1">{{ __('reports.sales_by_payment_method') }}</span>
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="payment_methods_chart" class="chart-container"></div>
-                    </div>
-                </div>
+        <!-- Sales Chart -->
+        <div class="card mb-8">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold fs-3 mb-1">{{ __('reports.daily_sales') }}</span>
+                </h3>
             </div>
-            <div class="col-xl-6">
-                <div class="card card-xl-stretch mb-xl-8">
-                    <div class="card-header border-0 pt-5">
-                        <h3 class="card-title align-items-start flex-column">
-                            <span class="card-label fw-bold fs-3 mb-1">{{ __('reports.daily_sales') }}</span>
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="daily_sales_chart" class="chart-container"></div>
-                    </div>
-                </div>
+            <div class="card-body">
+                <div id="daily_sales_chart" class="chart-container"></div>
             </div>
-        </div>
-
-        <!-- Payment Method Stats -->
-        <div class="row g-5 g-xl-8 mb-8">
-            @foreach($paymentMethodStats as $stat)
-            <div class="col-xl-4">
-                <div class="card payment-method-card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-5">
-                            <div class="symbol symbol-40px me-4">
-                                @if($stat->payment_method == 'cash')
-                                <div class="symbol-label fs-2 bg-light-success text-success">
-                                    <i class="bi bi-cash"></i>
-                                </div>
-                                @elseif($stat->payment_method == 'card')
-                                <div class="symbol-label fs-2 bg-light-primary text-primary">
-                                    <i class="bi bi-credit-card"></i>
-                                </div>
-                                @else
-                                <div class="symbol-label fs-2 bg-light-info text-info">
-                                    <i class="bi bi-bank"></i>
-                                </div>
-                                @endif
-                            </div>
-                            <div>
-                                <h4 class="mb-0">{{ __('reports.' . $stat->payment_method) }}</h4>
-                                <span class="text-muted">{{ __('reports.payment_method') }}</span>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">{{ __('reports.number_of_sales') }}</span>
-                            <span class="fw-bold">{{ $stat->count }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">{{ __('reports.total_amount') }}</span>
-                            <span class="fw-bold">{{ number_format($stat->total_amount, 2) }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
         </div>
 
         <!-- Sales Table -->
@@ -253,7 +162,6 @@
                             <tr class="fw-bold text-muted bg-light">
                                 <th class="min-w-100px">{{ __('reports.invoice_number') }}</th>
                                 <th class="min-w-150px">{{ __('reports.date_time') }}</th>
-                                <th class="min-w-150px">{{ __('reports.customer') }}</th>
                                 <th class="min-w-150px">{{ __('reports.warehouse_name') }}</th>
                                 <th class="min-w-100px">{{ __('reports.payment_method') }}</th>
                                 <th class="min-w-100px">{{ __('reports.tax') }}</th>
@@ -267,7 +175,6 @@
                             <tr>
                                 <td>{{ $sale->id }}</td>
                                 <td>{{ $sale->created_at->format('Y-m-d H:i') }}</td>
-                                <td>{{ $sale->customer ? $sale->customer->name : __('reports.no_customer') }}</td>
                                 <td>{{ $sale->warehouse ? $sale->warehouse->name : '-' }}</td>
                                 <td>
                                     @if($sale->payment_method == 'cash')
@@ -396,29 +303,6 @@
             });
         });
 
-        // Payment Methods Chart
-        const paymentMethodsData = @json($paymentMethodStats);
-        const paymentMethodsChart = new ApexCharts(document.querySelector("#payment_methods_chart"), {
-            series: paymentMethodsData.map(item => item.count),
-            chart: {
-                type: 'pie',
-                height: 350
-            },
-            labels: paymentMethodsData.map(item => {
-                switch(item.payment_method) {
-                    case 'cash': return '{{ __("reports.cash") }}';
-                    case 'card': return '{{ __("reports.card") }}';
-                    case 'bank_transfer': return '{{ __("reports.bank_transfer") }}';
-                    default: return item.payment_method;
-                }
-            }),
-            colors: ['#50cd89', '#009ef7', '#7239ea'],
-            legend: {
-                position: '{{ app()->getLocale() == "ar" ? "left" : "right" }}'
-            }
-        });
-        paymentMethodsChart.render();
-
         // Daily Sales Chart
         const dailySalesData = @json($dailySales);
         const dailySalesDates = dailySalesData.map(item => item.date).reverse();
@@ -483,4 +367,4 @@
         dailySalesChart.render();
     });
 </script>
-@endsection
+@endsection 

@@ -56,4 +56,14 @@ return [
     'Latest 10 Cryptocurrency Sales' => 'Latest 10 Cryptocurrency Sales',
     'Copy completed successfully!' => 'Copy completed successfully!',
     'Copy failed' => 'Copy failed',
+    'phone' => 'Phone',
+    'email' => 'Email',
+    'tax_number' => 'Tax Number',
+    // Company Information
+    'company_info' => 'Company Information',
+    'company_name' => 'Company Name',
+    'company_address' => 'Company Address',
+    'phone' => 'Phone Number',
+    'email' => 'Email Address',
+    'tax_number' => 'Tax Number',
 ];

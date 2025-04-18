@@ -226,4 +226,9 @@ class PurchaseController extends Controller
         return response()->json($products);
     }
 
+    public function print(Purchase $purchase)
+    {
+        return view('purchases.print', compact('purchase'));
+    }
+
 }

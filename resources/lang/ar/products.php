@@ -2,6 +2,7 @@
 
 return [
     'dashboard' => 'لوحة التحكم',
+    'product' => 'المنتج',
     'print' => 'طباعة',
     'print_options' => 'خيارات الطباعة',
     'select_labels_per_sheet' => 'حدد عدد الملصقات لكل ورقة',

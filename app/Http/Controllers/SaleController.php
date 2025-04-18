@@ -12,6 +12,9 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\SaleItem;
 use Illuminate\Support\Facades\DB;
+use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SalesExport;
 
 class SaleController extends Controller
 {
@@ -109,7 +112,19 @@ class SaleController extends Controller
 
     public function show($id)
     {
-        $sale = Sale::with(['customer', 'saleItems.product'])->findOrFail($id);
+        $sale = Sale::with([
+            'customer',
+            'saleDetails.product',  // Eager load sale details with products
+        ])->findOrFail($id);
+        
+        // Verify if we have the data
+        if ($sale->saleDetails->isEmpty()) {
+            \Log::warning("Sale #{$id} has no details", [
+                'sale_id' => $sale->id,
+                'customer' => $sale->customer ? $sale->customer->name : 'No Customer'
+            ]);
+        }
+        
         return view('sales.show', compact('sale'))->with('activePage', 'sales');
     }
 
@@ -239,6 +254,36 @@ class SaleController extends Controller
             'success' => true,
             'products' => $products
         ]);
+    }
+
+    public function print($id)
+    {
+        $sale = Sale::with(['customer', 'warehouse', 'saleItems.product'])->findOrFail($id);
+        
+        // Get company settings from the settings table
+        $company = [
+            'name' => config('settings.company_name', 'Company Name'),
+            'address' => config('settings.company_address', 'Company Address'),
+            'phone' => config('settings.company_phone', 'Company Phone'),
+            'email' => config('settings.company_email', 'Company Email'),
+            'tax_number' => config('settings.tax_number', 'Tax Number')
+        ];
+
+        return view('sales.print', [
+            'sale' => $sale,
+            'company' => $company
+        ]);
+    }
+
+    public function exportPdf(Sale $sale)
+    {
+        $pdf = PDF::loadView('sales.exports.pdf', compact('sale'));
+        return $pdf->download('sale-' . $sale->id . '.pdf');
+    }
+
+    public function exportExcel(Sale $sale)
+    {
+        return Excel::download(new SalesExport($sale), 'sale-' . $sale->id . '.xlsx');
     }
 
 }
