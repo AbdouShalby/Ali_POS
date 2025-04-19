@@ -48,7 +48,7 @@ return [
     'Suppliers Name' => 'اسم المورد',
     'There Are No Suppliers Yet' => 'لا يوجد موردين حتى الآن',
     'Latest 10 Cryptocurrency Purchases' => 'آخر 10 مشتريات بالعملات الرقمية',
-    'Latest 10 Cryptocurrency Transactions' => 'آخر 10 معاملات بالعملات الرقمية',
+    'Latest 10 Cryptocurrency Transactions' => 'آخر 10 معاملات للعملات المشفرة',
     'Transaction Number' => 'رقم المعاملة',
     'Payment Gateway' => 'بوابة الدفع',
     'Amount' => 'المبلغ',

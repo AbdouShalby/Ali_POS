@@ -13,6 +13,9 @@ class CreateCryptoTransactionsTable extends Migration
             $table->foreignId('crypto_gateway_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 15, 8);
             $table->decimal('profit_percentage', 5, 2)->nullable();
+            $table->string('type'); // 'buy' or 'sell'
+            $table->decimal('final_amount', 15, 8);
+            $table->decimal('profit_amount', 15, 8);
             $table->timestamps();
         });
     }

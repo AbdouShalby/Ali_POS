@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '- ' . __('crypto_transactions.today_transactions'))
+@section('title', __('crypto_transactions.today_transactions'))
 
 @section('content')
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -23,41 +23,134 @@
                     </li>
                 </ul>
             </div>
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+                <a href="{{ route('crypto_transactions.history') }}" class="btn btn-sm fw-bold btn-secondary">
+                    <i class="bi bi-clock-history me-1"></i>
+                    {{ __('crypto_transactions.view_history') }}
+                </a>
+            </div>
         </div>
     </div>
 
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-            <!-- Search & Filter -->
-            <div class="card card-flush shadow-sm">
-                <div class="card-header">
-                    <h3 class="card-title">{{ __('crypto_transactions.transactions_list') }}</h3>
+            <!-- Stats Cards -->
+            <div class="row g-5 g-xl-8 mb-5">
+                <!-- Total Transactions -->
+                <div class="col-xl-3">
+                    <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #F1416C;background-image:url('/assets/media/svg/shapes/wave-bg-red.svg')">
+                        <div class="card-header pt-5">
+                            <div class="card-title d-flex flex-column">
+                                <span class="fs-2hx fw-bold text-white me-2 lh-1">{{ $totalTransactions }}</span>
+                                <span class="text-white opacity-75 pt-1 fw-semibold fs-6">{{ __('crypto_transactions.total_transactions') }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="card-body">
+                <!-- Total Buy Amount -->
+                <div class="col-xl-3">
+                    <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #20D489;background-image:url('/assets/media/svg/shapes/wave-bg-green.svg')">
+                        <div class="card-header pt-5">
+                            <div class="card-title d-flex flex-column">
+                                <span class="fs-2hx fw-bold text-white me-2 lh-1">{{ number_format($totalBuyAmount, 2) }}</span>
+                                <span class="text-white opacity-75 pt-1 fw-semibold fs-6">{{ __('crypto_transactions.total_buy_amount') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Sell Amount -->
+                <div class="col-xl-3">
+                    <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #7239EA;background-image:url('/assets/media/svg/shapes/wave-bg-purple.svg')">
+                        <div class="card-header pt-5">
+                            <div class="card-title d-flex flex-column">
+                                <span class="fs-2hx fw-bold text-white me-2 lh-1">{{ number_format($totalSellAmount, 2) }}</span>
+                                <span class="text-white opacity-75 pt-1 fw-semibold fs-6">{{ __('crypto_transactions.total_sell_amount') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Profit -->
+                <div class="col-xl-3">
+                    <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #009EF7;background-image:url('/assets/media/svg/shapes/wave-bg-blue.svg')">
+                        <div class="card-header pt-5">
+                            <div class="card-title d-flex flex-column">
+                                <span class="fs-2hx fw-bold text-white me-2 lh-1">{{ number_format($totalProfit, 2) }}</span>
+                                <span class="text-white opacity-75 pt-1 fw-semibold fs-6">{{ __('crypto_transactions.total_profit') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="card card-flush">
+                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                    <div class="card-title">
+                        <div class="d-flex align-items-center position-relative my-1">
+                            <span class="svg-icon svg-icon-1 position-absolute ms-4">
+                                <i class="bi bi-search fs-2"></i>
+                            </span>
+                            <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="{{ __('crypto_transactions.search_placeholder') }}" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body pt-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-rounded border gy-5 gs-5 align-middle">
-                            <thead class="table-light text-gray-800 fw-bold">
-                            <tr>
-                                <th class="text-start">{{ __('crypto_transactions.gateway') }}</th>
-                                <th class="text-center">{{ __('crypto_transactions.amount') }}</th>
-                                <th class="text-center">{{ __('crypto_transactions.profit_percentage') }}</th>
-                                <th class="text-center">{{ __('crypto_transactions.profit_amount') }}</th>
-                                <th class="text-end">{{ __('crypto_transactions.date') }}</th>
-                            </tr>
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_transactions_table">
+                            <thead>
+                                <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="min-w-125px">{{ __('crypto_transactions.gateway') }}</th>
+                                    <th class="min-w-125px">{{ __('crypto_transactions.transaction_type') }}</th>
+                                    <th class="min-w-125px">{{ __('crypto_transactions.amount') }}</th>
+                                    <th class="min-w-125px">{{ __('crypto_transactions.profit_percentage') }}</th>
+                                    <th class="min-w-125px">{{ __('crypto_transactions.profit_amount') }}</th>
+                                    <th class="min-w-125px">{{ __('crypto_transactions.final_amount') }}</th>
+                                    <th class="text-end min-w-100px">{{ __('crypto_transactions.date') }}</th>
+                                </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="fw-semibold text-gray-600">
                             @foreach($transactions as $transaction)
                                 <tr>
-                                    <td class="text-start fw-semibold">{{ $transaction->cryptoGateway->name }}</td>
-                                    <td class="text-center {{ $transaction->amount < 0 ? 'text-danger' : 'text-success' }}">
-                                        {{ number_format($transaction->amount, 2) }}
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol symbol-circle symbol-35px me-3">
+                                                <span class="symbol-label bg-light-primary">
+                                                    <i class="bi bi-currency-bitcoin fs-2 text-primary"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex justify-content-start flex-column">
+                                                <span class="text-dark fw-bold text-hover-primary fs-6">{{ $transaction->cryptoGateway->name }}</span>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="text-center">
-                                        {{ $transaction->profit_percentage ? number_format($transaction->profit_percentage, 2) . '%' : '-' }}
+                                    <td>
+                                        @if($transaction->type == 'buy')
+                                            <span class="badge badge-light-success">{{ __('crypto_transactions.buy') }}</span>
+                                        @else
+                                            <span class="badge badge-light-danger">{{ __('crypto_transactions.sell') }}</span>
+                                        @endif
                                     </td>
-                                    <td class="text-center">{{ number_format($transaction->profit_amount, 2) }}</td>
-                                    <td class="text-end">{{ $transaction->created_at->format('Y-m-d') }}</td>
+                                    <td>
+                                        <span class="fw-bold {{ $transaction->amount < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ number_format($transaction->amount, 8) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ $transaction->profit_percentage }}%</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ number_format($transaction->profit_amount, 8) }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ number_format($transaction->final_amount, 8) }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-bold">{{ $transaction->created_at->format('Y-m-d H:i') }}</span>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -65,44 +158,55 @@
                     </div>
 
                     <div class="d-flex justify-content-end mt-4">
-                        {{ $transactions->links('pagination::bootstrap-4') }}
+                        {{ $transactions->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+@endsection
 
-    <style>
-        /* تحسينات الجدول */
-        .table {
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-        .table-hover tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        .text-success {
-            color: #28a745 !important;
-            font-weight: bold;
-        }
-        .text-danger {
-            color: #dc3545 !important;
-            font-weight: bold;
-        }
-        @media (max-width: 768px) {
-            th, td {
-                font-size: 14px;
-                padding: 8px;
+@section('scripts')
+    <script>
+        // تفعيل البحث في الجدول
+        var KTTransactionsTable = function () {
+            var table = document.querySelector('#kt_transactions_table');
+            var searchInput = document.querySelector('[data-kt-filter="search"]');
+
+            var initSearch = () => {
+                searchInput.addEventListener('keyup', function (e) {
+                    var value = e.target.value.toLowerCase();
+                    var rows = table.querySelectorAll('tbody tr');
+
+                    rows.forEach((row) => {
+                        var matches = false;
+                        var cells = row.querySelectorAll('td');
+
+                        cells.forEach((cell) => {
+                            if (cell.textContent.toLowerCase().indexOf(value) > -1) {
+                                matches = true;
+                            }
+                        });
+
+                        if (matches) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
             }
-        }
-        @media (max-width: 576px) {
-            th, td {
-                font-size: 12px;
-                padding: 6px;
-            }
-            .table-responsive {
-                overflow-x: auto;
-            }
-        }
-    </style>
+
+            return {
+                init: function () {
+                    initSearch();
+                }
+            };
+        }();
+
+        // تهيئة الجدول عند تحميل الصفحة
+        KTUtil.onDOMContentLoaded(function () {
+            KTTransactionsTable.init();
+        });
+    </script>
 @endsection

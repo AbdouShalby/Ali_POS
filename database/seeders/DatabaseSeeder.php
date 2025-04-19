@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             DebtsTableSeeder::class,
             CryptoTransactionSeeder::class,
             MaintenanceSeeder::class,
+            CryptoGatewaySeeder::class,
         ]);
     }
 }

@@ -27,6 +27,9 @@ class CryptoGatewayController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+        ], [
+            'name.required' => __('crypto_gateways.required_field'),
+            'name.max' => __('crypto_gateways.name_max_length'),
         ]);
 
         CryptoGateway::create([
@@ -34,7 +37,9 @@ class CryptoGatewayController extends Controller
             'balance' => 0,
         ]);
 
-        return redirect()->route('crypto_gateways.index')->with('success', 'تم إضافة بوابة العملات المشفرة بنجاح');
+        return redirect()
+            ->route('crypto_gateways.index')
+            ->with('success', __('crypto_gateways.success_add'));
     }
 
     public function edit($id)
@@ -49,13 +54,18 @@ class CryptoGatewayController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+        ], [
+            'name.required' => __('crypto_gateways.required_field'),
+            'name.max' => __('crypto_gateways.name_max_length'),
         ]);
 
         $gateway->update([
             'name' => $request->name,
         ]);
 
-        return redirect()->route('crypto_gateways.index')->with('success', 'تم تحديث بوابة العملات المشفرة بنجاح');
+        return redirect()
+            ->route('crypto_gateways.index')
+            ->with('success', __('crypto_gateways.success_update'));
     }
 
     public function show($id)
@@ -67,8 +77,17 @@ class CryptoGatewayController extends Controller
     public function destroy($id)
     {
         $gateway = CryptoGateway::findOrFail($id);
+        
+        if ($gateway->transactions()->exists()) {
+            return redirect()
+                ->route('crypto_gateways.index')
+                ->with('error', __('crypto_gateways.error_delete'));
+        }
+        
         $gateway->delete();
 
-        return redirect()->route('crypto_gateways.index')->with('success', 'تم حذف بوابة العملات المشفرة بنجاح');
+        return redirect()
+            ->route('crypto_gateways.index')
+            ->with('success', __('crypto_gateways.success_delete'));
     }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '- ' . __('Edit Cryptocurrency Gateway'))
+@section('title', __('crypto_gateways.edit_gateway'))
 
 @section('content')
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -30,53 +30,57 @@
 
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
-            <!-- Error Alert -->
             @if ($errors->any())
                 <div class="alert alert-danger d-flex align-items-center p-5 mb-5">
                     <span class="svg-icon svg-icon-2hx svg-icon-danger me-4">
                         <i class="bi bi-exclamation-triangle-fill fs-2"></i>
                     </span>
                     <div>
-                        <h4 class="alert-heading fw-bold">{{ __('crypto_gateways.error') }}</h4>
+                        <h4 class="mb-1 text-danger">{{ __('crypto_gateways.error') }}</h4>
                         <ul class="mb-0">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+                        <i class="bi bi-x fs-1 text-danger"></i>
+                    </button>
                 </div>
             @endif
 
-            <!-- Edit Form -->
-            <div class="card card-flush py-4">
-                <div class="card-header">
-                    <h2 class="card-title">{{ __('crypto_gateways.edit_gateway') }}</h2>
+            <div class="card card-flush">
+                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                    <div class="card-title">
+                        <h2 class="mb-0">{{ __('crypto_gateways.edit_gateway') }}</h2>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body pt-0">
                     <form action="{{ route('crypto_gateways.update', $gateway->id) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <!-- Name Field -->
+                        
                         <div class="mb-10">
-                            <label for="name" class="form-label fw-bold">{{ __('crypto_gateways.name') }}</label>
-                            <input
-                                type="text"
-                                class="form-control form-control-solid"
-                                id="name"
-                                name="name"
-                                value="{{ old('name', $gateway->name) }}"
-                                required>
+                            <label class="required fw-semibold fs-6 mb-2">{{ __('crypto_gateways.name') }}</label>
+                            <input type="text" 
+                                   class="form-control form-control-solid @error('name') is-invalid @enderror" 
+                                   name="name" 
+                                   value="{{ old('name', $gateway->name) }}" 
+                                   required />
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success me-3">
-                                <i class="bi bi-check-circle"></i> {{ __('crypto_gateways.update') }}
-                            </button>
-                            <a href="{{ route('crypto_gateways.index') }}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> {{ __('crypto_gateways.cancel') }}
+                            <a href="{{ route('crypto_gateways.index') }}" class="btn btn-light me-3">
+                                <i class="bi bi-arrow-left"></i>
+                                {{ __('crypto_gateways.cancel') }}
                             </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i>
+                                {{ __('crypto_gateways.save') }}
+                            </button>
                         </div>
                     </form>
                 </div>

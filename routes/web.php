@@ -83,9 +83,10 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     // **Crypto Routes**
     Route::resource('/crypto_gateways', CryptoGatewayController::class)->middleware(['auth', 'permission:manage crypto_gateways']);
     Route::get('/crypto_transactions', [CryptoTransactionController::class, 'index'])->name('crypto_transactions.index');
-    Route::get('/crypto_transactions/{gatewayId}/transactions/create', [CryptoTransactionController::class, 'create'])->name('crypto_transactions.create');
-    Route::post('/crypto_transactions/{gatewayId}/transactions', [CryptoTransactionController::class, 'store'])->name('crypto_transactions.store');
+    Route::get('/crypto_transactions/create/{gatewayId}', [CryptoTransactionController::class, 'create'])->name('crypto_transactions.create');
+    Route::post('/crypto_transactions/store/{gatewayId}', [CryptoTransactionController::class, 'store'])->name('crypto_transactions.store');
     Route::get('/crypto_transactions/history', [CryptoTransactionController::class, 'history'])->name('crypto_transactions.history');
+    Route::get('/crypto_transactions/export', [CryptoTransactionController::class, 'export'])->name('crypto_transactions.export');
 
     // **Customer Routes**
     Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
