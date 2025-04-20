@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Notification;
 
 class Product extends Model
 {
@@ -81,6 +82,11 @@ class Product extends Model
         return $this->belongsToMany(Warehouse::class)->withPivot('stock', 'stock_alert')->withTimestamps();
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
     public function scopeFilter($query, $filters)
     {
         return $query->when($filters['search'] ?? null, function ($query, $search) {
@@ -111,4 +117,22 @@ class Product extends Model
         return $this->hasMany(PurchaseItem::class);
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($product) {
+            // تحقق من المخزون في كل مستودع
+            foreach ($product->warehouses as $warehouse) {
+                if ($warehouse->pivot->stock <= $warehouse->pivot->stock_alert) {
+                    Notification::create([
+                        'title' => 'تنبيه المخزون',
+                        'message' => "المنتج {$product->name} وصل إلى الحد الأدنى للمخزون ({$warehouse->pivot->stock_alert}) في مستودع {$warehouse->name}",
+                        'type' => 'stock_alert',
+                        'product_id' => $product->id
+                    ]);
+                }
+            }
+        });
+    }
 }

@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'notifications' => 'الإشعارات',
+    'unread_notifications' => 'إشعارات غير مقروءة',
+    'no_new_notifications' => 'لا توجد إشعارات جديدة',
+    'loading' => 'جاري التحميل...',
+    'loading_notifications' => 'جاري تحميل الإشعارات...',
+    'mark_all_as_read' => 'تحديد الكل كمقروء',
+    'view_product' => 'عرض المنتج',
+    'just_now' => 'الآن',
+    'minutes_ago' => 'قبل :minutes دقيقة',
+    'hours_ago' => 'قبل :hours ساعة',
+    'days_ago' => 'قبل :days يوم',
+    'error_processing_notifications' => 'حدث خطأ أثناء معالجة الإشعارات',
+    'failed_to_load_notifications' => 'فشل في تحميل الإشعارات',
+    'failed_to_mark_notification' => 'فشل في تحديد الإشعار كمقروء',
+    'failed_to_mark_all_notifications' => 'فشل في تحديد جميع الإشعارات كمقروءة',
+    'failed_to_create_test_notifications' => 'فشل في إنشاء إشعارات تجريبية',
+    'test_notifications_created' => 'تم إنشاء إشعارات تجريبية بنجاح',
+    'stock_alert' => 'تنبيه المخزون',
+    'stock_alert_message' => 'المنتج :product وصل إلى مستوى التنبيه (:quantity وحدة)',
+    'notification_title' => 'عنوان الإشعار',
+    'notification_message' => 'رسالة الإشعار',
+    'notification_type' => 'نوع الإشعار',
+    'notification_date' => 'تاريخ الإشعار',
+    'notification_status' => 'حالة الإشعار',
+    'read' => 'مقروء',
+    'unread' => 'غير مقروء',
+    'view_all_notifications' => 'عرض كل الإشعارات'
+]; 

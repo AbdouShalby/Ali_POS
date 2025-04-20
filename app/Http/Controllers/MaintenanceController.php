@@ -73,6 +73,15 @@ class MaintenanceController extends Controller
         try {
             $maintenance = Maintenance::findOrFail($id);
 
+            // تسجيل البيانات المرسلة للتحقق من المشكلة
+            \Illuminate\Support\Facades\Log::info('Maintenance Update Request', [
+                'id' => $id,
+                'request_data' => $request->all(),
+                'old_status' => $maintenance->status,
+                'new_status' => $request->status
+            ]);
+
+            // التحقق من صحة البيانات
             $validated = $request->validate([
                 'customer_name' => 'required|string|max:255',
                 'phone_number' => 'required|string|max:15',
@@ -83,15 +92,7 @@ class MaintenanceController extends Controller
                 'status' => 'required|in:in_maintenance,completed,delivered',
             ]);
             
-            // تسجيل البيانات المرسلة للتحقق من المشكلة
-            \Illuminate\Support\Facades\Log::info('Maintenance Update Data', [
-                'id' => $id,
-                'request_data' => $request->all(),
-                'old_status' => $maintenance->status,
-                'new_status' => $request->status
-            ]);
-            
-            // تحديث البيانات بشكل صريح بدلاً من استخدام update($request->all())
+            // تحديث البيانات
             $maintenance->fill($validated);
             $result = $maintenance->save();
             
@@ -101,15 +102,18 @@ class MaintenanceController extends Controller
                 'new_maintenance_data' => $maintenance->toArray()
             ]);
 
-            return redirect()->route('maintenances.index')->with('success', 'تم تحديث عملية الصيانة بنجاح');
+            return redirect()->route('maintenances.index')
+                ->with('success', 'تم تحديث حالة الصيانة بنجاح');
         } catch (\Exception $e) {
             // تسجيل الخطأ في حالة حدوثه
             \Illuminate\Support\Facades\Log::error('Maintenance Update Error', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
             ]);
             
-            return redirect()->back()->withInput()->with('error', 'حدث خطأ أثناء تحديث عملية الصيانة: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء تحديث حالة الصيانة: ' . $e->getMessage());
         }
     }
 

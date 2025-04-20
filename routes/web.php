@@ -25,6 +25,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\CustomerSalesController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -175,5 +176,16 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::prefix('sales')->group(function () {
         Route::get('export/pdf/{sale}', [SaleController::class, 'exportPdf'])->name('sales.export.pdf');
         Route::get('export/excel/{sale}', [SaleController::class, 'exportExcel'])->name('sales.export.excel');
+    });
+
+    // Notification Routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/unread', [NotificationController::class, 'unread'])->name('notifications.unread');
+        Route::post('/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+        Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+        Route::get('/count', [NotificationController::class, 'getUnreadCount'])->name('notifications.count');
+        Route::get('/recent', [NotificationController::class, 'getRecentNotifications'])->name('notifications.recent');
+        Route::post('/test', [NotificationController::class, 'createTestNotifications'])->name('notifications.test');
     });
 });

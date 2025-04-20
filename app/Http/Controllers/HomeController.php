@@ -29,12 +29,50 @@ class HomeController extends Controller
 
     public function index()
     {
+        // Total statistics
         $totalSales = Sale::sum('total_amount');
         $totalPurchases = Purchase::sum('total_amount');
         $totalExternalPurchases = ExternalPurchase::sum('amount');
         $totalMaintenance = Maintenance::sum('cost');
         $totalDebt = Debt::where('status', 'unpaid')->sum('amount');
         $cashBalance = CashRegister::sum('balance');
+        
+        // Today's statistics
+        $today = Carbon::today();
+        $todaySales = Sale::whereDate('created_at', $today)->sum('total_amount');
+        $todayPurchases = Purchase::whereDate('created_at', $today)->sum('total_amount');
+        $todayProfit = $todaySales - $todayPurchases;
+        $todayExpenses = CashTransaction::whereDate('created_at', $today)
+            ->where('transaction_type', 'expense')
+            ->sum('amount');
+        
+        // Calculate total profit
+        $totalProfit = $totalSales - $totalPurchases;
+        
+        // Calculate total expenses
+        $totalExpenses = CashTransaction::where('transaction_type', 'expense')->sum('amount');
+        
+        // Chart data for last 30 days
+        $last30Days = collect();
+        $salesData = [];
+        $purchasesData = [];
+        $salesDates = [];
+        $purchasesDates = [];
+        
+        for ($i = 29; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $last30Days->push($date);
+            
+            $dailySales = Sale::whereDate('created_at', $date)->sum('total_amount');
+            $dailyPurchases = Purchase::whereDate('created_at', $date)->sum('total_amount');
+            
+            $salesData[] = $dailySales;
+            $purchasesData[] = $dailyPurchases;
+            $salesDates[] = $date->format('Y-m-d');
+            $purchasesDates[] = $date->format('Y-m-d');
+        }
+
+        // Other existing variables
         $totalProducts = Product::count();
         $totalProductsStock = DB::table('product_warehouse')->sum('stock');
         $totalCustomers = Customer::count();
@@ -53,29 +91,32 @@ class HomeController extends Controller
             ->take(10)
             ->get();
         $latestMaintenances = Maintenance::latest()->take(10)->get();
-        $latestSales = Sale::latest()->take(10)->get();
-        $latestPurchases = Purchase::latest()->take(10)->get();
+        $latestSales = Sale::with('customer')->latest()->take(10)->get();
+        $latestPurchases = Purchase::with('supplier')->latest()->take(10)->get();
         $latestCategories = Category::latest()->take(5)->get();
         $latestCustomers = Customer::latest()->take(5)->get();
         $latestSuppliers = Supplier::latest()->take(5)->get();
         $latestCryptoBuys = CryptoTransaction::orderBy('created_at', 'desc')->limit(10)->get();
         $latestCryptoSells = CryptoTransaction::orderBy('created_at', 'desc')->limit(10)->get();
-        $last7Days = Carbon::now()->subDays(7);
-        $incomeLast7Days = CashTransaction::where('transaction_type', 'sale')
-            ->where('created_at', '>=', $last7Days)
-            ->sum('amount');
-
-        $expensesLast7Days = CashTransaction::where('transaction_type', 'purchase')
-            ->where('created_at', '>=', $last7Days)
-            ->sum('amount');
+        
         return view('admin.dashboard', compact(
             'totalSales',
+            'todaySales',
+            'totalPurchases',
+            'todayPurchases',
+            'totalProfit',
+            'todayProfit',
+            'totalExpenses',
+            'todayExpenses',
+            'salesData',
+            'purchasesData',
+            'salesDates',
+            'purchasesDates',
             'totalCustomers',
             'totalProducts',
             'totalProductsStock',
             'totalCategories',
             'totalSuppliers',
-            'totalPurchases',
             'phonesInMaintenance',
             'cashBalance',
             'totalCryptoBalance',
@@ -93,9 +134,7 @@ class HomeController extends Controller
             'totalDebt',
             'maintenancePending',
             'maintenanceCompleted',
-            'maintenanceInProgress',
-            'incomeLast7Days',
-            'expensesLast7Days'
+            'maintenanceInProgress'
         ))->with('activePage', 'dashboard');
     }
 }
