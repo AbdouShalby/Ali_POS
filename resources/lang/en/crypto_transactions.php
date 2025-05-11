@@ -93,5 +93,12 @@ return [
     'last_3_months' => 'Last 3 Months',
     'last_6_months' => 'Last 6 Months',
     'last_year' => 'Last Year',
-    
+    'filter' => 'Filter',
+    'final.crypto_transactions' => 'Crypto Transactions',
+    'final' => 'Final',
+    'profit' => 'Profit',
+    'avg_profit' => 'Avg Profit',
+    'transactions_for_date' => 'Transactions for Date',
+    'all_transactions' => 'All Transactions',
+    'select_date_range' => 'Select Date Range',
 ];

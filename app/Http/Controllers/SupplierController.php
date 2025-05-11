@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Supplier;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Models\Product;
+use App\Models\Payment;
 
 class SupplierController extends Controller
 {
@@ -68,6 +70,28 @@ class SupplierController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         
+        // Get products purchased from this supplier with pagination
+        $products = Product::where('supplier_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        // Get debts for this supplier with pagination
+        $debts = Debt::where('supplier_id', $id)
+            ->with('product')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        // Get payment history for this supplier
+        $payments = Payment::where('supplier_id', $id)
+            ->with(['debt', 'debt.product'])
+            ->orderBy('payment_date', 'desc')
+            ->paginate(10);
+            
+        // Calculate total debt, total paid, and total remaining
+        $totalDebt = Debt::where('supplier_id', $id)->sum('amount');
+        $totalPaid = Debt::where('supplier_id', $id)->sum('paid');
+        $totalRemaining = $totalDebt - $totalPaid;
+        
         // Calculate statistics
         $totalPurchases = 0;
         $purchasesCount = 0;
@@ -94,7 +118,17 @@ class SupplierController extends Controller
             'average_purchase' => $purchasesCount > 0 ? $totalPurchases / $purchasesCount : 0,
         ];
         
-        return view('suppliers.show', compact('supplier', 'purchases', 'statistics'));
+        return view('suppliers.show', compact(
+            'supplier', 
+            'purchases', 
+            'products',
+            'debts',
+            'payments',
+            'statistics', 
+            'totalDebt', 
+            'totalPaid', 
+            'totalRemaining'
+        ));
     }
 
     public function edit($id)
@@ -166,6 +200,7 @@ class SupplierController extends Controller
             'payment_date' => $request->payment_date,
             'note' => $request->note ?? null,
             'payment_type' => 'supplier',
+            'supplier_id' => $debt->supplier_id
         ]);
 
         $debt->paid += $request->amount;
@@ -176,8 +211,79 @@ class SupplierController extends Controller
             $debt->save();
         }
 
+        // تحديث رصيد الخزنة
+        \App\Models\CashRegister::updateBalance(
+            'payment_to_supplier',
+            -1 * $request->amount,
+            'دفعة للمورد: ' . $debt->supplier->name . ' - للمنتج: ' . ($debt->product->name ?? 'غير محدد')
+        );
+
         return redirect()->route('suppliers.show', $debt->supplier_id)
-            ->with('success', 'Payment recorded successfully.');
+            ->with('success', 'تم تسجيل الدفعة بنجاح.');
+    }
+
+    // إضافة دالة تسجيل دفعة مجمعة للمورد (تنقسم على الديون المستحقة)
+    public function recordBulkPayment(Request $request, $supplierId)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+        ]);
+
+        $supplier = Supplier::findOrFail($supplierId);
+        
+        // الحصول على الديون غير المدفوعة بالكامل
+        $unpaidDebts = Debt::where('supplier_id', $supplierId)
+            ->where('status', '!=', 'paid')
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        if ($unpaidDebts->isEmpty()) {
+            return redirect()->route('suppliers.show', $supplierId)
+                ->with('error', 'لا توجد ديون مستحقة لهذا المورد.');
+        }
+        
+        $remainingPayment = $request->amount;
+        $successMessage = 'تم تسجيل الدفعة بنجاح.';
+        
+        foreach ($unpaidDebts as $debt) {
+            if ($remainingPayment <= 0) {
+                break;
+            }
+            
+            $debtRemaining = $debt->amount - $debt->paid;
+            $paymentForDebt = min($remainingPayment, $debtRemaining);
+            
+            if ($paymentForDebt > 0) {
+                $payment = $debt->payments()->create([
+                    'amount' => $paymentForDebt,
+                    'payment_date' => $request->payment_date,
+                    'note' => $request->note ?? 'دفعة جزئية من المبلغ الإجمالي: ' . $request->amount,
+                    'payment_type' => 'supplier',
+                    'supplier_id' => $supplierId
+                ]);
+                
+                $debt->paid += $paymentForDebt;
+                $remainingPayment -= $paymentForDebt;
+                
+                if ($debt->remaining <= 0) {
+                    $debt->status = 'paid';
+                    $successMessage = 'تم تسجيل الدفعة وسداد بعض الديون بالكامل.';
+                }
+                
+                $debt->save();
+            }
+        }
+        
+        // تحديث رصيد الخزنة
+        \App\Models\CashRegister::updateBalance(
+            'payment_to_supplier',
+            -1 * $request->amount,
+            'دفعة للمورد: ' . $supplier->name . ' - مبلغ: ' . $request->amount
+        );
+        
+        return redirect()->route('suppliers.show', $supplierId)
+            ->with('success', $successMessage);
     }
 
     public function paymentHistory(Debt $debt)

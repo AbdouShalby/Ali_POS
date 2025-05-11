@@ -116,6 +116,8 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::post('/products/{product}/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
     Route::delete('/products/{product}/remove-warehouse/{warehouse}', [ProductController::class, 'removeWarehouse']);
     Route::resource('/products', ProductController::class)->middleware(['auth', 'permission:manage products']);
+    Route::get('/products/search', [ProductController::class, 'searchProducts'])->name('products.search');
+    Route::get('/products/{product}/duplicate', [ProductController::class, 'duplicateProduct'])->name('products.duplicate');
 
     // **Purchase Routes**
     Route::get('/purchases/history', [PurchaseController::class, 'history'])->name('purchases.history');
@@ -150,8 +152,10 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     // **Supplier Routes**
     Route::get('/suppliers/{supplier}/debts', [SupplierController::class, 'debts'])->name('suppliers.debts');
-    Route::get('/debts/{debt}/payments', [SupplierController::class, 'showPaymentsForm'])->name('debt.payments');
+    Route::get('/debts/{debt}/payments', [SupplierController::class, 'showPaymentsForm'])->name('suppliers.payments');
     Route::post('/debts/{debt}/payments', [SupplierController::class, 'recordPayment'])->name('debt.record_payment');
+    Route::get('/debts/{debt}/payment-history', [SupplierController::class, 'paymentHistory'])->name('suppliers.payment_history');
+    Route::post('/suppliers/{supplier}/record-bulk-payment', [SupplierController::class, 'recordBulkPayment'])->name('suppliers.record_bulk_payment');
     Route::resource('/suppliers', SupplierController::class)->middleware(['auth', 'permission:manage suppliers']);
 
     // **Transaction Routes**

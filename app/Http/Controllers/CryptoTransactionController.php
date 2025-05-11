@@ -24,12 +24,10 @@ class CryptoTransactionController extends Controller
         $query = CryptoTransaction::with('cryptoGateway')
             ->whereDate('created_at', $date);
 
-        // Calculate statistics
-        $totalTransactions = $query->count();
-        $totalBuyAmount = $query->where('type', 'buy')->sum('amount');
-        $totalSellAmount = abs($query->where('type', 'sell')->sum('amount'));
-        $totalProfit = $query->sum('profit_amount');
-
+        // حساب الإحصائيات المفصلة
+        $statistics = $this->calculateDetailedStatistics($query);
+        
+        // الحصول على المعاملات مع الفلترة
         $transactions = $query->when($search, function ($query, $search) {
                 $query->where('amount', 'LIKE', "%$search%")
                     ->orWhereHas('cryptoGateway', function ($query) use ($search) {
@@ -39,14 +37,13 @@ class CryptoTransactionController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('crypto_transactions.index', compact(
-            'transactions', 
-            'search', 
-            'date',
-            'totalTransactions',
-            'totalBuyAmount',
-            'totalSellAmount',
-            'totalProfit'
+        return view('crypto_transactions.index', array_merge(
+            [
+                'transactions' => $transactions,
+                'search' => $search,
+                'date' => $date,
+            ],
+            $statistics
         ))->with('activePage', 'crypto_transactions');
     }
 
@@ -56,10 +53,10 @@ class CryptoTransactionController extends Controller
         return view('crypto_transactions.create', compact('gateway'))->with('activePage', 'crypto_transactions');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $gatewayId = null)
     {
         $request->validate([
-            'crypto_gateway_id' => 'required|exists:crypto_gateways,id',
+            'crypto_gateway_id' => $request->has('crypto_gateway_id') ? 'required|exists:crypto_gateways,id' : '',
             'amount' => 'required|numeric',
             'profit_percentage' => 'nullable|numeric',
             'type' => 'required|in:buy,sell'
@@ -68,10 +65,15 @@ class CryptoTransactionController extends Controller
         DB::beginTransaction();
 
         try {
+            // Set crypto_gateway_id from route parameter if not in request
+            if (!$request->has('crypto_gateway_id') && $gatewayId) {
+                $request->merge(['crypto_gateway_id' => $gatewayId]);
+            }
+
             $transaction = new CryptoTransaction([
                 'crypto_gateway_id' => $request->crypto_gateway_id,
                 'amount' => $request->amount,
-                'profit_percentage' => $request->profit_percentage,
+                'profit_percentage' => $request->profit_percentage ?? 0,
                 'type' => $request->type
             ]);
 
@@ -83,7 +85,13 @@ class CryptoTransactionController extends Controller
                 }
             }
 
+            // حساب final_amount و profit_amount قبل الحفظ
+            $transaction->calculateFinalAmount();
+            
+            // حفظ المعاملة
             $transaction->save();
+            
+            // تحديث الأرصدة
             $transaction->updateBalances();
 
             DB::commit();
@@ -106,6 +114,7 @@ class CryptoTransactionController extends Controller
 
         $query = CryptoTransaction::with('cryptoGateway');
 
+        // تطبيق الفلاتر
         if ($dateRange) {
             $dates = explode(' - ', $dateRange);
             if (count($dates) == 2) {
@@ -122,28 +131,84 @@ class CryptoTransactionController extends Controller
             $query->where('type', $type);
         }
 
-        // Calculate statistics
-        $totalTransactions = $query->count();
-        $totalBuyAmount = $query->where('type', 'buy')->sum('amount');
-        $totalSellAmount = abs($query->where('type', 'sell')->sum('amount'));
-        $totalProfit = $query->sum('profit_amount');
+        // حساب الإحصائيات المفصلة
+        $statistics = $this->calculateDetailedStatistics($query);
 
-        // Get gateways for filter
+        // الحصول على البوابات للفلتر
         $gateways = CryptoGateway::all();
 
+        // الحصول على المعاملات
         $transactions = $query->latest()->paginate(10);
 
-        return view('crypto_transactions.history', compact(
-            'transactions',
-            'gateways',
-            'dateRange',
-            'gateway',
-            'type',
-            'totalTransactions',
-            'totalBuyAmount',
-            'totalSellAmount',
-            'totalProfit'
+        return view('crypto_transactions.history', array_merge(
+            [
+                'transactions' => $transactions,
+                'gateways' => $gateways,
+                'dateRange' => $dateRange,
+                'gateway' => $gateway,
+                'type' => $type,
+            ],
+            $statistics
         ))->with('activePage', 'crypto_transactions.history');
+    }
+
+    /**
+     * حساب إحصائيات مفصلة للمعاملات
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return array
+     */
+    private function calculateDetailedStatistics($query)
+    {
+        // نسخ من الاستعلام للحفاظ على نفس الفلاتر
+        $buyQuery = clone $query;
+        $sellQuery = clone $query;
+        
+        // إحصائيات عامة
+        $totalTransactions = $query->count();
+        
+        // إحصائيات المشتريات
+        $buyTransactions = $buyQuery->where('type', 'buy')->get();
+        $totalBuyTransactions = $buyTransactions->count();
+        $totalBuyAmount = $buyTransactions->sum('amount');
+        $totalBuyFinalAmount = $buyTransactions->sum('final_amount');
+        $buyProfit = $buyTransactions->sum('profit_amount');
+        
+        // إحصائيات المبيعات
+        $sellTransactions = $sellQuery->where('type', 'sell')->get();
+        $totalSellTransactions = $sellTransactions->count();
+        $totalSellAmount = $sellTransactions->sum('amount');
+        $totalSellFinalAmount = $sellTransactions->sum('final_amount');
+        $sellProfit = $sellTransactions->sum('profit_amount');
+        
+        // إجمالي الأرباح
+        $totalProfit = $buyProfit + $sellProfit;
+        
+        // متوسط الربح لكل معاملة
+        $averageProfitPerTransaction = $totalTransactions > 0 
+            ? $totalProfit / $totalTransactions 
+            : 0;
+            
+        // نسبة الربح من إجمالي المبلغ (للمبيعات والمشتريات)
+        $totalAmount = $totalBuyAmount + $totalSellAmount;
+        $profitPercentage = $totalAmount > 0 
+            ? ($totalProfit / $totalAmount) * 100 
+            : 0;
+        
+        return [
+            'totalTransactions' => $totalTransactions,
+            'totalBuyTransactions' => $totalBuyTransactions,
+            'totalSellTransactions' => $totalSellTransactions,
+            'totalBuyAmount' => $totalBuyAmount,
+            'totalSellAmount' => $totalSellAmount,
+            'totalBuyFinalAmount' => $totalBuyFinalAmount,
+            'totalSellFinalAmount' => $totalSellFinalAmount, 
+            'buyProfit' => $buyProfit,
+            'sellProfit' => $sellProfit,
+            'totalProfit' => $totalProfit,
+            'averageProfitPerTransaction' => $averageProfitPerTransaction,
+            'profitPercentage' => $profitPercentage
+        ];
     }
 
     public function export(Request $request)

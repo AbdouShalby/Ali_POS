@@ -13,6 +13,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Image;
 
 class ProductController extends Controller
 {
@@ -54,6 +56,18 @@ class ProductController extends Controller
         ]);
 
         $validated = $this->validateProduct($request);
+        
+        // Validate price-cost relationship
+        if ($request->input('price') < $request->input('cost')) {
+            Log::warning("Product price is less than cost: " . $request->input('name'));
+        }
+        
+        // Validate barcode format
+        if (!$this->validateBarcode($request->input('barcode'))) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['barcode' => 'Invalid barcode format. Must be 8-13 digits.']);
+        }
 
         $files = $this->storeFiles($request);
 
@@ -68,12 +82,34 @@ class ProductController extends Controller
         $product = Product::create($productData);
 
         if ($request->payment_method === 'credit') {
-            Debt::create([
+            $initialPayment = $request->filled('initial_payment') ? $request->initial_payment : 0;
+            
+            $debt = Debt::create([
                 'supplier_id' => $request->supplier_id,
                 'product_id' => $product->id,
                 'amount' => $request->price,
-                'note' => 'Debt created for product: ' . $product->name,
+                'paid' => $initialPayment,
+                'status' => $initialPayment >= $request->price ? 'paid' : 'unpaid',
+                'note' => 'دين منتج: ' . $product->name,
             ]);
+            
+            // إذا كان هناك دفعة أولية، سجلها كدفعة
+            if ($initialPayment > 0) {
+                $debt->payments()->create([
+                    'supplier_id' => $request->supplier_id,
+                    'amount' => $initialPayment,
+                    'payment_date' => now()->format('Y-m-d'),
+                    'payment_type' => 'supplier',
+                    'note' => 'دفعة أولية عند شراء المنتج'
+                ]);
+                
+                // تحديث الخزنة
+                \App\Models\CashRegister::updateBalance(
+                    'payment_to_supplier',
+                    -1 * $initialPayment,
+                    'دفعة أولية للمورد: ' . Supplier::find($request->supplier_id)->name . ' - للمنتج: ' . $product->name
+                );
+            }
         }
 
         $this->attachWarehouses($product, $validated['warehouses']);
@@ -82,9 +118,17 @@ class ProductController extends Controller
             $this->storeMobileDetails($product, $request);
         }
 
+        // Use job for QR code generation
+        dispatch(function() use ($product) {
+            try {
         $this->generateQRCode($product);
+            } catch (\Exception $e) {
+                Log::error("QR Code generation failed in background job: " . $e->getMessage());
+            }
+        })->afterResponse();
 
-        return redirect()->route('products.index')->with('success', __('products.product_added_successfully', ['name' => $product->name]));
+        return redirect()->route('products.index')
+            ->with('success', __('products.product_added_successfully', ['name' => $product->name]));
     }
 
     protected function validateProduct($request, $product = null)
@@ -120,11 +164,27 @@ class ProductController extends Controller
 
     protected function storeFiles($request)
     {
-        return [
-            'image' => $request->hasFile('image') ? $request->file('image')->store('products/images', 'public') : null,
-            'scan_id' => $request->hasFile('scan_id') ? $request->file('scan_id')->store('products/scan_ids', 'public') : null,
-            'scan_documents' => $request->hasFile('scan_documents') ? $request->file('scan_documents')->store('products/scan_documents', 'public') : null,
-        ];
+        $files = [];
+        
+        if ($request->hasFile('image')) {
+            // Process the image (currently just passes it through)
+            $processedImage = $this->processImage($request->file('image'));
+            $files['image'] = $processedImage->store('products/images', 'public');
+        }
+        
+        if ($request->hasFile('scan_id')) {
+            // Process the scan ID image
+            $processedScanId = $this->processImage($request->file('scan_id'));
+            $files['scan_id'] = $processedScanId->store('products/scan_ids', 'public');
+        }
+        
+        if ($request->hasFile('scan_documents')) {
+            // Process the scan documents image
+            $processedScanDocs = $this->processImage($request->file('scan_documents'));
+            $files['scan_documents'] = $processedScanDocs->store('products/scan_documents', 'public');
+        }
+        
+        return $files;
     }
 
     protected function attachWarehouses($product, $warehouses)
@@ -171,13 +231,19 @@ class ProductController extends Controller
             ];
 
             $validated = $request->validate($rules);
+            
+            // التأكد من أن حقل has_box لديه قيمة (غير NULL)
+            if (!isset($validated['has_box'])) {
+                $validated['has_box'] = false;
+            }
 
             $product->mobileDetail()->updateOrCreate(
                 ['product_id' => $product->id],
                 $validated
             );
         } catch (\Exception $e) {
-            dd('Error in storeMobileDetails: ' . $e->getMessage());
+            \Log::error('Error in storeMobileDetails: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -258,9 +324,9 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        return view('products.show', [
-            'product' => $product->load(['category', 'brand', 'mobileDetail', 'warehouses'])
-        ])->with('activePage', 'products');
+        $product->load(['category', 'brand', 'mobileDetail', 'warehouses', 'supplier', 'customer']);
+        $debts = Debt::where('product_id', $product->id)->get();
+        return view('products.show', compact('product', 'debts'));
     }
 
     public function edit($id)
@@ -378,20 +444,80 @@ class ProductController extends Controller
         ]);
     }
 
-    public function checkBarcode(Request $request)
+    public function searchProducts(Request $request)
     {
-        $barcode = $request->barcode;
-        $productId = $request->product_id;
+        $term = $request->input('term');
+        
+        if (!$term || strlen($term) < 2) {
+            return response()->json([]);
+        }
+        
+        $products = Product::where('name', 'LIKE', "%{$term}%")
+            ->orWhere('barcode', 'LIKE', "%{$term}%")
+            ->select('id', 'name', 'barcode', 'price', 'cost')
+            ->limit(10)
+            ->get();
+            
+        return response()->json($products);
+    }
 
+    public function duplicateProduct($id)
+    {
+        $product = Product::with('mobileDetail')->findOrFail($id);
+        
+        return response()->json([
+            'success' => true,
+            'product' => $product,
+            'mobile_details' => $product->mobileDetail
+        ]);
+    }
+
+    protected function validateBarcode($barcode)
+    {
+        // Check if it's a valid EAN-13, EAN-8, UPC-A, or UPC-E format
+        return preg_match('/^[0-9]{8,13}$/', $barcode);
+    }
+
+    public function checkBarcode(Request $request, $barcode)
+    {
+        // Additional barcode format validation
+        $isValidFormat = $this->validateBarcode($barcode);
+        
+        if (!$isValidFormat) {
+            return response()->json([
+                'exists' => false,
+                'valid_format' => false,
+                'message' => 'Invalid barcode format'
+            ]);
+        }
+        
+        // Check if barcode exists (excluding current product if provided)
+        $productId = $request->input('product_id');
         $query = Product::where('barcode', $barcode);
 
-        if (!empty($productId)) {
+        if ($productId) {
             $query->where('id', '!=', $productId);
         }
 
         $exists = $query->exists();
 
-        return response()->json(['exists' => $exists]);
+        return response()->json([
+            'exists' => $exists,
+            'valid_format' => true,
+            'message' => $exists ? 'Barcode already exists' : 'Barcode is available'
+        ]);
+    }
+
+    protected function processImage($image)
+    {
+        // Since we don't have access to image manipulation libraries,
+        // we'll just store the original file
+        try {
+            return $image;
+        } catch (\Exception $e) {
+            \Log::error("Image processing issue: " . $e->getMessage());
+            return $image;
+        }
     }
 
 }

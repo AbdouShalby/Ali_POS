@@ -168,7 +168,7 @@
                                                 <td>
                                                     <a href="{{ route('sales.show', $sale->id) }}" class="text-dark fw-bold text-hover-primary fs-6">{{ $sale->invoice_number }}</a>
                                                 </td>
-                                                <td>{{ $sale->customer->name }}</td>
+                                                <td>{{ $sale->customer->name ?? '-' }}</td>
                                                 <td>{{ number_format($sale->total_amount, 2) }}</td>
                                                 <td>{{ $sale->created_at->format('Y-m-d H:i') }}</td>
                                             </tr>

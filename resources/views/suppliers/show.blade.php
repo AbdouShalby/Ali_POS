@@ -202,50 +202,303 @@
                                     <tbody>
                                         @forelse($purchases as $purchase)
                                             @php
-                                                $purchaseTotal = 0;
+                                                $totalItems = $purchase->purchaseItems->sum('quantity');
+                                                $totalAmount = 0;
                                                 foreach ($purchase->purchaseItems as $item) {
-                                                    $purchaseTotal += $item->quantity * $item->price;
+                                                    $totalAmount += $item->quantity * $item->price;
                                                 }
                                             @endphp
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('purchases.show', $purchase->id) }}" class="text-gray-800 text-hover-primary fw-bold">
-                                                        {{ $purchase->invoice_number }}
-                                                    </a>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="d-flex justify-content-start flex-column">
+                                                            <a href="#" class="text-dark fw-bold text-hover-primary fs-6">
+                                                                {{ $purchase->invoice_number ?? 'N/A' }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </td>
-                                                <td>{{ $purchase->created_at->format('Y-m-d') }}</td>
-                                                <td>{{ $purchase->purchaseItems->count() }}</td>
-                                                <td class="fw-bold">{{ number_format($purchaseTotal, 2) }}</td>
+                                                <td>
+                                                    {{ $purchase->created_at->format('Y-m-d') }}
+                                                </td>
+                                                <td>
+                                                    {{ $totalItems }}
+                                                </td>
+                                                <td>
+                                                    {{ number_format($totalAmount, 2) }}
+                                                </td>
                                                 <td class="text-end">
-                                                    <a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" title="{{ __('suppliers.view_purchase') }}">
-                                                        <i class="bi bi-eye-fill fs-4"></i>
-                                                    </a>
-                                                    <a href="{{ route('purchases.print', $purchase->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" title="{{ __('suppliers.print_purchase') }}">
-                                                        <i class="bi bi-printer-fill fs-4"></i>
+                                                    <a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
+                                                        <i class="bi bi-eye fs-3"></i>
                                                     </a>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5" class="text-center py-5">
-                                                    <div class="d-flex flex-column align-items-center">
-                                                        <i class="bi bi-cart-x fs-3x text-gray-400 mb-3"></i>
-                                                        <div class="fs-6 fw-bold text-gray-800 mb-1">{{ __('suppliers.no_purchases') }}</div>
-                                                    </div>
-                                                </td>
+                                                <td colspan="5" class="text-center">{{ __('suppliers.no_purchases_found') }}</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
                             </div>
-                            @if($purchases->hasPages())
-                                <div class="d-flex justify-content-center mt-5">
-                                    {{ $purchases->links() }}
+                            {{ $purchases->links() }}
+                        </div>
+                    </div>
+                    
+                    <!-- المنتجات المشتراة من المورد -->
+                    <div class="card card-flush mt-7">
+                        <div class="card-header">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold text-gray-800">{{ __('suppliers.supplier_products') }}</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                    <thead>
+                                        <tr class="fw-bold text-muted bg-light">
+                                            <th class="min-w-150px">{{ __('suppliers.product_name') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.payment_method') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.cost') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.price') }}</th>
+                                            <th class="min-w-100px text-end">{{ __('suppliers.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($products as $product)
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        @if($product->image)
+                                                            <div class="symbol symbol-45px me-5">
+                                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" />
+                                                            </div>
+                                                        @endif
+                                                        <div class="d-flex justify-content-start flex-column">
+                                                            <a href="{{ route('products.show', $product->id) }}" class="text-dark fw-bold text-hover-primary fs-6">
+                                                                {{ $product->name }}
+                                                            </a>
+                                                            <span class="text-muted fw-semibold text-muted d-block fs-7">
+                                                                {{ $product->barcode }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @if($product->payment_method == 'cash')
+                                                        <span class="badge badge-success">{{ __('suppliers.cash') }}</span>
+                                                    @else
+                                                        <span class="badge badge-warning">{{ __('suppliers.credit') }}</span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ number_format($product->cost, 2) }}</td>
+                                                <td>{{ number_format($product->price, 2) }}</td>
+                                                <td class="text-end">
+                                                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
+                                                        <i class="bi bi-eye fs-3"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center">{{ __('suppliers.no_products_found') }}</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            @if($products instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                                {{ $products->links() }}
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- الديون والمدفوعات -->
+                    <div class="card card-flush mt-7">
+                        <div class="card-header">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold text-gray-800">{{ __('suppliers.debts_and_payments') }}</span>
+                            </h3>
+                            <div class="card-toolbar">
+                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#add_payment_modal">
+                                    <i class="bi bi-plus-circle fs-7 me-1"></i>{{ __('suppliers.add_payment') }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="d-flex flex-wrap flex-stack mb-7">
+                                <div class="d-flex flex-column flex-grow-1 pe-8">
+                                    <div class="d-flex flex-wrap">
+                                        <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="{{ $totalDebt }}">{{ number_format($totalDebt, 2) }}</div>
+                                            </div>
+                                            <div class="fw-semibold fs-6 text-gray-400">{{ __('suppliers.total_debt') }}</div>
+                                        </div>
+                                        <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="{{ $totalPaid }}">{{ number_format($totalPaid, 2) }}</div>
+                                            </div>
+                                            <div class="fw-semibold fs-6 text-gray-400">{{ __('suppliers.total_paid') }}</div>
+                                        </div>
+                                        <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="{{ $totalRemaining }}">{{ number_format($totalRemaining, 2) }}</div>
+                                            </div>
+                                            <div class="fw-semibold fs-6 text-gray-400">{{ __('suppliers.total_remaining') }}</div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                    <thead>
+                                        <tr class="fw-bold text-muted bg-light">
+                                            <th class="min-w-150px">{{ __('suppliers.product') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.amount') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.paid') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.remaining') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.status') }}</th>
+                                            <th class="min-w-100px text-end">{{ __('suppliers.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($debts as $debt)
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="d-flex justify-content-start flex-column">
+                                                            <a href="{{ route('products.show', $debt->product_id) }}" class="text-dark fw-bold text-hover-primary fs-6">
+                                                                {{ $debt->product->name ?? __('suppliers.product_not_available') }}
+                                                            </a>
+                                                            <span class="text-muted fw-semibold text-muted d-block fs-7">
+                                                                {{ $debt->created_at->format('Y-m-d') }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{ number_format($debt->amount, 2) }}</td>
+                                                <td>{{ number_format($debt->paid, 2) }}</td>
+                                                <td>{{ number_format($debt->remaining, 2) }}</td>
+                                                <td>
+                                                    @if($debt->status == 'paid')
+                                                        <span class="badge badge-success">{{ __('suppliers.paid') }}</span>
+                                                    @else
+                                                        <span class="badge badge-warning">{{ __('suppliers.unpaid') }}</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-end">
+                                                    <a href="{{ route('suppliers.payment_history', $debt->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" title="{{ __('suppliers.payment_history') }}">
+                                                        <i class="bi bi-clock-history fs-3"></i>
+                                                    </a>
+                                                    @if($debt->status != 'paid')
+                                                        <a href="{{ route('suppliers.payments', $debt->id) }}" class="btn btn-icon btn-bg-light btn-active-color-success btn-sm" title="{{ __('suppliers.add_payment') }}">
+                                                            <i class="bi bi-cash-coin fs-3"></i>
+                                                        </a>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center">{{ __('suppliers.no_debts_found') }}</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            @if($debts instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                                {{ $debts->links() }}
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- سجل المدفوعات -->
+                    <div class="card card-flush mt-7">
+                        <div class="card-header">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold text-gray-800">{{ __('suppliers.payment_history_all') }}</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                    <thead>
+                                        <tr class="fw-bold text-muted bg-light">
+                                            <th class="min-w-120px">{{ __('suppliers.payment_date') }}</th>
+                                            <th class="min-w-120px">{{ __('suppliers.amount') }}</th>
+                                            <th class="min-w-150px">{{ __('suppliers.product') }}</th>
+                                            <th class="min-w-200px">{{ __('suppliers.note') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($payments as $payment)
+                                            <tr>
+                                                <td>{{ $payment->payment_date }}</td>
+                                                <td>{{ number_format($payment->amount, 2) }}</td>
+                                                <td>
+                                                    @if($payment->debt && $payment->debt->product)
+                                                        <a href="{{ route('products.show', $payment->debt->product_id) }}" class="text-dark fw-bold text-hover-primary fs-6">
+                                                            {{ $payment->debt->product->name }}
+                                                        </a>
+                                                    @else
+                                                        {{ __('suppliers.product_not_available') }}
+                                                    @endif
+                                                </td>
+                                                <td>{{ $payment->note ?? __('suppliers.no_note') }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center">{{ __('suppliers.no_payments_found') }}</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            @if($payments instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                                {{ $payments->links() }}
                             @endif
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إضافة دفعة Modal -->
+    <div class="modal fade" id="add_payment_modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('suppliers.add_payment') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('suppliers.record_bulk_payment', $supplier->id) }}" method="POST" id="add_payment_form">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-5">
+                            <label for="payment_amount" class="form-label required">{{ __('suppliers.payment_amount') }}</label>
+                            <input type="number" id="payment_amount" name="amount" class="form-control form-control-lg" step="0.01" min="0.01" required />
+                        </div>
+                        <div class="mb-5">
+                            <label for="payment_date" class="form-label required">{{ __('suppliers.payment_date') }}</label>
+                            <input type="date" id="payment_date" name="payment_date" class="form-control form-control-lg" value="{{ date('Y-m-d') }}" required />
+                        </div>
+                        <div class="mb-5">
+                            <label for="payment_note" class="form-label">{{ __('suppliers.payment_note') }}</label>
+                            <textarea id="payment_note" name="note" class="form-control form-control-lg" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('suppliers.cancel') }}</button>
+                        <button type="submit" class="btn btn-primary" id="add_payment_submit">
+                            <span class="indicator-label">{{ __('suppliers.submit') }}</span>
+                            <span class="indicator-progress">{{ __('suppliers.please_wait') }}
+                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -287,11 +540,23 @@
     </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
     function deleteSupplier(id) {
         const modal = document.getElementById('deleteModal');
         new bootstrap.Modal(modal).show();
     }
+
+    // تحديث الخزنة عندما يتم إضافة دفعة جديدة
+    document.addEventListener('DOMContentLoaded', function () {
+        const addPaymentForm = document.getElementById('add_payment_form');
+        if (addPaymentForm) {
+            addPaymentForm.addEventListener('submit', function() {
+                const submitButton = document.getElementById('add_payment_submit');
+                submitButton.setAttribute('data-kt-indicator', 'on');
+                submitButton.disabled = true;
+            });
+        }
+    });
 </script>
-@endpush
+@endsection

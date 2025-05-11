@@ -81,7 +81,7 @@
                             </div>
                             <div class="card-body text-center pt-0">
                                 <div class="d-inline-block mw-150px overflow-hidden text-center" style="border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
-                                    <img id="qrcode-image" src="{{ asset('storage/' . $product->qrcode) }}" alt="QR Code" style="max-width: 100%; height: auto;">
+                                    <img id="qrcode-image" src="{{ asset($product->qrcode) }}" alt="QR Code" style="max-width: 100%; height: auto;">
                                 </div>
                                 <div class="mt-3">
                                     <button class="btn btn-icon btn-primary me-2" onclick="downloadQRCode()">
@@ -116,21 +116,6 @@
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
-                    <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-n2">
-                        <li class="nav-item">
-                            <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_ecommerce_add_product_general">{{ __('products.general_information') }}</a>
-                        </li>
-                        @if($product->mobileDetail && !empty($product->mobileDetail->id))
-                            <li class="nav-item">
-                                <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_advanced">{{ __('products.device_details') }}</a>
-                            </li>
-                        @endif
-                        <li class="nav-item">
-                            <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_warehouses">{{ __('products.warehouses') }}</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general" role="tab-panel">
                             <div class="d-flex flex-column gap-7 gap-lg-10">
                                 <div class="card card-flush py-4">
                                     <div class="card-header">
@@ -169,11 +154,79 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+
+                                <!-- بداية قسم معلومات المورد/العميل -->
+                                <div class="card card-flush py-4 mb-5">
+                                    <div class="card-header">
+                                        <div class="card-title">
+                                            <h2>{{ __('products.source_information') }}</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card-body row pt-0">
+                                        <div class="mb-10 col-md-4">
+                                            <label class="form-label">{{ __('products.source_type') }}</label>
+                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" 
+                                                value="{{ $product->supplier_id ? __('products.supplier') : ($product->customer_id ? __('products.customer') : __('products.direct_purchase')) }}" readonly />
+                                        </div>
+                                        <div class="mb-10 col-md-4">
+                                            <label class="form-label">{{ __('products.source_name') }}</label>
+                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" 
+                                                value="{{ $product->supplier_id ? $product->supplier->name : ($product->customer_id ? $product->customer->name : __('products.empty_field')) }}" readonly />
+                                        </div>
+                                        <div class="mb-10 col-md-4">
+                                            <label class="form-label">{{ __('products.payment_method') }}</label>
+                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" 
+                                                value="{{ $product->payment_method ? __('products.'.$product->payment_method) : __('products.empty_field') }}" readonly />
+                                        </div>
+                                        @if($product->supplier_id && $debts->count() > 0)
+                                        <div class="mb-10 col-md-12">
+                                            <div class="border border-dashed border-gray-300 rounded p-5">
+                                                <h3 class="fs-5 fw-semibold mb-3">{{ __('products.debt_information') }}</h3>
+                                                <table class="table table-row-dashed gs-0 gy-4">
+                                                    <thead>
+                                                        <tr class="fw-bold text-muted bg-light">
+                                                            <th>{{ __('products.amount') }}</th>
+                                                            <th>{{ __('products.paid') }}</th>
+                                                            <th>{{ __('products.remaining') }}</th>
+                                                            <th>{{ __('products.status') }}</th>
+                                                            <th>{{ __('products.actions') }}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($debts as $debt)
+                                                        <tr>
+                                                            <td>{{ number_format($debt->amount, 2) }}</td>
+                                                            <td>{{ number_format($debt->paid, 2) }}</td>
+                                                            <td>{{ number_format($debt->remaining, 2) }}</td>
+                                                            <td>
+                                                                @if($debt->status == 'paid')
+                                                                    <span class="badge badge-success">{{ __('products.paid') }}</span>
+                                                                @else
+                                                                    <span class="badge badge-warning">{{ __('products.unpaid') }}</span>
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <a href="{{ route('suppliers.payment_history', $debt->id) }}" class="btn btn-sm btn-icon btn-light-primary me-2">
+                                                                    <i class="fas fa-history"></i>
+                                                                </a>
+                                                                @if($debt->status != 'paid')
+                                                                <a href="{{ route('suppliers.payments', $debt->id) }}" class="btn btn-sm btn-icon btn-light-success">
+                                                                    <i class="fas fa-money-bill-wave"></i>
+                                                                </a>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- نهاية قسم معلومات المورد/العميل -->
+
                         @if($product->mobileDetail && !empty($product->mobileDetail->id))
-                            <div class="tab-pane fade" id="kt_ecommerce_add_product_advanced" role="tab-panel">
-                                <div class="d-flex flex-column gap-7 gap-lg-10">
                                     <div class="card card-flush py-4">
                                         <div class="card-header">
                                             <div class="card-title">
@@ -245,14 +298,11 @@
                                                 </div>
                                             </div>
                                             @endif
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @endif
 
-                        <div class="tab-pane fade" id="kt_ecommerce_add_product_warehouses" role="tab-panel">
-                            <div class="d-flex flex-column gap-7 gap-lg-10">
                                 <div class="card card-flush py-4">
                                     <div class="card-header">
                                         <div class="card-title">
@@ -279,9 +329,6 @@
                                                 @endforeach
                                                 </tbody>
                                             </table>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -457,7 +504,7 @@
                         ${Array.from({ length: parseInt(paperSize) }).map((_, index) => `
                             <div class="label">
                                 <p>${productName}</p>
-                                <img id="barcode-${index}" />
+                                <img id="barcode-"${index}" />
                                 <p>${productPrice}</p>
                             </div>
                         `).join('')}

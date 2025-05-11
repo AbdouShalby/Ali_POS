@@ -151,13 +151,40 @@ return [
     'confirm_delete_image' => 'Confirm Delete Image',
     'image_deleted_successfully' => 'Image deleted successfully.',
     'error_deleting_image' => 'Error Deleting Image.',
-    'This barcode already exists!' =>  'This barcode already exists!',
+    'This barcode already exists!' => 'This barcode already exists!',
     'are_you_sure' => 'Are you sure?',
-    'delete_confirmation_message' => 'You won’t be able to revert this! Do you want to delete?',
+    'delete_confirmation_message' => 'You won\'t be able to revert this! Do you want to delete?',
     'yes_delete' => 'Yes, delete!',
     'success' => 'Success!',
     'error' => 'Error!',
     'product_added_successfully' => 'The product ":name" has been added successfully!',
     'product_updated_successfully' => 'The product ":name" has been updated successfully!',
     'product_deleted_successfully' => 'The product ":name" has been deleted successfully!',
+    
+    // Help texts (tooltips)
+    'name_help_text' => 'Enter a descriptive product name that customers can easily understand.',
+    'barcode_help_text' => 'Enter a unique product barcode or generate one automatically. This will be used for scanning and identifying the product.',
+    'cost_help_text' => 'The purchase cost of the product (what you paid for it).',
+    'price_help_text' => 'The selling price of the product (what customers will pay).',
+    'image_help_text' => 'Upload a clear image of the product. Recommended size: 500x500 pixels.',
+    'scan_id_help_text' => 'Upload a scanned copy of ID or proof of ownership.',
+    'scan_documents_help_text' => 'Upload scanned documents related to the product.',
+    
+    // Validation and form messages
+    'please_wait' => 'Please wait...',
+    'product_name_example' => 'Example: iPhone 13 Pro 128GB Graphite',
+    'invalid_barcode_format' => 'Invalid barcode format',
+    'valid_barcode' => 'Valid barcode',
+    'price_cost_warning' => 'Warning: Price is lower than cost!',
+    
+    // Duplicate Product
+    'duplicate_product' => 'Duplicate Product',
+    'duplicate_existing_product' => 'Duplicate Existing Product',
+    'search_product' => 'Search Product',
+    'search_by_name_barcode' => 'Search by name or barcode',
+
+    // Form validation
+    'form_validation_error' => 'Please correct the errors before submitting',
+    'field_required' => 'This field is required',
+    'brand_already_exists' => 'This brand already exists',
 ];
