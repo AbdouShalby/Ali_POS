@@ -160,7 +160,7 @@ return [
     'product_added_successfully' => 'The product ":name" has been added successfully!',
     'product_updated_successfully' => 'The product ":name" has been updated successfully!',
     'product_deleted_successfully' => 'The product ":name" has been deleted successfully!',
-    
+
     // Help texts (tooltips)
     'name_help_text' => 'Enter a descriptive product name that customers can easily understand.',
     'barcode_help_text' => 'Enter a unique product barcode or generate one automatically. This will be used for scanning and identifying the product.',
@@ -169,22 +169,53 @@ return [
     'image_help_text' => 'Upload a clear image of the product. Recommended size: 500x500 pixels.',
     'scan_id_help_text' => 'Upload a scanned copy of ID or proof of ownership.',
     'scan_documents_help_text' => 'Upload scanned documents related to the product.',
-    
+
     // Validation and form messages
     'please_wait' => 'Please wait...',
     'product_name_example' => 'Example: iPhone 13 Pro 128GB Graphite',
     'invalid_barcode_format' => 'Invalid barcode format',
     'valid_barcode' => 'Valid barcode',
     'price_cost_warning' => 'Warning: Price is lower than cost!',
-    
+    'invalid_barcode_format_message' => 'The barcode format is invalid. It should be 8-13 digits.', // More detailed message
+    'saving' => 'Saving...',
+    'An unexpected error occurred.' => 'An unexpected error occurred.',
+    'item_added_successfully' => ':item added successfully.', // Using a placeholder for item name
+    'error_saving_item' => 'Error saving :item.', // Using a placeholder for item name
+
+
     // Duplicate Product
     'duplicate_product' => 'Duplicate Product',
     'duplicate_existing_product' => 'Duplicate Existing Product',
     'search_product' => 'Search Product',
     'search_by_name_barcode' => 'Search by name or barcode',
+    'no_products_found' => 'No products found.',
+    'form_populated_for_duplication' => 'Form populated with product data.',
+    'review_and_save' => 'Review and save.',
+    'error_fetching_product_for_duplication' => 'Error fetching product data for duplication.',
+
 
     // Form validation
     'form_validation_error' => 'Please correct the errors before submitting',
     'field_required' => 'This field is required',
     'brand_already_exists' => 'This brand already exists',
+
+    // Print related messages
+    'barcode_not_entered' => 'Please enter a barcode to print.',
+    'invalid_label_count' => 'Invalid number of labels specified.',
+
+    // المصطلحات الجديدة المتعلقة بالمورد والعميل والديون (للتأكد من وجودها)
+    'source_information' => 'Source Information',
+    'source_type' => 'Source Type',
+    'source_name' => 'Source Name',
+    'direct_purchase' => 'Direct Purchase',
+    'debt_information' => 'Debt Information',
+    'amount' => 'Amount',
+    'paid' => 'Paid',
+    'remaining' => 'Remaining',
+    'status' => 'Status',
+    'unpaid' => 'Unpaid',
+    'initial_payment_amount' => 'Initial Payment Amount',
+    'initial_payment_help_text' => 'Enter the amount paid upfront to the supplier when purchasing the product.',
+    'initial_payment_notice' => 'This amount will be deducted from the total debt for this product.',
+
 ];

@@ -102,7 +102,7 @@ return [
     'order_summary' => 'ملخص الطلب',
     'monthly_sales' => 'المبيعات الشهرية',
     'product_stock_alerts' => 'تنبيهات مخزون المنتجات',
-    'low_stock' => 'مخزون منخفض',
+    'low_stock' => 'مخزون من��فض',
     'out_of_stock' => 'نفذ من المخزون',
     'view_product_details' => 'عرض تفاصيل المنتج',
     'edit_product' => 'تعديل المنتج',
@@ -125,7 +125,7 @@ return [
     'product_image' => 'صورة المنتج',
     'product_barcode' => 'باركود المنتج',
     'general_information' => 'معلومات عامة',
-    'device_information' => 'معلومات الجهاز',
+    'device_information' => '��علومات الجهاز',
     'product_cost' => 'تكلفة المنتج',
     'product_price' => 'سعر المنتج',
     'minimum_sale_price' => 'الحد الأدنى لسعر البيع',
@@ -160,7 +160,7 @@ return [
     'product_added_successfully' => 'تمت إضافة المنتج ":name" بنجاح!',
     'product_updated_successfully' => 'تم تحديث المنتج ":name" بنجاح!',
     'product_deleted_successfully' => 'تم حذف المنتج ":name" بنجاح!',
-    
+
     // نصوص المساعدة (تلميحات)
     'name_help_text' => 'أدخل اسمًا وصفيًا للمنتج يمكن للعملاء فهمه بسهولة.',
     'barcode_help_text' => 'أدخل باركود فريد للمنتج أو قم بتوليده تلقائيًا. سيتم استخدامه للمسح وتحديد المنتج.',
@@ -169,26 +169,36 @@ return [
     'image_help_text' => 'قم بتحميل صورة واضحة للمنتج. الحجم الموصى به: 500×500 بكسل.',
     'scan_id_help_text' => 'قم بتحميل نسخة ممسوحة ضوئياً من الهوية أو إثبات الملكية.',
     'scan_documents_help_text' => 'قم بتحميل المستندات الممسوحة ضوئياً المتعلقة بالمنتج.',
-    
+
     // رسائل التحقق والنماذج
     'please_wait' => 'يرجى الانتظار...',
     'product_name_example' => 'مثال: آيفون 13 برو 128 جيجابايت جرافيت',
     'invalid_barcode_format' => 'تنسيق الباركود غير صالح',
     'valid_barcode' => 'الباركود صالح',
     'price_cost_warning' => 'تحذير: السعر أقل من التكلفة!',
-    
-    // تكرار المنتج
+    'invalid_barcode_format_message' => 'تنسيق الباركود غير صالح. يجب أن يتكون من 8-13 رقماً.', // رسالة أكثر تفصيلاً
+    'saving' => 'جارٍ الحفظ...',
+    'An unexpected error occurred.' => 'حدث خطأ غير متوقع.',
+    'item_added_successfully' => 'تمت إضافة :item بنجاح.', // باستخدام متغير لاسم العنصر
+    'error_saving_item' => 'خطأ في حفظ :item.', // باستخدام متغير لاسم العنصر
+
+
+    // تكرار المنت��
     'duplicate_product' => 'نسخ المنتج',
     'duplicate_existing_product' => 'نسخ منتج موجود',
     'search_product' => 'بحث عن منتج',
     'search_by_name_barcode' => 'بحث بالاسم أو الباركود',
+    'no_products_found' => 'لم يتم العثور على منتجات.',
+    'form_populated_for_duplication' => 'تم ملء النموذج ببيانات المنتج.',
+    'review_and_save' => 'راجع واحفظ.',
+    'error_fetching_product_for_duplication' => 'خطأ في جلب بيانات المنتج للنسخ.',
 
-    // التحقق من صحة النموذج
-    'form_validation_error' => 'يرجى تصحيح الأخطاء قبل الإرسال',
-    'field_required' => 'هذا الحقل مطلوب',
-    'brand_already_exists' => 'هذه العلامة التجارية موجودة بالفعل',
 
-    // المصطلحات الجديدة المتعلقة بالمورد والعميل والديون
+    // طباعة الباركود
+    'barcode_not_entered' => 'يرجى إدخال باركود للطباعة أولاً.',
+    'invalid_label_count' => 'عدد الملصقات المحدد غير صالح.',
+
+    // المصطلحات الجديدة المتعلقة بالمورد والعميل والديون (للتأكد من وجودها)
     'source_information' => 'معلومات المصدر',
     'source_type' => 'نوع المصدر',
     'source_name' => 'اسم المصدر',
@@ -202,4 +212,5 @@ return [
     'initial_payment_amount' => 'المبلغ المدفوع مقدماً',
     'initial_payment_help_text' => 'أدخل المبلغ الذي تم دفعه مقدماً للمورد عند شراء المنتج.',
     'initial_payment_notice' => 'هذا المبلغ سيتم خصمه من إجمالي الدين المستحق على هذا المنتج.',
+
 ];

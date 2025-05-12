@@ -72,28 +72,7 @@
                             </div>
                         </div>
                     @endif
-                    @if($product->qrcode)
-                        <div class="card card-flush py-3">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <h2>{{ __('products.product_qrcode') }}</h2>
-                                </div>
-                            </div>
-                            <div class="card-body text-center pt-0">
-                                <div class="d-inline-block mw-150px overflow-hidden text-center" style="border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
-                                    <img id="qrcode-image" src="{{ asset($product->qrcode) }}" alt="QR Code" style="max-width: 100%; height: auto;">
-                                </div>
-                                <div class="mt-3">
-                                    <button class="btn btn-icon btn-primary me-2" onclick="downloadQRCode()">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <button id="printQRButton" type="button" class="btn btn-icon btn-secondary">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+                    {{-- Product-level QR code display removed as it is now device-specific --}}
                     <div class="card card-flush py-3">
                         <div class="card-header">
                             <div class="card-title">
@@ -155,76 +134,7 @@
                                     </div>
                                 </div>
 
-                                <!-- بداية قسم معلومات المورد/العميل -->
-                                <div class="card card-flush py-4 mb-5">
-                                    <div class="card-header">
-                                        <div class="card-title">
-                                            <h2>{{ __('products.source_information') }}</h2>
-                                        </div>
-                                    </div>
-                                    <div class="card-body row pt-0">
-                                        <div class="mb-10 col-md-4">
-                                            <label class="form-label">{{ __('products.source_type') }}</label>
-                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" 
-                                                value="{{ $product->supplier_id ? __('products.supplier') : ($product->customer_id ? __('products.customer') : __('products.direct_purchase')) }}" readonly />
-                                        </div>
-                                        <div class="mb-10 col-md-4">
-                                            <label class="form-label">{{ __('products.source_name') }}</label>
-                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" 
-                                                value="{{ $product->supplier_id ? $product->supplier->name : ($product->customer_id ? $product->customer->name : __('products.empty_field')) }}" readonly />
-                                        </div>
-                                        <div class="mb-10 col-md-4">
-                                            <label class="form-label">{{ __('products.payment_method') }}</label>
-                                            <input type="text" class="form-control mb-2" placeholder="{{ __('products.empty_field') }}" 
-                                                value="{{ $product->payment_method ? __('products.'.$product->payment_method) : __('products.empty_field') }}" readonly />
-                                        </div>
-                                        @if($product->supplier_id && $debts->count() > 0)
-                                        <div class="mb-10 col-md-12">
-                                            <div class="border border-dashed border-gray-300 rounded p-5">
-                                                <h3 class="fs-5 fw-semibold mb-3">{{ __('products.debt_information') }}</h3>
-                                                <table class="table table-row-dashed gs-0 gy-4">
-                                                    <thead>
-                                                        <tr class="fw-bold text-muted bg-light">
-                                                            <th>{{ __('products.amount') }}</th>
-                                                            <th>{{ __('products.paid') }}</th>
-                                                            <th>{{ __('products.remaining') }}</th>
-                                                            <th>{{ __('products.status') }}</th>
-                                                            <th>{{ __('products.actions') }}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($debts as $debt)
-                                                        <tr>
-                                                            <td>{{ number_format($debt->amount, 2) }}</td>
-                                                            <td>{{ number_format($debt->paid, 2) }}</td>
-                                                            <td>{{ number_format($debt->remaining, 2) }}</td>
-                                                            <td>
-                                                                @if($debt->status == 'paid')
-                                                                    <span class="badge badge-success">{{ __('products.paid') }}</span>
-                                                                @else
-                                                                    <span class="badge badge-warning">{{ __('products.unpaid') }}</span>
-                                                                @endif
-                                                            </td>
-                                                            <td>
-                                                                <a href="{{ route('suppliers.payment_history', $debt->id) }}" class="btn btn-sm btn-icon btn-light-primary me-2">
-                                                                    <i class="fas fa-history"></i>
-                                                                </a>
-                                                                @if($debt->status != 'paid')
-                                                                <a href="{{ route('suppliers.payments', $debt->id) }}" class="btn btn-sm btn-icon btn-light-success">
-                                                                    <i class="fas fa-money-bill-wave"></i>
-                                                                </a>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <!-- نهاية قسم معلومات المورد/العميل -->
+                                {{-- Source Information & Debt Section has been removed as these concepts are decoupled from direct product definition. --}}
 
                         @if($product->mobileDetail && !empty($product->mobileDetail->id))
                                     <div class="card card-flush py-4">
@@ -270,37 +180,75 @@
                                                 <label class="form-label">{{ __('products.device_description') }}</label>
                                                 <textarea class="form-control mb-2 min-h-100px" placeholder="{{ __('products.empty_field') }}" readonly>{{ $product->mobileDetail->device_description }}</textarea>
                                             </div>
-                                            
-                                            @if($product->scan_id)
+
+                                            {{-- Display Scan ID if available in mobileDetail --}}
+                                            @if($product->mobileDetail->scan_id)
                                             <div class="mb-10 col-md-6">
                                                 <label class="form-label">{{ __('products.scan_id') }}</label>
                                                 <div class="border rounded p-3 text-center">
-                                                    <img src="{{ asset('storage/' . $product->scan_id) }}" alt="{{ __('products.scan_id') }}" class="img-fluid mb-2" style="max-height: 200px;">
+                                                    <img src="{{ asset('storage/' . $product->mobileDetail->scan_id) }}" alt="{{ __('products.scan_id') }}" class="img-fluid mb-2" style="max-height: 200px;">
                                                     <div class="mt-2">
-                                                        <a href="{{ asset('storage/' . $product->scan_id) }}" class="btn btn-sm btn-primary" download>
+                                                        <a href="{{ asset('storage/' . $product->mobileDetail->scan_id) }}" class="btn btn-sm btn-primary" download>
                                                             <i class="fas fa-download me-1"></i> {{ __('products.download') }}
                                                         </a>
                                                     </div>
                                                 </div>
                                             </div>
                                             @endif
-                                            
-                                            @if($product->scan_documents)
+
+                                            {{-- Display Scan Documents if available in mobileDetail --}}
+                                            @if($product->mobileDetail->scan_documents)
                                             <div class="mb-10 col-md-6">
                                                 <label class="form-label">{{ __('products.scan_documents') }}</label>
                                                 <div class="border rounded p-3 text-center">
-                                                    <img src="{{ asset('storage/' . $product->scan_documents) }}" alt="{{ __('products.scan_documents') }}" class="img-fluid mb-2" style="max-height: 200px;">
+                                                    {{-- Check if it's an image or PDF for appropriate display --}}
+                                                    @php
+                                                        $filePath = $product->mobileDetail->scan_documents;
+                                                        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+                                                    @endphp
+                                                    @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                                                        <img src="{{ asset('storage/' . $filePath) }}" alt="{{ __('products.scan_documents') }}" class="img-fluid mb-2" style="max-height: 200px;">
+                                                    @else
+                                                        <i class="fas fa-file-alt fs-3x mb-2"></i>
+                                                        <p>{{ basename($filePath) }}</p>
+                                                    @endif
                                                     <div class="mt-2">
-                                                        <a href="{{ asset('storage/' . $product->scan_documents) }}" class="btn btn-sm btn-primary" download>
+                                                        <a href="{{ asset('storage/' . $filePath) }}" class="btn btn-sm btn-primary" download>
                                                             <i class="fas fa-download me-1"></i> {{ __('products.download') }}
                                                         </a>
                                                     </div>
                                                 </div>
                                             </div>
                                             @endif
+
+                                            {{-- Display Device QR Code if available in mobileDetail --}}
+                                            @if($product->mobileDetail->qrcode)
+                                            <div class="mb-10 col-md-12">
+                                                <div class="card card-flush py-3">
+                                                    <div class="card-header">
+                                                        <div class="card-title">
+                                                            <h2>{{ __('products.device_qrcode') }}</h2> {{-- Changed title --}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body text-center pt-0">
+                                                        <div class="d-inline-block mw-150px overflow-hidden text-center" style="border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
+                                                            <img id="device-qrcode-image" src="{{ asset('storage/' . $product->mobileDetail->qrcode) }}" alt="Device QR Code" style="max-width: 100%; height: auto;">
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <button class="btn btn-icon btn-primary me-2" onclick="downloadDeviceQRCode()">
+                                                                <i class="fas fa-download"></i>
+                                                            </button>
+                                                            <button id="printDeviceQRButton" type="button" class="btn btn-icon btn-secondary">
+                                                                <i class="fas fa-print"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                         @endif
 
                                 <div class="card card-flush py-4">
@@ -388,16 +336,39 @@
                 });
             });
 
-            function downloadQRCode() {
-                const qrImage = document.getElementById('qrcode-image');
+            // Function for product's main QR (if it were still used directly on product)
+            // function downloadQRCode() {
+            //     const qrImage = document.getElementById('qrcode-image'); // Original QR image ID
+            //     if (!qrImage) return;
+            //     const link = document.createElement('a');
+            //     link.href = qrImage.src;
+            //     link.download = 'product_qrcode.png';
+            //     link.click();
+            // }
+
+            // if (document.getElementById('printQRButton')) { // Check if original print button exists
+            //     document.getElementById('printQRButton').addEventListener('click', function () {
+            //         const qrImage = document.getElementById('qrcode-image'); // Original QR image ID
+            //         // ... print logic ...
+            //     });
+            // }
+
+            // Functions for Device QR Code
+            function downloadDeviceQRCode() {
+                const qrImage = document.getElementById('device-qrcode-image'); // New ID for device QR image
+                if (!qrImage) {
+                    alert("{{ __('products.device_qrcode_not_found') }}");
+                    return;
+                }
                 const link = document.createElement('a');
                 link.href = qrImage.src;
-                link.download = 'qrcode.png';
+                link.download = 'device_qrcode.png';
                 link.click();
             }
 
-            document.getElementById('printQRButton').addEventListener('click', function () {
-                const qrImage = document.getElementById('qrcode-image');
+            if (document.getElementById('printDeviceQRButton')) {
+                document.getElementById('printDeviceQRButton').addEventListener('click', function () {
+                    const qrImage = document.getElementById('device-qrcode-image'); // New ID for device QR image
 
                 if (!qrImage) {
                     alert("QR Code image not found!");
@@ -448,7 +419,7 @@
                     alert("{{ __('products.barcode_not_found') }}");
                     return;
                 }
-                
+
                 const printOptionsModal = new bootstrap.Modal(document.getElementById('printOptionsModal'));
                 printOptionsModal.show();
             });
@@ -470,7 +441,7 @@
                 const paperSizeSelect = document.getElementById('paperSize');
                 const customLabelCount = document.getElementById('customLabelCount');
                 let paperSize = paperSizeSelect.value;
-                
+
                 if (paperSize === 'custom') {
                     if (customLabelCount.value === '' || customLabelCount.value < 1 || customLabelCount.value > 40) {
                         alert("{{ __('products.please_enter_valid_custom_label_count') }}");
@@ -490,9 +461,9 @@
                         <title>Print Barcode</title>
                         <style>
                             body { display: flex; flex-wrap: wrap; padding: 0; margin: 0; }
-                            .label { 
-                                width: calc(100% / ${Math.ceil(Math.sqrt(paperSize))}); 
-                                text-align: center; 
+                            .label {
+                                width: calc(100% / ${Math.ceil(Math.sqrt(paperSize))});
+                                text-align: center;
                                 padding: 10px;
                                 box-sizing: border-box;
                             }

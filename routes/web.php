@@ -48,7 +48,7 @@ Auth::routes();
 Route::group(['middleware' => ['auth', 'role:Admin']], function () {
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
-    
+
     // POS Routes
     Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
     Route::get('/pos/warehouse-products', [POSController::class, 'getWarehouseProducts'])->name('pos.warehouse-products');
@@ -65,8 +65,9 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::delete('/accounting/payments/{id}', [PaymentController::class, 'destroy'])->name('accounting.payments.destroy');
     Route::get('/accounting/revenues', [RevenueController::class, 'index'])->name('accounting.revenues');
 
+
     // **Brand Routes**
-    Route::post('/brands/store', [BrandController::class, 'store'])->name('brands.store');
+    // Route::post('/brands/store', [BrandController::class, 'store'])->name('brands.store'); // This was causing a name conflict with Route::resource
     Route::resource('/brands', BrandController::class)->middleware(['auth', 'permission:manage brands']);
 
     // **Cash Register Routes**
@@ -78,7 +79,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/cash-register/transaction/{id}', [CashRegisterController::class, 'transactionDetails'])->name('cash-register.transaction');
 
     // **Category Routes**
-    Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');
+    // Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store'); // This was causing a name conflict with Route::resource
     Route::resource('/categories', CategoryController::class)->middleware(['auth', 'permission:manage categories']);
 
     // **Crypto Routes**
@@ -90,7 +91,7 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/crypto_transactions/export', [CryptoTransactionController::class, 'export'])->name('crypto_transactions.export');
 
     // **Customer Routes**
-    Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
+    // Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store'); // This was causing a name conflict with Route::resource
     Route::resource('/customers', CustomerController::class)->middleware(['auth', 'permission:manage customers']);
 
     // **Debt Routes**
@@ -115,9 +116,14 @@ Route::group(['middleware' => ['auth', 'role:Admin']], function () {
     Route::get('/products/check-barcode/{barcode}', [ProductController::class, 'checkBarcode'])->name('products.checkBarcode');
     Route::post('/products/{product}/delete-image', [ProductController::class, 'deleteImage'])->name('products.deleteImage');
     Route::delete('/products/{product}/remove-warehouse/{warehouse}', [ProductController::class, 'removeWarehouse']);
-    Route::resource('/products', ProductController::class)->middleware(['auth', 'permission:manage products']);
     Route::get('/products/search', [ProductController::class, 'searchProducts'])->name('products.search');
     Route::get('/products/{product}/duplicate', [ProductController::class, 'duplicateProduct'])->name('products.duplicate');
+    Route::resource('/products', ProductController::class)->middleware(['auth', 'permission:manage products']);
+
+    // Add products.search route outside the group temporarily
+}); // Close the Admin middleware group here temporarily
+
+Route::group(['middleware' => ['auth', 'role:Admin']], function () { // Re-open the group for routes below this line
 
     // **Purchase Routes**
     Route::get('/purchases/history', [PurchaseController::class, 'history'])->name('purchases.history');

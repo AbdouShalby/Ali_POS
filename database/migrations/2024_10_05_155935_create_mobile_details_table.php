@@ -13,15 +13,20 @@ class CreateMobileDetailsTable extends Migration
             $table->unsignedBigInteger('product_id')->unique();
 
             $table->string('color')->nullable();
-            $table->string('imei')->nullable();
+            // $table->string('imei')->nullable(); // Removed as per new requirements
             $table->string('storage')->nullable();
             $table->decimal('battery_health', 5, 2)->nullable();
             $table->string('ram')->nullable();
             $table->string('gpu')->nullable();
             $table->string('cpu')->nullable();
-            $table->string('condition')->nullable();
-            $table->text('device_description')->nullable();
+            $table->string('condition')->nullable(); // e.g., New, Used - Like New
+            $table->text('device_description')->nullable(); // Additional details about the device
             $table->boolean('has_box')->default(false);
+
+            // New fields for device-specific QR code and scanned documents
+            $table->string('qrcode')->nullable(); // Path to the QR code image for the device
+            $table->string('scan_id')->nullable(); // Path to the scanned ID image
+            $table->string('scan_documents')->nullable(); // Path to the scanned documents
 
             $table->timestamps();
 

@@ -19,59 +19,38 @@ class Product extends Model
         'price',
         'wholesale_price',
         'min_sale_price',
-        'stock_alert',
         'brand_id',
         'category_id',
         'is_mobile',
-        'color',
-        'imei',
-        'storage',
-        'battery_health',
-        'ram',
-        'gpu',
-        'cpu',
-        'condition',
-        'device_description',
-        'has_box',
-        'client_type',
-        'customer_id',
-        'supplier_id',
-        'payment_method',
-        'seller_name',
-        'scan_id',
-        'scan_documents',
-        'qrcode'
     ];
 
     protected $casts = [
-        'price' => 'float',
         'cost' => 'float',
+        'price' => 'float',
         'wholesale_price' => 'float',
         'min_sale_price' => 'float',
         'is_mobile' => 'boolean',
-        'has_box' => 'boolean',
     ];
 
+    /**
+     * Get the category that owns the product.
+     */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * Get the brand that owns the product.
+     */
     public function brand()
     {
         return $this->belongsTo(Brand::class);
     }
 
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class);
-    }
-
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class);
-    }
-
+    /**
+     * Get the mobile detail associated with the product.
+     */
     public function mobileDetail()
     {
         return $this->hasOne(MobileDetail::class);
@@ -122,17 +101,22 @@ class Product extends Model
         parent::boot();
 
         static::updated(function ($product) {
-            // تحقق من المخزون في كل مستودع
+            // Check stock in each warehouse and create notification if below alert level
             foreach ($product->warehouses as $warehouse) {
                 if ($warehouse->pivot->stock <= $warehouse->pivot->stock_alert) {
+                    // Ensure Notification class is correctly referenced or imported if not already.
                     Notification::create([
-                        'title' => 'تنبيه المخزون',
-                        'message' => "المنتج {$product->name} وصل إلى الحد الأدنى للمخزون ({$warehouse->pivot->stock_alert}) في مستودع {$warehouse->name}",
+                        'title' => 'Stock Alert', // English translation
+                        'message' => "Product {$product->name} has reached the minimum stock level ({$warehouse->pivot->stock_alert}) in warehouse {$warehouse->name}.", // English translation
                         'type' => 'stock_alert',
                         'product_id' => $product->id
                     ]);
                 }
             }
+
+            // If the product is a mobile and has details,
+            // we might need to trigger a QR code regeneration if product data (e.g., name, price) changes.
+            // This logic will be handled in ProductController for now, or could be an event/listener.
         });
     }
 }

@@ -11,32 +11,26 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
 
-            $table->string('name');
-            $table->string('barcode')->nullable()->unique();
+            $table->string('name'); // Mandatory
+            $table->string('barcode')->unique(); // Mandatory, unique
 
-            $table->decimal('cost', 15, 2)->default(0);
-            $table->decimal('price', 15, 2)->default(0);
-            $table->decimal('wholesale_price', 15, 2)->default(0);
-            $table->decimal('min_sale_price', 15, 2)->default(0);
+            $table->decimal('cost', 15, 2); // Mandatory
+            $table->decimal('price', 15, 2)->default(0)->nullable(); // Optional
+            $table->decimal('wholesale_price', 15, 2)->default(0)->nullable(); // Optional
+            $table->decimal('min_sale_price', 15, 2)->default(0)->nullable(); // Optional
 
-            $table->string('image')->nullable();
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->foreignId('brand_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('image')->nullable(); // Optional
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null'); // Optional
+            $table->foreignId('brand_id')->nullable()->constrained()->onDelete('set null'); // Optional
 
-            $table->text('description')->nullable();
+            $table->text('description')->nullable(); // Optional
 
-            $table->boolean('is_mobile')->default(false);
+            $table->boolean('is_mobile')->default(false); // To determine if it's a device
 
-            $table->string('client_type')->nullable();
-            $table->foreignId('customer_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('set null');
-            $table->string('payment_method')->nullable();
+            // Removed fields: client_type, customer_id, supplier_id, payment_method, seller_name, scan_id, scan_documents, qrcode
+            // These fields were removed as per new requirements to simplify the product's direct data.
+            // scan_id, scan_documents, and qrcode will be part of mobile_details if is_mobile is true.
 
-            $table->string('seller_name')->nullable();
-            $table->string('scan_id')->nullable();
-            $table->string('scan_documents')->nullable();
-
-            $table->string('qrcode')->nullable();
             $table->timestamps();
         });
     }

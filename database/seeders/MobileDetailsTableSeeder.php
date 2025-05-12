@@ -10,31 +10,30 @@ class MobileDetailsTableSeeder extends Seeder
 {
     public function run()
     {
-        $products = Product::whereHas('category', function ($query) {
-            $query->where('name', 'Phones');
-        })->get();
+        // Get all products marked as 'is_mobile' that don't already have mobile details.
+        // ProductFactory should now handle creating MobileDetail for new is_mobile products via its configure() method.
+        // This seeder can act as a supplement or be removed if factory logic is sufficient.
+        $mobileProductsWithoutDetails = Product::where('is_mobile', true)
+                                            ->whereDoesntHave('mobileDetail')
+                                            ->get();
 
-        foreach ($products as $product) {
-            MobileDetail::updateOrCreate(
-                ['product_id' => $product->id],
-                [
-                    'color' => 'Black',
-                    'storage' => '128GB',
-                    'battery_health' => 95,
-                    'ram' => '8GB',
-                    'gpu' => 'Mali-G78',
-                    'cpu' => 'Exynos 2100',
-                    'condition' => 'New',
-                    'device_description' => 'Excellent condition, no scratches',
-                    'has_box' => true,
-                ]
-            );
+        if ($mobileProductsWithoutDetails->isEmpty()) {
+            $this->command->info('MobileDetailsTableSeeder: No mobile products found needing details, or MobileDetailFactory handled them.');
+        }
+
+        foreach ($mobileProductsWithoutDetails as $product) {
+            MobileDetail::factory()->create([
+                'product_id' => $product->id,
+            ]);
         }
     }
 
+    // Example of a helper function, not currently used in run() method and can be removed.
+    /* 
     private function getRandomColor()
     {
-        $colors = ['Black', 'White', 'Blue', 'Red'];
+        $colors = ['Black', 'White', 'Blue', 'Red', 'Green', 'Silver', 'Gold'];
         return $colors[array_rand($colors)];
     }
+    */
 }

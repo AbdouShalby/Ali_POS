@@ -130,6 +130,15 @@
                                                         <li><strong>{{ __('products.condition') }}:</strong> {{ $product->mobileDetail->condition }}</li>
                                                         <li><strong>{{ __('products.description') }}:</strong> {{ $product->mobileDetail->device_description }}</li>
                                                         <li><strong>{{ __('products.with_box') }}:</strong> {{ $product->mobileDetail->has_box ? __('products.yes') : __('products.no') }}</li>
+                                                        @if($product->mobileDetail->qrcode)
+                                                            <li><strong>{{ __('products.device_qrcode') }}:</strong> <img src="{{ asset('storage/' . $product->mobileDetail->qrcode) }}" alt="Device QR Code" style="max-width: 100px; height: auto; margin-top: 5px;"></li>
+                                                        @endif
+                                                        @if($product->mobileDetail->scan_id)
+                                                            <li><strong>{{ __('products.scan_id') }}:</strong> <a href="{{ asset('storage/' . $product->mobileDetail->scan_id) }}" target="_blank">{{ __('View Scan ID') }}</a></li>
+                                                        @endif
+                                                        @if($product->mobileDetail->scan_documents)
+                                                            <li><strong>{{ __('products.scan_documents') }}:</strong> <a href="{{ asset('storage/' . $product->mobileDetail->scan_documents) }}" target="_blank">{{ __('View Documents') }}</a></li>
+                                                        @endif
                                                     </ul>
                                                 </div>
                                                 <div class="modal-footer">

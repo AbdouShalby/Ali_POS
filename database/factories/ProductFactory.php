@@ -15,26 +15,44 @@ class ProductFactory extends Factory
 
     public function definition()
     {
+        $cost = $this->faker->randomFloat(2, 10, 500); // Ensure cost is reasonable and not zero
+        $price = $cost + $this->faker->randomFloat(2, 5, 200); // Ensure price is greater than cost
+
         return [
-            'name' => $this->faker->word,
+            'name' => $this->faker->words(3, true),
             'description' => $this->faker->sentence,
-            'cost' => $this->faker->randomFloat(2, 50, 1000),
-            'price' => $this->faker->randomFloat(2, 100, 2000),
-            'wholesale_price' => $this->faker->randomFloat(2, 80, 1800),
-            'min_sale_price' => $this->faker->randomFloat(2, 90, 1900),
+            'cost' => $cost,
+            'price' => $price,
+            'wholesale_price' => $this->faker->optional()->randomFloat(2, $cost + 2, $price - 1), // Optional and within cost/price range
+            'min_sale_price' => $this->faker->optional()->randomFloat(2, $cost + 1, $price), // Optional and within cost/price range
             'barcode' => $this->faker->unique()->ean13,
-            'qrcode' => $this->faker->uuid,
-            'image' => 'default_product.jpg',
-            'brand_id' => Brand::inRandomOrder()->first()?->id,
-            'category_id' => Category::inRandomOrder()->first()?->id,
-            'client_type' => $this->faker->randomElement(['customer', 'supplier']),
-            'customer_id' => Customer::inRandomOrder()->first()?->id,
-            'supplier_id' => Supplier::inRandomOrder()->first()?->id,
-            'payment_method' => $this->faker->randomElement(['cash', 'credit']),
-            'seller_name' => $this->faker->name,
-            'is_mobile' => $this->faker->boolean(30),
-            'scan_id' => $this->faker->uuid,
-            'scan_documents' => 'document.pdf',
+            'image' => null, 
+            
+            'brand_id' => Brand::inRandomOrder()->first()?->id ?? Brand::factory(),
+            'category_id' => Category::inRandomOrder()->first()?->id ?? Category::factory(),
+            
+            'is_mobile' => $this->faker->boolean(30), 
         ];
+    }
+
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
+    public function configure()
+    {
+        return $this->afterCreating(function (Product $product) {
+            if ($product->is_mobile) {
+                // If it's a mobile, ensure MobileDetail is created for it.
+                // This can be done here or in the ProductSeeder.
+                // For simplicity, we can call a MobileDetailFactory here if one exists and is configured.
+                if (!\App\Models\MobileDetail::where('product_id', $product->id)->exists()) {
+                    \App\Models\MobileDetail::factory()->create([
+                        'product_id' => $product->id,
+                    ]);
+                }
+            }
+        });
     }
 }

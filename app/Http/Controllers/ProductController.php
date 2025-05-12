@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\MobileDetail; // Added this line
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Log;
@@ -43,8 +44,6 @@ class ProductController extends Controller
         return view('products.create', [
             'categories' => Category::all(),
             'brands' => Brand::all(),
-            'suppliers' => Supplier::all(),
-            'customers' => Customer::all(),
             'warehouses' => Warehouse::all()
         ])->with('activePage', 'products.create');
     }
@@ -69,69 +68,41 @@ class ProductController extends Controller
                 ->withErrors(['barcode' => 'Invalid barcode format. Must be 8-13 digits.']);
         }
 
-        $files = $this->storeFiles($request);
+        $uploadedImagePaths = $this->storeFiles($request); // Now returns only path for 'image' if uploaded
 
-        $productData = array_merge($validated, $files, [
-            'client_type' => $request->payment_method === 'credit' ? 'supplier' : $request->client_type,
-            'customer_id' => $request->payment_method === 'credit' ? null : ($request->client_type === 'customer' ? $request->customer_id : null),
-            'supplier_id' => $request->payment_method === 'credit' ? $request->supplier_id : ($request->client_type === 'supplier' ? $request->supplier_id : null),
-            'payment_method' => $request->payment_method,
-            'seller_name' => $request->seller_name ?? auth()->user()->name,
-        ]);
-
-        $product = Product::create($productData);
-
-        if ($request->payment_method === 'credit') {
-            $initialPayment = $request->filled('initial_payment') ? $request->initial_payment : 0;
-            
-            $debt = Debt::create([
-                'supplier_id' => $request->supplier_id,
-                'product_id' => $product->id,
-                'amount' => $request->price,
-                'paid' => $initialPayment,
-                'status' => $initialPayment >= $request->price ? 'paid' : 'unpaid',
-                'note' => 'دين منتج: ' . $product->name,
-            ]);
-            
-            // إذا كان هناك دفعة أولية، سجلها كدفعة
-            if ($initialPayment > 0) {
-                $debt->payments()->create([
-                    'supplier_id' => $request->supplier_id,
-                    'amount' => $initialPayment,
-                    'payment_date' => now()->format('Y-m-d'),
-                    'payment_type' => 'supplier',
-                    'note' => 'دفعة أولية عند شراء المنتج'
-                ]);
-                
-                // تحديث الخزنة
-                \App\Models\CashRegister::updateBalance(
-                    'payment_to_supplier',
-                    -1 * $initialPayment,
-                    'دفعة أولية للمورد: ' . Supplier::find($request->supplier_id)->name . ' - للمنتج: ' . $product->name
-                );
-            }
+        // Prepare data for Product creation, excluding fields that were removed or moved
+        $productData = $validated; // Start with validated data (name, barcode, cost, etc.)
+        if (!empty($uploadedImagePaths['image'])) {
+            $productData['image'] = $uploadedImagePaths['image'];
         }
 
-        $this->attachWarehouses($product, $validated['warehouses']);
+        // Remove fields from $validated that are not direct properties of Product model anymore
+        // or are handled separately (like warehouses, or mobile-specific details)
+        // Example: $validated might still contain 'warehouses' array from form, but it's handled by attachWarehouses
+        // Ensure $productData only contains fields present in Product::$fillable
+        $productFillable = (new Product)->getFillable();
+        $productDataForCreate = array_intersect_key($productData, array_flip($productFillable));
+        $productDataForCreate['is_mobile'] = $request->boolean('is_mobile'); // Ensure is_mobile is set correctly
 
-        if ($request->is_mobile) {
-            $this->storeMobileDetails($product, $request);
+        $product = Product::create($productDataForCreate);
+
+        // --- DEBT CREATION LOGIC (Commented Out) ---
+        // This section needs to be re-evaluated based on new purchase/debt management flow.
+
+        // Attach warehouses if data is provided in the request
+        if (isset($validated['warehouses']) && is_array($validated['warehouses'])) {
+            $this->attachWarehouses($product, $validated['warehouses']);
         }
 
-        // Use job for QR code generation
-        dispatch(function() use ($product) {
-            try {
-        $this->generateQRCode($product);
-            } catch (\Exception $e) {
-                Log::error("QR Code generation failed in background job: " . $e->getMessage());
-            }
-        })->afterResponse();
+        if ($product->is_mobile) {
+            $this->storeMobileDetails($product, $request); // This will handle QR for device
+        }
 
         return redirect()->route('products.index')
             ->with('success', __('products.product_added_successfully', ['name' => $product->name]));
     }
 
-    protected function validateProduct($request, $product = null)
+    protected function validateProduct(Request $request, Product $product = null)
     {
         $rules = [
             'name' => 'required|string|max:255',
@@ -141,50 +112,41 @@ class ProductController extends Controller
                 'max:255',
                 $product ? 'unique:products,barcode,' . $product->id : 'unique:products,barcode',
             ],
-            'category_id' => 'required|exists:categories,id',
+            'cost' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'wholesale_price' => 'nullable|numeric|min:0',
+            'min_sale_price' => 'nullable|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id', // Optional, as per migration changes
             'brand_id' => 'nullable|exists:brands,id',
-            'warehouses.*.id' => 'required|exists:warehouses,id',
-            'warehouses.*.stock' => 'required|numeric|min:0',
-            'warehouses.*.stock_alert' => 'required|numeric|min:0',
-            'cost' => 'required|numeric',
-            'price' => 'required|numeric',
-            'wholesale_price' => 'required|numeric',
-            'min_sale_price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string|max:255',
-            'client_type' => 'nullable|in:customer,supplier',
-            'customer_id' => 'nullable|required_if:client_type,customer|exists:customers,id',
-            'supplier_id' => 'nullable|required_if:client_type,supplier|exists:suppliers,id',
-            'payment_method' => 'nullable|string|in:cash,credit',
             'is_mobile' => 'nullable|boolean',
+
+            // Rules for warehouses if they are submitted with the main product form
+            // This assumes 'warehouses' is an array of objects, each with id, stock, and stock_alert
+            'warehouses' => 'nullable|array',
+            'warehouses.*.id' => 'required_with:warehouses|exists:warehouses,id',
+            'warehouses.*.stock' => 'required_with:warehouses|numeric|min:0',
+            'warehouses.*.stock_alert' => 'required_with:warehouses|numeric|min:0',
+            
+            // These fields are no longer part of the Product model directly.
         ];
 
         return $request->validate($rules);
     }
 
-    protected function storeFiles($request)
+    protected function storeFiles(Request $request)
     {
-        $files = [];
+        $uploadedFilesPaths = [];
         
         if ($request->hasFile('image')) {
-            // Process the image (currently just passes it through)
-            $processedImage = $this->processImage($request->file('image'));
-            $files['image'] = $processedImage->store('products/images', 'public');
+            $imageFile = $request->file('image');
+            $processedImage = $this->processImage($imageFile);
+            $uploadedFilesPaths['image'] = $processedImage->store('products/images', 'public');
         }
         
-        if ($request->hasFile('scan_id')) {
-            // Process the scan ID image
-            $processedScanId = $this->processImage($request->file('scan_id'));
-            $files['scan_id'] = $processedScanId->store('products/scan_ids', 'public');
-        }
-        
-        if ($request->hasFile('scan_documents')) {
-            // Process the scan documents image
-            $processedScanDocs = $this->processImage($request->file('scan_documents'));
-            $files['scan_documents'] = $processedScanDocs->store('products/scan_documents', 'public');
-        }
-        
-        return $files;
+        // scan_id and scan_documents are now handled in storeMobileDetails
+        return $uploadedFilesPaths;
     }
 
     protected function attachWarehouses($product, $warehouses)
@@ -214,12 +176,11 @@ class ProductController extends Controller
         }
     }
 
-    protected function storeMobileDetails($product, $request)
+    protected function storeMobileDetails(Product $product, Request $request)
     {
         try {
             $rules = [
                 'color' => 'nullable|string|max:255',
-                'imei' => 'nullable|string|max:255',
                 'storage' => 'nullable|string|max:255',
                 'battery_health' => 'nullable|numeric|min:0|max:100',
                 'ram' => 'nullable|string|max:255',
@@ -228,104 +189,179 @@ class ProductController extends Controller
                 'condition' => 'nullable|string|max:255',
                 'device_description' => 'nullable|string',
                 'has_box' => 'nullable|boolean',
+                'scan_id' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'scan_documents' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf|max:4096',
             ];
 
-            $validated = $request->validate($rules);
-            
-            // التأكد من أن حقل has_box لديه قيمة (غير NULL)
-            if (!isset($validated['has_box'])) {
-                $validated['has_box'] = false;
-            }
+            $validatedMobileData = $request->validate($rules);
+            $validatedMobileData['has_box'] = $request->boolean('has_box');
 
-            $product->mobileDetail()->updateOrCreate(
-                ['product_id' => $product->id],
-                $validated
-            );
-        } catch (\Exception $e) {
-            \Log::error('Error in storeMobileDetails: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    protected function generateQRCode($product)
-    {
-        $qrData = $this->prepareQRData($product);
-
-        if (!empty($qrData)) {
-            try {
-                $qrContent = implode("\n", array_map(fn($key, $value) => "$key: $value", array_keys($qrData), $qrData));
-
-                $qrContent = mb_convert_encoding($qrContent, 'UTF-8', 'auto');
-
-                $qrCodePath = public_path('qrcodes');
-                if (!file_exists($qrCodePath)) {
-                    mkdir($qrCodePath, 0755, true);
+            if ($request->hasFile('scan_id')) {
+                $processedScanId = $this->processImage($request->file('scan_id'));
+                $validatedMobileData['scan_id'] = $processedScanId->store('mobiles/scan_ids', 'public');
+            } elseif ($request->filled('existing_scan_id')){
+                $validatedMobileData['scan_id'] = $request->input('existing_scan_id');
+            } else if (!$request->hasFile('scan_id') && !$request->filled('existing_scan_id')){
+                // If no new file and no existing file path, old value might be cleared if not handled carefully.
+                // To preserve old value if no new file and no existing path, explicitly load old path.
+                if ($product->mobileDetail && $product->mobileDetail->scan_id && !$request->boolean('remove_scan_id')) { // Assuming a remove_scan_id flag from form
+                     $validatedMobileData['scan_id'] = $product->mobileDetail->scan_id;
+                } else {
+                     $validatedMobileData['scan_id'] = null; // Explicitly set to null if to be removed or no new/existing
                 }
-
-                $fileName = 'qrcodes/' . uniqid() . '.png';
-
-                \QrCode::format('png')
-                    ->encoding('UTF-8')
-                    ->size(300)
-                    ->generate($qrContent, public_path($fileName));
-
-                $product->qrcode = $fileName;
-                $product->save();
-
-                \Log::info("QR Code generated and saved to: " . public_path($fileName));
-            } catch (\Exception $e) {
-                \Log::error("Failed to generate QR Code: " . $e->getMessage());
-                throw new \Exception('Failed to generate QR Code. Please check the logs for more details.');
             }
-        } else {
-            \Log::warning("QR Data is empty. Unable to generate QR Code.");
+
+            if ($request->hasFile('scan_documents')) {
+                $processedScanDocs = $this->processImage($request->file('scan_documents'));
+                $validatedMobileData['scan_documents'] = $processedScanDocs->store('mobiles/scan_documents', 'public');
+            } elseif ($request->filled('existing_scan_documents')) {
+                $validatedMobileData['scan_documents'] = $request->input('existing_scan_documents');
+            } else if (!$request->hasFile('scan_documents') && !$request->filled('existing_scan_documents')){
+                if ($product->mobileDetail && $product->mobileDetail->scan_documents && !$request->boolean('remove_scan_documents')) { // Assuming a remove_scan_documents flag
+                     $validatedMobileData['scan_documents'] = $product->mobileDetail->scan_documents;
+                } else {
+                    $validatedMobileData['scan_documents'] = null;
+                }
+            }
+
+            $mobileDetail = $product->mobileDetail()->updateOrCreate(
+                ['product_id' => $product->id],
+                $validatedMobileData
+            );
+
+            // Generate or update QR Code for the mobile detail
+            if ($mobileDetail) {
+                // Dispatch QR code generation to a background job
+                \App\Jobs\UpdateDeviceQrCodeJob::dispatch($mobileDetail, $product)->afterResponse();
+                Log::info("Dispatched UpdateDeviceQrCodeJob from storeMobileDetails for MobileDetail ID: {$mobileDetail->id}");
+            }
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Log validation errors specifically for debugging if needed
+            Log::error('Validation Error in storeMobileDetails: ' . $e->getMessage(), $e->errors());
+            throw $e; // Re-throw to let Laravel handle it (e.g., redirect back with errors)
+        } catch (\Exception $e) {
+            Log::error('Error in storeMobileDetails: ' . $e->getMessage());
+            throw $e; // Re-throw for general error handling
         }
     }
 
-    protected function prepareQRData($product)
+    /**
+     * Prepares the data array for QR code generation for a device.
+     * @param MobileDetail $mobileDetail The mobile detail object.
+     * @param Product $product The associated product object.
+     * @return array The data to be encoded in the QR code.
+     */
+    protected function prepareDeviceQRData(MobileDetail $mobileDetail, Product $product): array
     {
         $qrData = [];
 
-        $fields = [
-            'name' => 'Name',
-            'price' => 'Price',
+        // Basic product info
+        if ($product->name) {
+            $qrData['Product Name'] = $product->name;
+        }
+        if ($product->price) {
+            $qrData['Price'] = $product->price; // Assuming price is relevant for the QR
+        }
+        if ($product->barcode) {
+            $qrData['Barcode'] = $product->barcode;
+        }
+
+        // Device-specific details from MobileDetail model
+        $deviceFields = [
+            'color' => 'Color',
+            'storage' => 'Storage',
+            'battery_health' => 'Battery Health',
+            'ram' => 'RAM',
+            'cpu' => 'CPU',
+            'gpu' => 'GPU',
+            'condition' => 'Condition',
+            // 'imei' was removed
         ];
 
-        foreach ($fields as $field => $label) {
-            if ($product->$field) {
-                $qrData[$label] = $product->$field;
+        foreach ($deviceFields as $field => $label) {
+            if (!empty($mobileDetail->$field)) {
+                $qrData[$label] = ($field === 'battery_health' && is_numeric($mobileDetail->$field))
+                    ? $mobileDetail->$field . '%'
+                    : $mobileDetail->$field;
             }
         }
-
-        if ($product->is_mobile && $product->mobileDetail) {
-            $mobileDetails = $product->mobileDetail;
-
-            $mobileFields = [
-                'color' => 'Color',
-                'battery_health' => 'Battery Health',
-                'ram' => 'RAM',
-                'cpu' => 'CPU',
-                'gpu' => 'GPU',
-                'condition' => 'Condition',
-                'imei' => 'IMEI',
-            ];
-
-            foreach ($mobileFields as $field => $label) {
-                if ($mobileDetails->$field) {
-                    $qrData[$label] = $field === 'battery_health'
-                        ? $mobileDetails->$field . '%'
-                        : $mobileDetails->$field;
-                }
-            }
+        
+        if ($mobileDetail->has_box) {
+            $qrData['Box Included'] = 'Yes';
         }
+
+        // Add more fields from $mobileDetail or $product as needed for the QR code
+        // For example, $mobileDetail->device_description if it's short enough
 
         return $qrData;
     }
 
+    /**
+     * Generates or updates a QR Code for a given mobile device detail and saves it.
+     * @param MobileDetail $mobileDetail The mobile detail object to update with QR code path.
+     * @param Product $product The associated product object.
+     */
+    protected function generateOrUpdateDeviceQRCode(MobileDetail $mobileDetail, Product $product)
+    {
+        $qrData = $this->prepareDeviceQRData($mobileDetail, $product);
+
+        if (empty($qrData)) {
+            Log::warning("QR Data is empty for mobile detail ID: {$mobileDetail->id}. Unable to generate QR Code.");
+            // Optionally, clear any existing QR code if data is now empty
+            if ($mobileDetail->qrcode) {
+                Storage::disk('public')->delete($mobileDetail->qrcode);
+                $mobileDetail->qrcode = null;
+                $mobileDetail->save();
+            }
+            return;
+        }
+
+        try {
+            $qrContent = implode("\n", array_map(fn($key, $value) => "$key: $value", array_keys($qrData), $qrData));
+            $qrContent = mb_convert_encoding($qrContent, 'UTF-8', 'auto');
+
+            $qrCodeDirectory = 'qrcodes/devices'; // Store device QR codes in a sub-directory
+            $fileName = $qrCodeDirectory . '/' . $mobileDetail->id . '_' . uniqid() . '.png';
+
+            // Ensure the directory exists
+            Storage::disk('public')->makeDirectory($qrCodeDirectory);
+            
+            // Generate QR code image content
+            $qrImageContent = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+                ->encoding('UTF-8')
+                ->size(300) // Standard QR size
+                ->generate($qrContent);
+
+            // Store the new QR code
+            Storage::disk('public')->put($fileName, $qrImageContent);
+
+            // Delete old QR code if it exists and is different
+            if ($mobileDetail->qrcode && $mobileDetail->qrcode !== $fileName && Storage::disk('public')->exists($mobileDetail->qrcode)) {
+                Storage::disk('public')->delete($mobileDetail->qrcode);
+            }
+
+            // Update the mobileDetail with the new QR code path
+            $mobileDetail->qrcode = $fileName;
+            $mobileDetail->save();
+
+            Log::info("Device QR Code generated/updated and saved to: " . $fileName . " for MobileDetail ID: " . $mobileDetail->id);
+
+        } catch (\Exception $e) {
+            Log::error("Failed to generate/update Device QR Code for MobileDetail ID: {$mobileDetail->id}: " . $e->getMessage());
+            // Do not throw exception here to prevent breaking the main flow if QR generation fails in background
+        }
+    }
+
+
     public function show(Product $product)
     {
-        $product->load(['category', 'brand', 'mobileDetail', 'warehouses', 'supplier', 'customer']);
-        $debts = Debt::where('product_id', $product->id)->get();
+        $product->load(['category', 'brand', 'mobileDetail', 'warehouses']);
+        
+        // Debt logic is commented out in store/update, so this might not be relevant anymore
+        // or needs to be re-evaluated based on how debts are linked.
+        $debts = Debt::where('product_id', $product->id)->get(); 
+        
         return view('products.show', compact('product', 'debts'));
     }
 
@@ -335,8 +371,6 @@ class ProductController extends Controller
             'product' => Product::with(['mobileDetail', 'warehouses'])->findOrFail($id),
             'categories' => Category::all(),
             'brands' => Brand::all(),
-            'suppliers' => Supplier::all(),
-            'customers' => Customer::all(),
             'warehouses' => Warehouse::all(),
         ])->with('activePage', 'products');
     }
@@ -347,27 +381,49 @@ class ProductController extends Controller
             'is_mobile' => $request->has('is_mobile') ? true : false,
         ]);
 
-        $validated = $this->validateProduct($request, $product);
+        $validatedProductData = $this->validateProduct($request, $product);
 
+        // Prepare data for Product update
+        $productDataToUpdate = $validatedProductData;
+
+        // Handle product image update
         if ($request->hasFile('image')) {
-            $product->image = $request->file('image')->store('products/images', 'public');
+            // Optionally delete old image if it exists
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $productDataToUpdate['image'] = $request->file('image')->store('products/images', 'public');
+        } elseif ($request->filled('remove_image') && $request->input('remove_image') == '1') {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $productDataToUpdate['image'] = null;
         }
 
-        if ($request->hasFile('scan_id')) {
-            $product->scan_id = $request->file('scan_id')->store('products/scan_ids', 'public');
+        // scan_id and scan_documents are handled by storeMobileDetails
+
+        // Filter to only include fillable fields for the Product model
+        $productFillable = (new Product)->getFillable();
+        $productDataForUpdate = array_intersect_key($productDataToUpdate, array_flip($productFillable));
+        $productDataForUpdate['is_mobile'] = $request->boolean('is_mobile'); // Ensure is_mobile is set correctly
+
+        $product->update($productDataForUpdate);
+
+        // Attach/update warehouses if data is provided
+        if (isset($validatedProductData['warehouses']) && is_array($validatedProductData['warehouses'])) {
+            $this->attachWarehouses($product, $validatedProductData['warehouses']);
         }
 
-        if ($request->hasFile('scan_documents')) {
-            $product->scan_documents = $request->file('scan_documents')->store('products/scan_documents', 'public');
-        }
-
-        $product->update($validated);
-        $this->attachWarehouses($product, $validated['warehouses']);
-
-        if ($request->is_mobile) {
-            $this->storeMobileDetails($product, $request);
+        if ($product->is_mobile) {
+            $this->storeMobileDetails($product, $request); // This will handle mobile details and device QR code
         } else {
-            $product->mobileDetail()->delete();
+            // If the product is no longer a mobile, delete its mobile details and associated QR code file
+            if ($product->mobileDetail) {
+                if ($product->mobileDetail->qrcode && Storage::disk('public')->exists($product->mobileDetail->qrcode)) {
+                    Storage::disk('public')->delete($product->mobileDetail->qrcode);
+                }
+                $product->mobileDetail()->delete();
+            }
         }
 
         return redirect()->route('products.index')->with('success', __('products.product_updated_successfully', ['name' => $product->name]));
@@ -390,39 +446,51 @@ class ProductController extends Controller
 
     public function deleteImage(Request $request, Product $product)
     {
-        $imageType = $request->input('image_type');
+        $imageType = $request->input('image_type'); // e.g., 'image', 'scan_id', 'scan_documents'
+        $targetModel = $product;
+        $columnToUpdate = null;
 
-        $imageFields = [
-            'image' => 'image',
-            'scan_id' => 'scan_id',
-            'scan_documents' => 'scan_documents',
-        ];
-
-        if (!array_key_exists($imageType, $imageFields)) {
+        if ($imageType === 'image') {
+            $columnToUpdate = 'image';
+        } elseif ($imageType === 'scan_id' || $imageType === 'scan_documents') {
+            if (!$product->is_mobile || !$product->mobileDetail) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Device details not found for this product.',
+                ], 404);
+            }
+            $targetModel = $product->mobileDetail;
+            $columnToUpdate = $imageType; // 'scan_id' or 'scan_documents' are direct columns on mobileDetail
+        } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid image type.',
-            ]);
+                'message' => 'Invalid image type specified.',
+            ], 400);
         }
 
-        $column = $imageFields[$imageType];
+        if ($targetModel && $columnToUpdate && $targetModel->$columnToUpdate) {
+            Storage::disk('public')->delete($targetModel->$columnToUpdate);
+            $targetModel->$columnToUpdate = null;
+            $targetModel->save();
 
-        if ($product->$column) {
-            Storage::delete($product->$column);
-
-            $product->$column = null;
-            $product->save();
+            // If a device's QR code image itself is being deleted (if image_type was 'qrcode_device'),
+            // this logic would be slightly different, but qrcode is a path, not an uploaded file typically deleted this way.
+            // However, if scan_id or scan_documents change, the QR code for the device might need an update.
+            // This can be triggered explicitly or via an event listener on MobileDetail update.
+            // For simplicity here, we are just deleting the specified image.
+            // If deleting scan_id or scan_documents should regenerate QR, that logic needs to be added.
+            // Consider calling $this->generateOrUpdateDeviceQRCode($product->mobileDetail, $product) if applicable and imageType is scan_id/scan_documents
 
             return response()->json([
                 'success' => true,
-                'message' => 'Image deleted successfully.',
+                'message' => ucfirst(str_replace('_', ' ', $imageType)) . ' deleted successfully.',
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Image not found.',
-        ]);
+            'message' => ucfirst(str_replace('_', ' ', $imageType)) . ' not found or already deleted.',
+        ], 404);
     }
 
     public function removeWarehouse($productId, $warehouseId)
@@ -446,19 +514,26 @@ class ProductController extends Controller
 
     public function searchProducts(Request $request)
     {
-        $term = $request->input('term');
-        
-        if (!$term || strlen($term) < 2) {
-            return response()->json([]);
-        }
-        
-        $products = Product::where('name', 'LIKE', "%{$term}%")
-            ->orWhere('barcode', 'LIKE', "%{$term}%")
-            ->select('id', 'name', 'barcode', 'price', 'cost')
-            ->limit(10)
-            ->get();
+        try {
+            $term = $request->input('term');
             
-        return response()->json($products);
+            if (!$term || strlen($term) < 2) {
+                return response()->json([]);
+            }
+            
+            $products = Product::where('name', 'LIKE', "%{$term}%")
+                ->orWhere('barcode', 'LIKE', "%{$term}%")
+                ->select('id', 'name', 'barcode', 'price', 'cost') // Ensure these fields are sufficient for display
+                ->limit(10)
+                ->get();
+                
+            return response()->json($products);
+
+        } catch (\Exception $e) {
+            Log::error("Error in searchProducts: " . $e->getMessage());
+            // Return a JSON error response that the frontend can understand
+            return response()->json(['error' => true, 'message' => 'An error occurred while searching products.'], 500);
+        }
     }
 
     public function duplicateProduct($id)

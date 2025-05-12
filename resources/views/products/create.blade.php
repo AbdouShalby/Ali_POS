@@ -42,8 +42,8 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- بداية القسم العام -->
+
+                    <!-- General Section -->
                     <div class="card card-flush py-4">
                         <div class="card-header mb-5">
                             <div class="card-title">
@@ -88,18 +88,18 @@
                                 </div>
                                 <div class="card-body" id="warehouse-container">
                                     @if(old('warehouses'))
-                                        @foreach(old('warehouses') as $index => $warehouse)
+                                        @foreach(old('warehouses') as $index => $warehouseData)
                                             <div class="input-group mb-2 warehouse-entry">
                                                 <select class="form-select" name="warehouses[{{ $index }}][id]" required>
                                                     <option value="">{{ __('products.select_warehouse') }}</option>
                                                     @foreach($warehouses as $warehouseOption)
-                                                        <option value="{{ $warehouseOption->id }}" {{ $warehouse['id'] == $warehouseOption->id ? 'selected' : '' }}>
+                                                        <option value="{{ $warehouseOption->id }}" {{ ($warehouseData['id'] ?? null) == $warehouseOption->id ? 'selected' : '' }}>
                                                             {{ $warehouseOption->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                <input type="number" class="form-control" name="warehouses[{{ $index }}][stock]" value="{{ $warehouse['stock'] }}" placeholder="{{ __('products.stock') }}" required>
-                                                <input type="number" class="form-control" name="warehouses[{{ $index }}][stock_alert]" value="{{ $warehouse['stock_alert'] }}" placeholder="{{ __('products.stock_alert') }}" required>
+                                                <input type="number" class="form-control" name="warehouses[{{ $index }}][stock]" value="{{ $warehouseData['stock'] ?? '' }}" placeholder="{{ __('products.stock') }}" required>
+                                                <input type="number" class="form-control" name="warehouses[{{ $index }}][stock_alert]" value="{{ $warehouseData['stock_alert'] ?? '' }}" placeholder="{{ __('products.stock_alert') }}" required>
                                                 <button type="button" class="btn btn-danger remove-warehouse">{{ __('products.remove') }}</button>
                                             </div>
                                         @endforeach
@@ -120,46 +120,40 @@
                                 <button type="button" id="add-warehouse" class="btn btn-primary">{{ __('products.add_warehouse') }}</button>
                             </div>
                             <div class="mb-10 col-md-3">
-                                <label class="form-label">{{ __('products.cost') }}
-                                    <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('products.cost_help_text') ?? 'The purchase cost of the product (what you paid for it).' }}"></i>
-                                </label>
+                                <label class="form-label">{{ __('products.cost') }}</label>
                                 <input type="number" class="form-control mb-2" id="cost" name="cost" step="0.01" min="0" value="{{ old('cost', 0) }}" required>
                             </div>
                             <div class="mb-10 col-md-3">
-                                <label class="form-label">{{ __('products.price') }}
-                                    <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('products.price_help_text') ?? 'The selling price of the product (what customers will pay).' }}"></i>
-                                </label>
-                                <input type="number" class="form-control mb-2" id="price" name="price" step="0.01" min="0" value="{{ old('price', 0) }}" required>
+                                <label class="form-label">{{ __('products.price') }}</label>
+                                <input type="number" class="form-control mb-2" id="price" name="price" step="0.01" min="0" value="{{ old('price', 0) }}">
                                 <div id="price-feedback" class="form-text text-danger d-none">{{ __('products.price_cost_warning') }}</div>
                             </div>
                             <div class="mb-10 col-md-3">
                                 <label class="form-label">{{ __('products.wholesale_price') }}</label>
-                                <input type="number" class="form-control mb-2" id="wholesale_price" name="wholesale_price" step="0.01" value="{{ old('wholesale_price', 0) }}" required>
+                                <input type="number" class="form-control mb-2" id="wholesale_price" name="wholesale_price" step="0.01" value="{{ old('wholesale_price', 0) }}">
                             </div>
                             <div class="mb-10 col-md-3">
                                 <label class="form-label">{{ __('products.lowest_price_for_sale') }}</label>
-                                <input type="number" class="form-control mb-2" id="min_sale_price" name="min_sale_price" step="0.01" value="{{ old('min_sale_price', 0) }}" required>
+                                <input type="number" class="form-control mb-2" id="min_sale_price" name="min_sale_price" step="0.01" value="{{ old('min_sale_price', 0) }}">
                             </div>
                             <div class="mb-10 col-md-12">
                                 <label class="form-label">{{ __('products.description') }}</label>
                                 <textarea class="form-control mb-2 min-h-100px" id="description" name="description">{{ old('description') }}</textarea>
                             </div>
                             <div class="mb-10 col-md-4">
-                                <label class="form-label">{{ __('products.image') }}
-                                    <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('products.image_help_text') ?? 'Upload a clear image of the product. Recommended size: 500x500 pixels.' }}"></i>
-                                </label>
-                                <input type="file" class="form-control mb-2" id="image" name="image" accept="image/*">
-                                <div class="image-preview mt-2 d-none" id="imagePreviewContainer">
-                                    <img id="imagePreview" src="#" alt="Product Image Preview" class="img-thumbnail" style="max-height: 150px; max-width: 100%;">
-                                    <button type="button" class="btn btn-sm btn-danger mt-1" id="removeImagePreview">
-                                        <i class="fas fa-times"></i> {{ __('products.remove') }}
-                                    </button>
+                                <label class="form-label">{{ __('products.image') }}</label>
+                                <div class="image-upload-container position-relative">
+                                    <input type="file" class="form-control mb-2" id="image" name="image" accept="image/*">
+                                    <div class="image-preview mt-2 d-none" id="new_image_preview_display_container">
+                                        <img id="new_image_preview_display" src="#" alt="New Product Image Preview" class="img-thumbnail" style="max-height: 150px; max-width: 100%;">
+                                        <button type="button" class="btn btn-sm btn-danger mt-1" id="cancel_new_image_selection">{{ __('products.cancel') }}</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="mb-10 col-md-4">
                                 <label class="form-label">{{ __('products.category') }}</label>
                                 <div class="d-flex align-items-center">
-                                    <select class="form-select me-2" id="category_id" name="category_id" required>
+                                    <select class="form-select me-2" id="category_id" name="category_id">
                                         <option value="">{{ __('products.choose_category') }}</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
@@ -167,16 +161,13 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                                        {{ __('products.add') }}
-                                    </button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">{{ __('products.add') }}</button>
                                 </div>
                             </div>
-
                             <div class="mb-10 col-md-4">
                                 <label class="form-label">{{ __('products.brand') }}</label>
                                 <div class="d-flex align-items-center">
-                                    <select class="form-select me-2" id="brand_id" name="brand_id" required>
+                                    <select class="form-select me-2" id="brand_id" name="brand_id">
                                         <option value="">{{ __('products.choose_brand') }}</option>
                                         @foreach($brands as $brand)
                                             <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
@@ -184,16 +175,14 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal">
-                                        {{ __('products.add') }}
-                                    </button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal">{{ __('products.add') }}</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- نهاية القسم العام -->
+                    <!-- End General Section -->
 
-                    <!-- بداية قسم تفاصيل الجهاز -->
+                    <!-- Device Details Section -->
                     <div id="device_details_section" style="display: {{ old('is_mobile') ? 'block' : 'none' }};">
                         <div class="card card-flush py-4">
                             <div class="card-header">
@@ -227,7 +216,7 @@
                                     <select class="form-select mb-2" id="has_box" name="has_box">
                                         <option value="">{{ __('products.choose') }}</option>
                                         <option value="1" {{ old('has_box') == '1' ? 'selected' : '' }}>{{ __('products.yes') }}</option>
-                                        <option value="0" {{ old('has_box') == '0' || old('has_box') === null ? 'selected' : '' }}>{{ __('products.no') }}</option>
+                                        <option value="0" {{ old('has_box', '0') == '0' ? 'selected' : '' }}>{{ __('products.no') }}</option>
                                     </select>
                                 </div>
                                 <div class="mb-10 col-md-2">
@@ -239,98 +228,36 @@
                                     <input type="text" class="form-control mb-2" id="gpu" name="gpu" value="{{ old('gpu') }}">
                                 </div>
                                 <div class="mb-10 col-md-2">
-                                    <label class="form-label">{{ __('products.imei') }}</label>
-                                    <input type="text" class="form-control mb-2" id="imei" name="imei" value="{{ old('imei') }}">
-                                </div>
-                                <div class="mb-10 col-md-2">
-                                    <label class="form-label">{{ __('products.scan_id') }}
-                                        <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('products.scan_id_help_text') ?? 'Upload a scanned copy of ID or proof of ownership.' }}"></i>
-                                    </label>
-                                    <input type="file" class="form-control" id="scan_id" name="scan_id" accept="image/*">
-                                    <div class="image-preview mt-2 d-none" id="scanIdPreviewContainer">
-                                        <img id="scanIdPreview" src="#" alt="ID Scan Preview" class="img-thumbnail" style="max-height: 150px; max-width: 100%;">
-                                        <button type="button" class="btn btn-sm btn-danger mt-1" id="removeScanIdPreview">
-                                            <i class="fas fa-times"></i> {{ __('products.remove') }}
-                                        </button>
+                                    <label class="form-label">{{ __('products.scan_id') }}</label>
+                                    <div class="image-upload-container position-relative">
+                                        <input type="file" class="form-control mb-2" id="scan_id" name="scan_id" accept="image/*">
+                                        <div class="image-preview mt-2 d-none" id="new_scan_id_preview_display_container">
+                                            <img id="new_scan_id_preview_display" src="#" alt="New Scan ID Preview" class="img-thumbnail" style="max-height: 150px; max-width: 100%;">
+                                            <button type="button" class="btn btn-sm btn-danger mt-1" id="cancel_new_scan_id_selection">{{ __('products.cancel') }}</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-10 col-md-2">
-                                    <label class="form-label">{{ __('products.scan_documents') }}
-                                        <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('products.scan_documents_help_text') ?? 'Upload scanned documents related to the product.' }}"></i>
-                                    </label>
-                                    <input type="file" class="form-control" id="scan_documents" name="scan_documents" accept="image/*">
-                                    <div class="image-preview mt-2 d-none" id="scanDocumentsPreviewContainer">
-                                        <img id="scanDocumentsPreview" src="#" alt="Documents Scan Preview" class="img-thumbnail" style="max-height: 150px; max-width: 100%;">
-                                        <button type="button" class="btn btn-sm btn-danger mt-1" id="removeScanDocumentsPreview">
-                                            <i class="fas fa-times"></i> {{ __('products.remove') }}
-                                        </button>
+                                    <label class="form-label">{{ __('products.scan_documents') }}</label>
+                                     <div class="image-upload-container position-relative">
+                                        <input type="file" class="form-control mb-2" id="scan_documents" name="scan_documents" accept="image/*,application/pdf">
+                                        <div class="image-preview mt-2 d-none" id="new_scan_documents_preview_display_container">
+                                            <img id="new_scan_documents_preview_display" src="#" alt="New Scan Documents Preview" class="img-thumbnail" style="max-height: 150px; max-width: 100%;">
+                                            <span id="new_scan_documents_file_name_display" class="d-none"></span> {{-- For PDF name --}}
+                                            <button type="button" class="btn btn-sm btn-danger mt-1" id="cancel_new_scan_documents_selection">{{ __('products.cancel') }}</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-10 col-md-2">
-                                    <label class="form-label">{{ __('products.payment_method') }}</label>
-                                    <select class="form-select" id="payment_method" name="payment_method">
-                                        <option value="">{{ __('products.choose_payment_method') }}</option>
-                                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>{{ __('products.cash') }}</option>
-                                        <option value="credit" {{ old('payment_method') == 'credit' ? 'selected' : '' }}>{{ __('products.credit') }}</option>
-                                    </select>
-                                </div>
-                                <div class="mb-10 col-md-4" id="initial_payment_section" style="display: {{ old('payment_method') == 'credit' ? 'block' : 'none' }};">
-                                    <label class="form-label">{{ __('products.initial_payment_amount') }}
-                                        <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('products.initial_payment_help_text') }}"></i>
-                                    </label>
-                                    <input type="number" class="form-control mb-2" id="initial_payment" name="initial_payment" step="0.01" min="0" value="{{ old('initial_payment', 0) }}">
-                                    <div class="form-text">{{ __('products.initial_payment_notice') }}</div>
                                 </div>
                                 <div class="mb-10 col-md-12">
                                     <label class="form-label">{{ __('products.device_description') }}</label>
                                     <textarea class="form-control mb-2 min-h-100px" id="device_description" name="device_description">{{ old('device_description') }}</textarea>
                                 </div>
-                                <div class="mb-10 col-md-4">
-                                    <label class="form-label">{{ __('products.seller_name') }}</label>
-                                    <input type="text" class="form-control" id="seller_name" name="seller_name" value="{{ Auth::user()->name }}" readonly>
-                                </div>
-                                <div class="mb-10 col-md-4">
-                                    <label class="form-label">{{ __('products.client_type') }}</label>
-                                    <select class="form-select" id="client_type" name="client_type" onchange="toggleClientSections(this.value)">
-                                        <option value="">{{ __('products.choose_client_type') }}</option>
-                                        <option value="customer" {{ old('client_type') == 'customer' ? 'selected' : '' }}>{{ __('products.customer') }}</option>
-                                        <option value="supplier" {{ old('client_type') == 'supplier' ? 'selected' : '' }}>{{ __('products.supplier') }}</option>
-                                    </select>
-                                </div>
-                                <div class="mb-10 col-md-4" id="customer_section" style="display: {{ old('client_type') == 'customer' ? 'block' : 'none' }};">
-                                    <label class="form-label">{{ __('products.select_customer') }}</label>
-                                    <div class="d-flex align-items-center">
-                                        <select class="form-select me-2" id="customer_id" name="customer_id">
-                                            <option value="">{{ __('products.choose_customer') }}</option>
-                                            @foreach($customers as $customer)
-                                                <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>{{ $customer->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-                                            {{ __('products.add') }}
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mb-10 col-md-4" id="supplier_section" style="display: {{ old('client_type') == 'supplier' ? 'block' : 'none' }};">
-                                    <label class="form-label">{{ __('products.select_supplier') }}</label>
-                                    <div class="d-flex align-items-center">
-                                        <select class="form-select me-2" id="supplier_id" name="supplier_id">
-                                            <option value="">{{ __('products.choose_supplier') }}</option>
-                                            @foreach($suppliers as $supplier)
-                                                <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-                                            {{ __('products.add') }}
-                                        </button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- نهاية قسم تفاصيل الجهاز -->
+                    <!-- End Device Details Section -->
 
-                    <!-- زر الحفظ -->
+                    <!-- Save Button -->
                     <div class="d-flex justify-content-end mt-4">
                         <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#duplicateProductModal">
                             <i class="fas fa-copy me-1"></i> {{ __('products.duplicate_existing_product') ?? 'Duplicate Existing Product' }}
@@ -350,1168 +277,501 @@
         </div>
     </div>
 
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">{{ __('products.add_new_category') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addCategoryForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="category_name" class="form-label">{{ __('products.category_name') }}</label>
-                            <input type="text" class="form-control" id="category_name" name="name" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">{{ __('products.add') }}</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{-- Modals for Add Category, Brand, Customer, Supplier, Print Options, Duplicate Product --}}
+    {{-- These modals are kept as they might be used independently or for other functionalities --}}
+    @include('products.partials.add_category_modal')
+    @include('products.partials.add_brand_modal')
+    @include('products.partials.print_options_modal')
+    {{-- @include('products.partials.add_customer_modal') --}} {{-- Commented out as product is not directly linked to customer --}}
+    {{-- @include('products.partials.add_supplier_modal') --}} {{-- Commented out as product is not directly linked to supplier --}}
+    @include('products.partials.duplicate_product_modal')
 
-    <div class="modal fade" id="addBrandModal" tabindex="-1" aria-labelledby="addBrandModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addBrandModalLabel">{{ __('products.add_new_brand') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addBrandForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="brand_name" class="form-label">{{ __('products.brand_name') }}</label>
-                            <input type="text" class="form-control" id="brand_name" name="name" required>
-                            <small id="brand-error" class="text-danger d-none">{{ __('products.brand_already_exists') }}</small>
-                        </div>
-                        <button type="submit" class="btn btn-primary">{{ __('products.add') }}</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+@endsection
 
-    <div class="modal fade" id="printOptionsModal" tabindex="-1" aria-labelledby="printOptionsLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="printOptionsLabel">{{ __('products.print_options') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="paperSize">{{ __('products.select_labels_per_sheet') }}</label>
-                        <select class="form-select" id="paperSize" required>
-                            <option value="40">{{ __('products.40_per_sheet') }}</option>
-                            <option value="30">{{ __('products.30_per_sheet') }}</option>
-                            <option value="24">{{ __('products.24_per_sheet') }}</option>
-                            <option value="20">{{ __('products.20_per_sheet') }}</option>
-                            <option value="18">{{ __('products.18_per_sheet') }}</option>
-                            <option value="14">{{ __('products.14_per_sheet') }}</option>
-                            <option value="12">{{ __('products.12_per_sheet') }}</option>
-                            <option value="10">{{ __('products.10_per_sheet') }}</option>
-                            <option value="custom">{{ __('products.custom') }}</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="customLabelCountContainer" style="display: none;">
-                        <label for="customLabelCount">{{ __('products.enter_custom_number_of_labels_per_page_(1-40):') }}</label>
-                        <input type="number" id="customLabelCount" min="1" max="40" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label for="labelContent" class="form-label">{{ __('products.label_content') }}</label>
-                        <input type="text" class="form-control" id="labelContent" placeholder="{{ __('products.enter_content_to_appear_on_the_label') }}" value="{{ __('products.product_name_price_and_barcode') }}" disabled>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('products.cancel') }}</button>
-                    <button type="button" class="btn btn-primary" id="confirmPrint">{{ __('products.print') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltip initialization
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
 
-    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title" id="addCustomerModalLabel">{{ __('products.add_new_customer') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addCustomerForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="customer_name" class="form-label fw-bold">{{ __('products.customer_name') }} <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-solid" id="customer_name" name="name" required>
-                            <div class="invalid-feedback" id="customer-name-error"></div>
-                            <div class="form-text">{{ __('products.required_field') }}</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customer_phone" class="form-label">{{ __('products.customer_phone') }}</label>
-                            <input type="text" class="form-control form-control-solid" id="customer_phone" name="phone">
-                            <div class="invalid-feedback" id="customer-phone-error"></div>
-                            <div class="form-text">{{ __('products.optional_field') }}</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customer_email" class="form-label">{{ __('products.customer_email') }}</label>
-                            <input type="email" class="form-control form-control-solid" id="customer_email" name="email">
-                            <div class="invalid-feedback" id="customer-email-error"></div>
-                            <div class="form-text">{{ __('products.optional_field') }}</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customer_address" class="form-label">{{ __('products.customer_address') }}</label>
-                            <input type="text" class="form-control form-control-solid" id="customer_address" name="address">
-                            <div class="invalid-feedback" id="customer-address-error"></div>
-                            <div class="form-text">{{ __('products.optional_field') }}</div>
-                        </div>
-                        <div id="customer-form-errors" class="alert alert-danger mt-3 d-none">
-                            <ul class="mb-0" id="customer-errors-list"></ul>
-                        </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">{{ __('products.cancel') }}</button>
-                            <button type="button" id="saveCustomer" class="btn btn-primary">
-                                <span class="indicator-label">{{ __('products.save') }}</span>
-                                <span class="indicator-progress d-none">
-                                    {{ __('products.please_wait') }}
-                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                </span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+        // Initialize mobile checkbox functionality - Show/hide device details section
+        const isMobileCheckbox = document.getElementById('is_mobile');
+        const deviceDetailsSection = document.getElementById('device_details_section');
+        const hasBoxSelect = document.getElementById('has_box');
 
-    <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title" id="addSupplierModalLabel">{{ __('products.add_new_supplier') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addSupplierForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="supplier_name" class="form-label fw-bold">{{ __('products.supplier_name') }} <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-solid" id="supplier_name" name="name" required>
-                            <div class="invalid-feedback" id="supplier-name-error"></div>
-                            <div class="form-text">{{ __('products.required_field') }}</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="supplier_phone" class="form-label">{{ __('products.supplier_phone') }}</label>
-                            <input type="text" class="form-control form-control-solid" id="supplier_phone" name="phone">
-                            <div class="invalid-feedback" id="supplier-phone-error"></div>
-                            <div class="form-text">{{ __('products.optional_field') }}</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="supplier_email" class="form-label">{{ __('products.supplier_email') }}</label>
-                            <input type="email" class="form-control form-control-solid" id="supplier_email" name="email">
-                            <div class="invalid-feedback" id="supplier-email-error"></div>
-                            <div class="form-text">{{ __('products.optional_field') }}</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="supplier_address" class="form-label">{{ __('products.supplier_address') }}</label>
-                            <input type="text" class="form-control form-control-solid" id="supplier_address" name="address">
-                            <div class="invalid-feedback" id="supplier-address-error"></div>
-                            <div class="form-text">{{ __('products.optional_field') }}</div>
-                        </div>
-                        <div id="supplier-form-errors" class="alert alert-danger mt-3 d-none">
-                            <ul class="mb-0" id="supplier-errors-list"></ul>
-                        </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">{{ __('products.cancel') }}</button>
-                            <button type="button" class="btn btn-primary" id="saveSupplier">
-                                <span class="indicator-label">{{ __('products.save') }}</span>
-                                <span class="indicator-progress d-none">
-                                    {{ __('products.please_wait') }}
-                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                </span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="duplicateProductModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ __('products.duplicate_product') ?? 'Duplicate Product' }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('products.search_product') ?? 'Search Product' }}</label>
-                        <input type="text" class="form-control" id="productSearch" placeholder="{{ __('products.search_by_name_barcode') ?? 'Search by name or barcode' }}">
-                    </div>
-                    <div id="productSearchResults" class="list-group">
-                        <!-- Search results will be populated here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @section('scripts')
-        <script>
-            // Make sure jQuery is available
-            if (typeof jQuery === 'undefined') {
-                console.error('jQuery is required but not loaded. Please include jQuery in your page.');
-                document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
+        if (isMobileCheckbox && deviceDetailsSection) {
+            function toggleDeviceDetails() {
+                deviceDetailsSection.style.display = isMobileCheckbox.checked ? 'block' : 'none';
+                if (isMobileCheckbox.checked && hasBoxSelect && hasBoxSelect.value === '') {
+                    hasBoxSelect.value = '0'; // Default to 'No' if 'is_mobile' is checked and 'has_box' is empty
+                }
             }
-            
-            @if ($errors->any())
-            @foreach ($errors->all() as $error)
-            toastr.error("{{ $error }}");
-            @endforeach
-            @endif
+            isMobileCheckbox.addEventListener('change', toggleDeviceDetails);
+            toggleDeviceDetails(); // Initial check on page load
+        }
 
-            document.getElementById('is_mobile').addEventListener('change', function() {
-                var detailsTab = document.getElementById('detailsTab');
-                detailsTab.style.display = this.checked ? 'block' : 'none';
-            });
+        // Warehouse management
+        const warehouseContainer = document.getElementById('warehouse-container');
+        const addWarehouseButton = document.getElementById('add-warehouse');
+        let warehouseIndex = warehouseContainer ? warehouseContainer.querySelectorAll('.warehouse-entry').length : 0;
 
-            document.addEventListener('DOMContentLoaded', function () {
-                const warehouseContainer = document.getElementById('warehouse-container');
-                const addWarehouseButton = document.getElementById('add-warehouse');
-                let warehouseIndex = 1;
-
-                function updateWarehouseOptions() {
-                    const selectedWarehouses = Array.from(document.querySelectorAll('select[name^="warehouses"]')).map(select => select.value);
-                    const allSelects = document.querySelectorAll('select[name^="warehouses"]');
-
-                    allSelects.forEach((select) => {
-                        const currentValue = select.value;
-                        select.innerHTML = `
-                            <option value="">{{ __('Select Warehouse') }}</option>
-                        `;
-
+        if (addWarehouseButton && warehouseContainer) {
+            addWarehouseButton.addEventListener('click', function () {
+                const newEntry = document.createElement('div');
+                newEntry.classList.add('input-group', 'mb-2', 'warehouse-entry');
+                newEntry.innerHTML = `
+                    <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
+                        <option value="">{{ __('products.select_warehouse') }}</option>
                         @foreach($warehouses as $warehouse)
-                        if (!selectedWarehouses.includes("{{ $warehouse->id }}") || currentValue === "{{ $warehouse->id }}") {
-                            select.innerHTML += `<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>`;
-                        }
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
-
-                        select.value = currentValue;
-                    });
-                }
-
-                addWarehouseButton.addEventListener('click', function () {
-                    const newWarehouseEntry = document.createElement('div');
-                    newWarehouseEntry.classList.add('input-group', 'mb-2', 'warehouse-entry');
-                    newWarehouseEntry.innerHTML = `
-                        <select class="form-select" name="warehouses[${warehouseIndex}][id]" required>
-                            <option value="">{{ __('Select Warehouse') }}</option>
-                            @foreach($warehouses as $warehouse)
-                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                            @endforeach
-                                </select>
-                                <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('Stock') }}" required>
-                        <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('Stock Alert') }}" required>
-                        <button type="button" class="btn btn-danger remove-warehouse">{{ __('Remove') }}</button>
-                    `;
-                    warehouseContainer.appendChild(newWarehouseEntry);
-
-                    warehouseIndex++;
-                    updateWarehouseOptions();
+                    </select>
+                    <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock]" placeholder="{{ __('products.stock') }}" required>
+                    <input type="number" class="form-control" name="warehouses[${warehouseIndex}][stock_alert]" placeholder="{{ __('products.stock_alert') }}" required>
+                    <button type="button" class="btn btn-danger remove-warehouse">{{ __('products.remove') }}</button>
+                `;
+                warehouseContainer.appendChild(newEntry);
+                newEntry.querySelector('.remove-warehouse').addEventListener('click', function() {
+                    this.closest('.warehouse-entry').remove();
                 });
-
-                warehouseContainer.addEventListener('change', function (e) {
-                    if (e.target.tagName === 'SELECT') {
-                        updateWarehouseOptions();
-                    }
-                });
-
-                warehouseContainer.addEventListener('click', function (e) {
-                    if (e.target.classList.contains('remove-warehouse')) {
-                        e.target.closest('.warehouse-entry').remove();
-                        updateWarehouseOptions();
-                    }
-                });
-
-                updateWarehouseOptions();
+                warehouseIndex++;
             });
 
-            document.getElementById('client_type').addEventListener('change', function () {
-                const customerSection = document.getElementById('customer_section');
-                const supplierSection = document.getElementById('supplier_section');
-
-                if (this.value === 'customer') {
-                    customerSection.style.display = 'block';
-                    supplierSection.style.display = 'none';
-                } else if (this.value === 'supplier') {
-                    customerSection.style.display = 'none';
-                    supplierSection.style.display = 'block';
-                } else {
-                    customerSection.style.display = 'none';
-                    supplierSection.style.display = 'none';
+            warehouseContainer.addEventListener('click', function (e) {
+                if (e.target.classList.contains('remove-warehouse')) {
+                    e.target.closest('.warehouse-entry').remove();
                 }
             });
+        }
 
-            document.getElementById('payment_method').addEventListener('change', function () {
-                const clientTypeSelect = document.getElementById('client_type');
-                const customerSection = document.getElementById('customer_section');
-                const supplierSection = document.getElementById('supplier_section');
-                const initialPaymentSection = document.getElementById('initial_payment_section');
+        // Barcode generation and checking
+        const generateBarcodeBtn = document.getElementById('generateBarcode');
+        const barcodeInput = document.getElementById('barcode');
+        const barcodeFeedback = document.getElementById("barcode-feedback");
+        const barcodeFormatFeedback = document.getElementById("barcode-format-feedback");
+        const barcodeValidFeedback = document.getElementById("barcode-valid-feedback");
 
-                if (this.value === 'credit') {
-                    clientTypeSelect.value = 'supplier';
-                    clientTypeSelect.setAttribute('disabled', true);
-                    customerSection.style.display = 'none';
-                    supplierSection.style.display = 'block';
-                    initialPaymentSection.style.display = 'block';
-                } else {
-                    clientTypeSelect.value = '';
-                    clientTypeSelect.removeAttribute('disabled');
-                    customerSection.style.display = 'none';
-                    supplierSection.style.display = 'none';
-                    initialPaymentSection.style.display = 'none';
-                }
-            });
-
-            document.getElementById('saveCustomer').addEventListener('click', function () {
-                const form = document.getElementById('addCustomerForm');
-                const formData = new FormData(form);
-                const submitButton = this;
-                const customerFormErrors = document.getElementById('customer-form-errors');
-                const customerErrorsList = document.getElementById('customer-errors-list');
-                
-                // Reset any previous errors
-                customerFormErrors.classList.add('d-none');
-                customerErrorsList.innerHTML = '';
-                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                
-                // تحقق من البيانات المدخلة
-                let isValid = true;
-                
-                const nameInput = document.getElementById('customer_name');
-                if (!nameInput.value.trim()) {
-                    nameInput.classList.add('is-invalid');
-                    document.getElementById('customer-name-error').textContent = '{{ __("products.name_required") }}';
-                    isValid = false;
-                }
-                
-                // الهاتف غير مطلوب الآن
-                const phoneInput = document.getElementById('customer_phone');
-                
-                // التحقق من صحة تنسيق البريد الإلكتروني إذا تم إدخاله
-                const emailInput = document.getElementById('customer_email');
-                if (emailInput.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
-                    emailInput.classList.add('is-invalid');
-                    document.getElementById('customer-email-error').textContent = '{{ __("products.email_invalid") }}';
-                    isValid = false;
-                }
-                
-                if (!isValid) return;
-                
-                // إظهار مؤشر التحميل
-                submitButton.querySelector('.indicator-label').classList.add('d-none');
-                submitButton.querySelector('.indicator-progress').classList.remove('d-none');
-                submitButton.disabled = true;
-
-                // Make AJAX request with jQuery instead of fetch
-                $.ajax({
-                    url: '{{ route('customers.store') }}',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    },
-                    success: function(data) {
-                        if (data.success) {
-                            const customerSelect = document.getElementById('customer_id');
-                            const newOption = document.createElement('option');
-                            newOption.value = data.customer.id;
-                            newOption.textContent = data.customer.name;
-                            newOption.selected = true;
-                            customerSelect.appendChild(newOption);
-
-                            // تحديث نوع العميل واظهار قسم العميل
-                            const clientTypeSelect = document.getElementById('client_type');
-                            clientTypeSelect.value = 'customer';
-                            toggleClientSections('customer');
-
-                            // إخفاء النافذة المنبثقة
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
-                            modal.hide();
-
-                            // إعادة تعيين النموذج
-                            form.reset();
-                            
-                            // إظهار إشعار نجاح بتنسيق محسن
-                            toastr.options = {
-                                closeButton: true,
-                                progressBar: true,
-                                positionClass: "toast-top-right",
-                                timeOut: 3000
-                            };
-                            toastr.success(data.message || '{{ __("products.customer_added_successfully") }}');
-                            
-                            // تمييز اختيار العميل بتأثير بصري
-                            customerSelect.classList.add('border-success');
-                            setTimeout(() => {
-                                customerSelect.classList.remove('border-success');
-                            }, 2000);
-                        } else {
-                            toastr.error(data.message || '{{ __("products.error_saving_customer") }}');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('{{ __("products.error") }}:', error);
-                        
-                        // محاولة تحليل الرد كـ JSON
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            
-                            if (response.errors) {
-                                // التعامل مع أخطاء التحقق
-                                customerFormErrors.classList.remove('d-none');
-                                customerErrorsList.innerHTML = '';
-                                
-                                Object.keys(response.errors).forEach(field => {
-                                    response.errors[field].forEach(message => {
-                                        const li = document.createElement('li');
-                                        li.textContent = message;
-                                        customerErrorsList.appendChild(li);
-                                    });
-                                    
-                                    const fieldInput = document.getElementById('customer_' + field);
-                                    if (fieldInput) {
-                                        fieldInput.classList.add('is-invalid');
-                                        document.getElementById('customer-' + field + '-error').textContent = response.errors[field][0];
-                                    }
-                                });
-                            } else if (response.message) {
-                                toastr.error(response.message);
-                            } else {
-                                toastr.error('{{ __("products.something_went_wrong") }}');
-                            }
-                        } catch (e) {
-                            // إذا لم يكن الرد JSON صالحًا، عرض خطأ عام
-                            toastr.error('{{ __("products.server_error") }}');
-                        }
-                    },
-                    complete: function() {
-                        // إعادة تعيين حالة الزر
-                        submitButton.querySelector('.indicator-label').classList.remove('d-none');
-                        submitButton.querySelector('.indicator-progress').classList.add('d-none');
-                        submitButton.disabled = false;
-                    }
-                });
-            });
-
-            document.getElementById('saveSupplier').addEventListener('click', function () {
-                const form = document.getElementById('addSupplierForm');
-                const formData = new FormData(form);
-                const submitButton = this;
-                const supplierFormErrors = document.getElementById('supplier-form-errors');
-                const supplierErrorsList = document.getElementById('supplier-errors-list');
-                
-                // Reset any previous errors
-                supplierFormErrors.classList.add('d-none');
-                supplierErrorsList.innerHTML = '';
-                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                
-                // التحقق من بيانات المورد المدخلة
-                let isValid = true;
-                
-                const nameInput = document.getElementById('supplier_name');
-                if (!nameInput.value.trim()) {
-                    nameInput.classList.add('is-invalid');
-                    document.getElementById('supplier-name-error').textContent = '{{ __("products.name_required") }}';
-                    isValid = false;
-                }
-                
-                // التحقق من صحة تنسيق البريد الإلكتروني إذا تم إدخاله
-                const emailInput = document.getElementById('supplier_email');
-                if (emailInput.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
-                    emailInput.classList.add('is-invalid');
-                    document.getElementById('supplier-email-error').textContent = '{{ __("products.email_invalid") }}';
-                    isValid = false;
-                }
-                
-                if (!isValid) return;
-                
-                // إظهار مؤشر التحميل
-                submitButton.querySelector('.indicator-label').classList.add('d-none');
-                submitButton.querySelector('.indicator-progress').classList.remove('d-none');
-                submitButton.disabled = true;
-
-                // Make AJAX request with jQuery instead of fetch
-                $.ajax({
-                    url: '{{ route('suppliers.store') }}',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    },
-                    success: function(data) {
-                        if (data.success) {
-                            const supplierSelect = document.getElementById('supplier_id');
-                            const newOption = document.createElement('option');
-                            newOption.value = data.supplier.id;
-                            newOption.textContent = data.supplier.name;
-                            newOption.selected = true;
-                            supplierSelect.appendChild(newOption);
-
-                            // تحديث نوع المورد واظهار قسم المورد
-                            const clientTypeSelect = document.getElementById('client_type');
-                            clientTypeSelect.value = 'supplier';
-                            toggleClientSections('supplier');
-
-                            // إخفاء النافذة المنبثقة
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('addSupplierModal'));
-                            modal.hide();
-
-                            // إعادة تعيين النموذج
-                            form.reset();
-                            
-                            // إظهار إشعار نجاح بتنسيق محسن
-                            toastr.options = {
-                                closeButton: true,
-                                progressBar: true,
-                                positionClass: "toast-top-right",
-                                timeOut: 3000
-                            };
-                            toastr.success(data.message || '{{ __("products.supplier_added_successfully") }}');
-                            
-                            // تمييز اختيار المورد بتأثير بصري
-                            supplierSelect.classList.add('border-success');
-                            setTimeout(() => {
-                                supplierSelect.classList.remove('border-success');
-                            }, 2000);
-                        } else {
-                            toastr.error(data.message || '{{ __("products.error_saving_supplier") }}');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('{{ __("products.error") }}:', error);
-                        
-                        // محاولة تحليل الرد كـ JSON
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            
-                            if (response.errors) {
-                                // التعامل مع أخطاء التحقق
-                                supplierFormErrors.classList.remove('d-none');
-                                supplierErrorsList.innerHTML = '';
-                                
-                                Object.keys(response.errors).forEach(field => {
-                                    response.errors[field].forEach(message => {
-                                        const li = document.createElement('li');
-                                        li.textContent = message;
-                                        supplierErrorsList.appendChild(li);
-                                    });
-                                    
-                                    const fieldInput = document.getElementById('supplier_' + field);
-                                    if (fieldInput) {
-                                        fieldInput.classList.add('is-invalid');
-                                        document.getElementById('supplier-' + field + '-error').textContent = response.errors[field][0];
-                                    }
-                                });
-                            } else if (response.message) {
-                                toastr.error(response.message);
-                            } else {
-                                toastr.error('{{ __("products.something_went_wrong") }}');
-                            }
-                        } catch (e) {
-                            // إذا لم يكن الرد JSON صالحًا، عرض خطأ عام
-                            toastr.error('{{ __("products.server_error") }}');
-                        }
-                    },
-                    complete: function() {
-                        // إعادة تعيين حالة الزر
-                        submitButton.querySelector('.indicator-label').classList.remove('d-none');
-                        submitButton.querySelector('.indicator-progress').classList.add('d-none');
-                        submitButton.disabled = false;
-                    }
-                });
-            });
-
-            document.getElementById('addBrandForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const form = document.getElementById('addBrandForm');
-                const formData = new FormData(form);
-
-                fetch('{{ route('brands.store') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json', // تأكيد أن الرد سيكون JSON
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    },
-                    body: formData,
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(err => { throw err });
-                        }
-                        return response.json();
-                    })
+        if (generateBarcodeBtn && barcodeInput) {
+            generateBarcodeBtn.addEventListener('click', function() {
+                fetch('{{ route('products.generateBarcode') }}')
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            const brandSelect = document.getElementById('brand_id');
-                            const newOption = document.createElement('option');
-                            newOption.value = data.brand.id;
-                            newOption.textContent = data.brand.name;
-                            newOption.selected = true;
-                            brandSelect.appendChild(newOption);
-
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('addBrandModal'));
-                            modal.hide();
-
-                            form.reset();
-                        } else {
-                            alert(data.message || 'Error saving brand.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert(error.message || 'Something went wrong. Please try again.');
-                    });
-            });
-
-            document.getElementById('addCategoryForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const form = document.getElementById('addCategoryForm');
-                const formData = new FormData(form);
-
-                fetch('{{ route('categories.store') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    },
-                    body: formData,
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(err => { throw err });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            const categorySelect = document.getElementById('category_id');
-                            const newOption = document.createElement('option');
-                            newOption.value = data.category.id;
-                            newOption.textContent = data.category.name;
-                            newOption.selected = true;
-                            categorySelect.appendChild(newOption);
-
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
-                            modal.hide();
-
-                            form.reset();
-                            toastr.success(data.message);
-                        } else {
-                            toastr.error(data.message || 'Error saving category.');
-                        }
+                            barcodeInput.value = data.barcode;
+                            checkBarcode(); // Validate the newly generated barcode
+                        } else { console.error('Error generating barcode'); }
                     })
                     .catch(error => console.error('Error:', error));
             });
+        }
 
-            document.getElementById('paperSize').addEventListener('change', function () {
-                const customLabelCountContainer = document.getElementById('customLabelCountContainer');
-                if (this.value === 'custom') {
-                    customLabelCountContainer.style.display = 'block';
+        window.checkBarcode = function() { // Made global for onblur
+            if (!barcodeInput || !barcodeFeedback || !barcodeFormatFeedback || !barcodeValidFeedback) return;
+            let barcode = barcodeInput.value.trim();
+
+            barcodeFeedback.classList.add("d-none");
+            barcodeFormatFeedback.classList.add("d-none");
+            barcodeValidFeedback.classList.add("d-none");
+            barcodeInput.classList.remove("is-invalid", "is-valid");
+
+            if (barcode === "") return;
+
+            if (!/^[0-9]{8,13}$/.test(barcode)) {
+                barcodeFormatFeedback.textContent = '{{ __("products.invalid_barcode_format_message") }}'; // Specific message
+                barcodeFormatFeedback.classList.remove("d-none");
+                barcodeInput.classList.add("is-invalid");
+                return;
+            }
+
+            fetch(`{{ route('products.checkBarcode', '') }}/${barcode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        barcodeFeedback.textContent = data.message || '{{ __("products.This barcode already exists!") }}';
+                        barcodeFeedback.classList.remove("d-none");
+                        barcodeInput.classList.add("is-invalid");
+                    } else if (data.valid_format === false) { // Should be caught by regex but good to double check
+                        barcodeFormatFeedback.textContent = data.message || '{{ __("products.invalid_barcode_format_message") }}';
+                        barcodeFormatFeedback.classList.remove("d-none");
+                        barcodeInput.classList.add("is-invalid");
+                    } else {
+                        barcodeValidFeedback.textContent = data.message || '{{ __("products.valid_barcode") }}';
+                        barcodeValidFeedback.classList.remove("d-none");
+                        barcodeInput.classList.add("is-valid");
+                    }
+                })
+                .catch(error => console.error("Error checking barcode:", error));
+        }
+        if(barcodeInput) barcodeInput.addEventListener('input', checkBarcode);
+
+
+        // Price vs Cost Check
+        const costInput = document.getElementById('cost');
+        const priceInput = document.getElementById('price');
+        const priceFeedback = document.getElementById('price-feedback');
+
+        if (costInput && priceInput && priceFeedback) {
+            const validatePriceVsCost = function() {
+                const cost = parseFloat(costInput.value) || 0;
+                const price = parseFloat(priceInput.value) || 0;
+                if (price > 0 && cost > 0 && price < cost) { // Only show warning if price is entered and less than cost
+                    priceFeedback.classList.remove('d-none');
+                    priceInput.classList.add('is-invalid');
                 } else {
-                    customLabelCountContainer.style.display = 'none';
+                    priceFeedback.classList.add('d-none');
+                    priceInput.classList.remove('is-invalid');
+                }
+            };
+            costInput.addEventListener('input', validatePriceVsCost);
+            priceInput.addEventListener('input', validatePriceVsCost);
+            validatePriceVsCost(); // Initial check
+        }
+
+        // Unified Image/File Preview Logic
+        function setupImagePreviewLogic(inputId, newImagePreviewId, cancelNewImageButtonId, newFileNameDisplayId) {
+            const fileInput = document.getElementById(inputId);
+            const newPreviewImg = document.getElementById(newImagePreviewId);
+            const newPreviewWrapper = newPreviewImg ? newPreviewImg.parentElement : null;
+            const cancelNewImageBtn = document.getElementById(cancelNewImageButtonId);
+            const newFileNameDisplay = newFileNameDisplayId ? document.getElementById(newFileNameDisplayId) : null;
+
+            if (fileInput) {
+                fileInput.addEventListener('change', function(event) {
+                    if (event.target.files && event.target.files[0]) {
+                        const file = event.target.files[0];
+                        if (newPreviewImg && newPreviewWrapper) {
+                            if (file.type.startsWith('image/')) {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    newPreviewImg.src = e.target.result;
+                                    newPreviewImg.classList.remove('d-none');
+                                    if(newFileNameDisplay) newFileNameDisplay.classList.add('d-none');
+                                }
+                                reader.readAsDataURL(file);
+                            } else if (newFileNameDisplay) {
+                                newPreviewImg.classList.add('d-none');
+                                newPreviewImg.src = '#';
+                                newFileNameDisplay.textContent = file.name;
+                                newFileNameDisplay.classList.remove('d-none');
+                            }
+                            newPreviewWrapper.classList.remove('d-none');
+                        }
+                    } else {
+                        if (newPreviewWrapper) newPreviewWrapper.classList.add('d-none');
+                        if (newPreviewImg) { newPreviewImg.src = '#'; newPreviewImg.classList.remove('d-none'); }
+                        if (newFileNameDisplay) { newFileNameDisplay.textContent = ''; newFileNameDisplay.classList.add('d-none'); }
+                    }
+                });
+            }
+
+            if (cancelNewImageBtn) {
+                cancelNewImageBtn.addEventListener('click', function() {
+                    fileInput.value = '';
+                    if (newPreviewWrapper) newPreviewWrapper.classList.add('d-none');
+                    if (newPreviewImg) { newPreviewImg.src = '#'; newPreviewImg.classList.remove('d-none'); }
+                    if (newFileNameDisplay) { newFileNameDisplay.textContent = ''; newFileNameDisplay.classList.add('d-none'); }
+                });
+            }
+        }
+
+        setupImagePreviewLogic('image', 'new_image_preview_display', 'cancel_new_image_selection');
+        setupImagePreviewLogic('scan_id', 'new_scan_id_preview_display', 'cancel_new_scan_id_selection');
+        setupImagePreviewLogic('scan_documents', 'new_scan_documents_preview_display', 'cancel_new_scan_documents_selection', 'new_scan_documents_file_name_display');
+
+        // AJAX for Modals (Add Category, Brand, Customer, Supplier)
+        // Simplified, ensure these routes exist and controllers handle JSON responses.
+        function setupModalForm(formId, url, selectToUpdateId, modalId, itemName) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.innerHTML = '{{ __("products.saving") }} <span class="spinner-border spinner-border-sm"></span>';
+                submitButton.disabled = true;
+
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data[itemName]) {
+                        const selectElement = document.getElementById(selectToUpdateId);
+                        if (selectElement) {
+                            const option = new Option(data[itemName].name, data[itemName].id, true, true);
+                            selectElement.appendChild(option);
+                            selectElement.dispatchEvent(new Event('change')); // For select2 or other libraries to update
+                        }
+                        var modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+                        if (modal) modal.hide();
+                        form.reset();
+                        toastr.success(data.message || itemName.charAt(0).toUpperCase() + itemName.slice(1) + ' added successfully.');
+                    } else {
+                        toastr.error(data.message || 'Error saving ' + itemName + '. ' + (data.error || ''));
+                        if(data.errors){
+                            let errorMsg = '';
+                            for(const field in data.errors){
+                                errorMsg += data.errors[field].join('\n') + '\n';
+                            }
+                            toastr.error(errorMsg);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('An unexpected error occurred.');
+                })
+                .finally(() => {
+                    submitButton.innerHTML = originalButtonText;
+                    submitButton.disabled = false;
+                });
+            });
+        }
+
+        setupModalForm('addCategoryForm', '{{ route("categories.store") }}', 'category_id', 'addCategoryModal', 'category');
+        setupModalForm('addBrandForm', '{{ route("brands.store") }}', 'brand_id', 'addBrandModal', 'brand');
+        // Customer and Supplier modals are present but their direct integration with Product form was removed.
+        // If they are to be used for general creation, their AJAX can be kept.
+        // The selectToUpdateId might not be relevant anymore for customer/supplier on this specific product form.
+        // setupModalForm('addCustomerForm', '{{ route("customers.store") }}', 'customer_id', 'addCustomerModal', 'customer');
+        // setupModalForm('addSupplierForm', '{{ route("suppliers.store") }}', 'supplier_id', 'addSupplierModal', 'supplier');
+
+        // Print Barcode Modal Logic
+        const printBarcodeBtn = document.getElementById('printBarcode');
+        if(printBarcodeBtn) {
+            printBarcodeBtn.addEventListener('click', function() {
+                var printOptionsModalEl = document.getElementById('printOptionsModal');
+                if(printOptionsModalEl){
+                    var printOptionsModal = new bootstrap.Modal(printOptionsModalEl);
+                    printOptionsModal.show();
                 }
             });
+        }
 
-            document.getElementById('printBarcode').addEventListener('click', function() {
-                var printOptionsModal = new bootstrap.Modal(document.getElementById('printOptionsModal'));
-                printOptionsModal.show();
-            });
-
-            document.getElementById('confirmPrint').addEventListener('click', function() {
+        const confirmPrintBtn = document.getElementById('confirmPrint');
+        if(confirmPrintBtn){
+            confirmPrintBtn.addEventListener('click', function() {
                 let paperSize = document.getElementById('paperSize').value;
                 if (paperSize === 'custom') {
                     paperSize = document.getElementById('customLabelCount').value;
                 }
-
                 const barcodeValue = document.getElementById('barcode').value;
-
                 if (!barcodeValue) {
-                    alert('Please generate a barcode first.');
+                    toastr.error('{{ __("products.barcode_not_entered") }}');
                     return;
                 }
-
+                if (!paperSize || paperSize < 1) {
+                    toastr.error('{{ __("products.invalid_label_count") }}');
+                    return;
+                }
+                // Simplified print content - actual implementation might vary
                 const printWindow = window.open('', '_blank');
-                printWindow.document.write(`
-                    <html>
-                    <head>
-                        <title>Print Barcode</title>
-                        <style>
-                            body { display: flex; flex-wrap: wrap; padding: 0; margin: 0; }
-                            .label { width: calc(100% / 5); text-align: center; }
-                            img { max-width: 100%; height: auto; }
-                            p { font-size: 12px; margin: 0; }
-                        </style>
-                    </head>
-                    <body>
-                        ${Array.from({ length: paperSize }).map((_, index) => `
-                            <div class="label">
-                                <img id="barcode-"${index}" />
-                            </div>
-                        `).join('')}
-                        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                for (let i = 0; i < ${paperSize}; i++) {
-                                    JsBarcode("#barcode-" + i, "${barcodeValue}", {
-                                        format: "CODE128",
-                                        displayValue: true
-                                    });
-                                }
-                                window.print();
-                            });
-                        <\/script>
-                    </body>
-                    </html>
-                `);
+                printWindow.document.write('<html><head><title>Print Barcode</title></head><body>');
+                for(let i=0; i< parseInt(paperSize); i++) {
+                    printWindow.document.write(`<div style="text-align:center; margin:10px;"><svg id="barcode-${i}"></svg></div>`);
+                }
+                printWindow.document.write('<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>');
+                printWindow.document.write('<script>document.addEventListener("DOMContentLoaded", function() {');
+                for(let i=0; i< parseInt(paperSize); i++) {
+                    printWindow.document.write(`JsBarcode("#barcode-${i}", "${barcodeValue}", { format: "CODE128", displayValue: true, textMargin: 0, fontSize: 14, margin: 10 });`);
+                }
+                printWindow.document.write('window.print(); window.close(); });<\/script></body></html>');
                 printWindow.document.close();
-
-                var printOptionsModal = bootstrap.Modal.getInstance(document.getElementById('printOptionsModal'));
-                printOptionsModal.hide();
+                var modal = bootstrap.Modal.getInstance(document.getElementById('printOptionsModal'));
+                if(modal) modal.hide();
             });
-
-            function checkBarcode() {
-                let barcodeInput = document.getElementById("barcode");
-                let feedback = document.getElementById("barcode-feedback");
-                let formatFeedback = document.getElementById("barcode-format-feedback");
-                let validFeedback = document.getElementById("barcode-valid-feedback");
-                let barcode = barcodeInput.value.trim();
-
-                // إعادة تعيين جميع حالات الملاحظات
-                feedback.classList.add("d-none");
-                formatFeedback.classList.add("d-none");
-                validFeedback.classList.add("d-none");
-                barcodeInput.classList.remove("is-invalid");
-
-                if (barcode === "") return;
-
-                // التحقق من صحة تنسيق الباركود (8-13 رقم)
-                if (!/^[0-9]{8,13}$/.test(barcode)) {
-                    formatFeedback.classList.remove("d-none");
-                    barcodeInput.classList.add("is-invalid");
-                    return;
-                }
-
-                fetch(`{{ route('products.checkBarcode', '') }}/${barcode}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.exists) {
-                            feedback.classList.remove("d-none");
-                            barcodeInput.classList.add("is-invalid");
-                            validFeedback.classList.add("d-none");
-                        } else {
-                            feedback.classList.add("d-none");
-                            barcodeInput.classList.remove("is-invalid");
-                            validFeedback.classList.remove("d-none");
-                        }
-                    })
-                    .catch(error => console.error("Error checking barcode:", error));
-            }
-
-            document.addEventListener('DOMContentLoaded', function () {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl)
-                });
-                
-                // Add event listener for generate barcode button
-                document.getElementById('generateBarcode').addEventListener('click', function() {
-                    fetch('{{ route('products.generateBarcode') }}')
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // تحديث قيمة الباركود
-                                document.getElementById('barcode').value = data.barcode;
-                                
-                                // إزالة كل رسائل الخطأ
-                                document.getElementById('barcode').classList.remove('is-invalid');
-                                document.getElementById('barcode-feedback').classList.add('d-none');
-                                document.getElementById('barcode-format-feedback').classList.add('d-none');
-                                
-                                // إظهار رسالة نجاح
-                                document.getElementById('barcode-valid-feedback').classList.remove('d-none');
-                            } else {
-                                console.error('Error generating barcode');
-                            }
-                        })
-                        .catch(error => console.error('Error:', error));
-                });
-                
-                initFormValidation();
-                
-                initImagePreviews();
-                
-                initPriceCostCheck();
-                
-                initBarcodeValidation();
-
-                // Initialize mobile checkbox functionality - Show/hide device details section
-                const isMobileCheckbox = document.getElementById('is_mobile');
-                const deviceDetailsSection = document.getElementById('device_details_section');
-                const hasBoxSelect = document.getElementById('has_box');
-
-                isMobileCheckbox.addEventListener('change', function() {
-                    deviceDetailsSection.style.display = this.checked ? 'block' : 'none';
-                    
-                    // إذا تم تحديد "هذا جهاز" والمربع "with box" لم يتم اختياره، نضع القيمة الافتراضية "لا"
-                    if (this.checked && hasBoxSelect.value === '') {
-                        hasBoxSelect.value = '0';
-                    }
-                });
-
-                // Initialize based on current state
-                deviceDetailsSection.style.display = isMobileCheckbox.checked ? 'block' : 'none';
-                
-                // تعيين القيمة الافتراضية لـ has_box عند تحميل الصفحة إذا كان خيار الجهاز محددًا
-                if (isMobileCheckbox.checked && hasBoxSelect.value === '') {
-                    hasBoxSelect.value = '0';
-                }
+        }
+        const paperSizeSelect = document.getElementById('paperSize');
+        if(paperSizeSelect){
+            paperSizeSelect.addEventListener('change', function () {
+                document.getElementById('customLabelCountContainer').style.display = this.value === 'custom' ? 'block' : 'none';
             });
-            
-            function initFormValidation() {
-                const form = document.querySelector('form');
+        }
+
+        // Form submission validation (simplified, main validation is server-side)
+        const mainForm = document.querySelector('form.form.d-flex');
+        if(mainForm){
+            mainForm.addEventListener('submit', function(e){
                 const submitButton = document.getElementById('submit-form');
-                const toastEl = document.getElementById('formErrorToast');
-                const toast = new bootstrap.Toast(toastEl);
-                
-                // تنظيف مستمعي الأحداث السابقة للنموذج (لمنع التكرار)
-                const newForm = form.cloneNode(true);
-                form.parentNode.replaceChild(newForm, form);
-                
-                // تحديث مرجع النموذج
-                const updatedForm = document.querySelector('form');
-                
-                // تعديل submit بطريقة احترافية وموحدة
-                updatedForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // 1. إظهار مؤشر التحميل على الزر
+                if(submitButton){
                     submitButton.setAttribute('data-kt-indicator', 'on');
                     submitButton.disabled = true;
-                    
-                    // 2. التحقق من الحقول المطلوبة
-                    const requiredFields = updatedForm.querySelectorAll('[required]');
-                    let isValid = true;
-                    let firstInvalidField = null;
-                    let tabToActivate = null;
-                    let invalidFieldsMessages = [];
-                    
-                    // التحقق من كل حقل مطلوب
-                    requiredFields.forEach(function(field) {
-                        if (!field.value.trim()) {
-                            isValid = false;
-                            field.classList.add('is-invalid');
-                            
-                            // إضافة رسالة الحقل غير الصالح
-                            let fieldLabel = '';
-                            const labelEl = field.closest('.mb-10')?.querySelector('.form-label');
-                            if (labelEl) {
-                                fieldLabel = labelEl.textContent.replace('*', '').trim();
-                            } else {
-                                fieldLabel = field.name.replace('_', ' ').replace(/^\w/, c => c.toUpperCase());
-                            }
-                            invalidFieldsMessages.push(fieldLabel);
-                        }
-                    });
-                    
-                    // التحقق من المخزن
-                    const warehouseEntries = document.querySelectorAll('.warehouse-entry');
-                    let hasValidWarehouse = false;
-                    
-                    for (const entry of warehouseEntries) {
-                        const warehouseSelect = entry.querySelector('select[name^="warehouses"]');
-                        const stockInput = entry.querySelector('input[name$="[stock]"]');
-                        const alertInput = entry.querySelector('input[name$="[stock_alert]"]');
-                        
-                        if (warehouseSelect && warehouseSelect.value && 
-                            stockInput && stockInput.value && 
-                            alertInput && alertInput.value) {
-                            hasValidWarehouse = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!hasValidWarehouse) {
-                        invalidFieldsMessages.push('بيانات المخزن (المخزن، الكمية، والإنذار)');
-                        
-                        // تحديد أول حقل في أول مخزن كأول حقل مفقود إذا لم يتم تحديد حقل آخر
-                        if (!firstInvalidField && warehouseEntries.length > 0) {
-                            const firstWarehouse = warehouseEntries[0];
-                            firstInvalidField = firstWarehouse.querySelector('select') || 
-                                              firstWarehouse.querySelector('input[name$="[stock]"]') || 
-                                              firstWarehouse.querySelector('input[name$="[stock_alert]"]');
-                            
-                            if (firstInvalidField) {
-                                firstInvalidField.classList.add('is-invalid');
-                            }
-                        }
-                    }
-                    
-                    // إذا كانت هناك حقول مفقودة، عرض رسالة خطأ
-                    if (invalidFieldsMessages.length > 0) {
-                        // عرض توست مخصص
-                        const toastContainer = document.createElement('div');
-                        toastContainer.className = 'position-fixed top-0 end-0 p-3';
-                        toastContainer.style.zIndex = '11';
-                        
-                        const toastElement = document.createElement('div');
-                        toastElement.className = 'toast align-items-center text-white bg-danger border-0';
-                        toastElement.setAttribute('role', 'alert');
-                        toastElement.setAttribute('aria-live', 'assertive');
-                        toastElement.setAttribute('aria-atomic', 'true');
-                        
-                        // إنشاء نص الخطأ
-                        let errorMessage = '<strong>يرجى استكمال الحقون التالية:</strong><ul class="mt-2 mb-0">';
-                        invalidFieldsMessages.forEach(field => {
-                            errorMessage += `<li>${field}</li>`;
-                        });
-                        errorMessage += '</ul>';
-                        
-                        toastElement.innerHTML = `
-                            <div class="d-flex">
-                                <div class="toast-body">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    ${errorMessage}
-                                </div>
-                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                        `;
-                        
-                        toastContainer.appendChild(toastElement);
-                        document.body.appendChild(toastContainer);
-                        
-                        // عرض التوست
-                        const toast = new bootstrap.Toast(toastElement, {
-                            autohide: false
-                        });
-                        toast.show();
-                        
-                        // التركيز على أول حقل مفقود
-                        if (firstInvalidField) {
-                            // تنشيط التبويب الذي يحتوي على الحقل
-                            const tabPanel = firstInvalidField.closest('.tab-pane');
-                            if (tabPanel) {
-                                const tabId = tabPanel.id;
-                                const tabLink = document.querySelector(`a[data-bs-toggle="tab"][href="#${tabId}"]`);
-                                if (tabLink) {
-                                    const tab = new bootstrap.Tab(tabLink);
-                                    tab.show();
-                                }
-                            }
-                            
-                            // التركيز على الحقل
-                            setTimeout(() => {
-                                firstInvalidField.focus();
-                                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 300);
-                        }
-                        
-                        // إزالة التوست عند إغلاقه
-                        toastElement.addEventListener('hidden.bs.toast', function() {
-                            toastContainer.remove();
-                        });
-                        
-                        return;
-                    }
-                    
-                    // إذا لم تكن هناك أي حقول مفقودة، قم بإرسال النموذج
-                    form.submit();
-                });
-            }
-            
-            function initImagePreviews() {
-                // Image preview functionality for product image
-                const imageInput = document.getElementById('image');
-                const imagePreview = document.getElementById('imagePreview');
-                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-                const removeImagePreviewButton = document.getElementById('removeImagePreview');
-                
-                if (imageInput) {
-                    imageInput.addEventListener('change', function() {
-                        if (this.files && this.files[0]) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                imagePreview.src = e.target.result;
-                                imagePreviewContainer.classList.remove('d-none');
-                            };
-                            reader.readAsDataURL(this.files[0]);
-                        }
-                    });
                 }
-                
-                if (removeImagePreviewButton) {
-                    removeImagePreviewButton.addEventListener('click', function() {
-                        imageInput.value = '';
-                        imagePreviewContainer.classList.add('d-none');
-                        imagePreview.src = '#';
-                    });
-                }
-                
-                // Scan ID preview
-                const scanIdInput = document.getElementById('scan_id');
-                const scanIdPreview = document.getElementById('scanIdPreview');
-                const scanIdPreviewContainer = document.getElementById('scanIdPreviewContainer');
-                const removeScanIdPreviewButton = document.getElementById('removeScanIdPreview');
-                
-                if (scanIdInput) {
-                    scanIdInput.addEventListener('change', function() {
-                        if (this.files && this.files[0]) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                scanIdPreview.src = e.target.result;
-                                scanIdPreviewContainer.classList.remove('d-none');
-                            };
-                            reader.readAsDataURL(this.files[0]);
-                        }
-                    });
-                }
-                
-                if (removeScanIdPreviewButton) {
-                    removeScanIdPreviewButton.addEventListener('click', function() {
-                        scanIdInput.value = '';
-                        scanIdPreviewContainer.classList.add('d-none');
-                        scanIdPreview.src = '#';
-                    });
-                }
-                
-                // Scan Documents preview
-                const scanDocsInput = document.getElementById('scan_documents');
-                const scanDocsPreview = document.getElementById('scanDocumentsPreview');
-                const scanDocsPreviewContainer = document.getElementById('scanDocumentsPreviewContainer');
-                const removeScanDocsPreviewButton = document.getElementById('removeScanDocumentsPreview');
-                
-                if (scanDocsInput) {
-                    scanDocsInput.addEventListener('change', function() {
-                        if (this.files && this.files[0]) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                scanDocsPreview.src = e.target.result;
-                                scanDocsPreviewContainer.classList.remove('d-none');
-                            };
-                            reader.readAsDataURL(this.files[0]);
-                        }
-                    });
-                }
-                
-                if (removeScanDocsPreviewButton) {
-                    removeScanDocsPreviewButton.addEventListener('click', function() {
-                        scanDocsInput.value = '';
-                        scanDocsPreviewContainer.classList.add('d-none');
-                        scanDocsPreview.src = '#';
-                    });
-                }
-            }
-            
-            function initPriceCostCheck() {
-                const costInput = document.getElementById('cost');
-                const priceInput = document.getElementById('price');
-                const priceFeedback = document.getElementById('price-feedback');
-                
-                if (costInput && priceInput && priceFeedback) {
-                    const validatePriceVsCost = function() {
-                        const cost = parseFloat(costInput.value) || 0;
-                        const price = parseFloat(priceInput.value) || 0;
-                        
-                        if (price < cost && price > 0) {
-                            priceFeedback.classList.remove('d-none');
-                            priceInput.classList.add('is-invalid');
-                        } else {
-                            priceFeedback.classList.add('d-none');
-                            priceInput.classList.remove('is-invalid');
-                        }
-                    };
-                    
-                    costInput.addEventListener('input', validatePriceVsCost);
-                    priceInput.addEventListener('input', validatePriceVsCost);
-                    
-                    // Initial validation
-                    validatePriceVsCost();
-                }
-            }
-            
-            function initBarcodeValidation() {
-                const barcodeInput = document.getElementById('barcode');
-                const barcodeFeedback = document.getElementById('barcode-feedback');
-                const barcodeFormatFeedback = document.getElementById('barcode-format-feedback');
-                const barcodeValidFeedback = document.getElementById('barcode-valid-feedback');
-                
-                if (barcodeInput) {
-                    barcodeInput.addEventListener('input', function() {
-                        const barcode = this.value.trim();
-                        
-                        // إعادة تعيين جميع حالات الملاحظات
-                        barcodeFeedback.classList.add('d-none');
-                        barcodeFormatFeedback.classList.add('d-none');
-                        barcodeValidFeedback.classList.add('d-none');
-                        barcodeInput.classList.remove('is-invalid');
-                        
-                        // تخطي التحقق للباركود الفارغ
-                        if (!barcode) return;
-                        
-                        // التحقق من صحة التنسيق (8-13 رقم)
-                        if (!/^[0-9]{8,13}$/.test(barcode)) {
-                            barcodeFormatFeedback.classList.remove('d-none');
-                            barcodeInput.classList.add('is-invalid');
-                            return;
-                        }
-                        
-                        // التحقق مما إذا كان الباركود موجودًا
-                        fetch(`{{ route('products.checkBarcode', '') }}/${barcode}`)
+            });
+        }
+
+    });
+
+    // --- Duplicate Product Modal Logic ---
+    const duplicateModalEl = document.getElementById('duplicateProductModal');
+    const productSearchInput = document.getElementById('productSearchModalInput');
+    const productSearchResultsDiv = document.getElementById('productSearchResultsModal');
+    let duplicateModalInstance = null;
+
+    if (duplicateModalEl) {
+        duplicateModalInstance = new bootstrap.Modal(duplicateModalEl);
+
+        if (productSearchInput && productSearchResultsDiv) {
+            let searchTimeout;
+            productSearchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const searchTerm = this.value.trim();
+                if (searchTerm.length >= 2) {
+                    searchTimeout = setTimeout(() => {
+                        fetch(`{{ route('products.search') }}?term=${encodeURIComponent(searchTerm)}`)
                             .then(response => response.json())
                             .then(data => {
-                                if (data.exists) {
-                                    barcodeFeedback.classList.remove('d-none');
-                                    barcodeInput.classList.add('is-invalid');
-                                    barcodeValidFeedback.classList.add('d-none');
-                                } else if (data.valid_format) {
-                                    barcodeFeedback.classList.add('d-none');
-                                    barcodeFormatFeedback.classList.add('d-none');
-                                    barcodeInput.classList.remove('is-invalid');
-                                    barcodeValidFeedback.classList.remove('d-none');
+                                productSearchResultsDiv.innerHTML = ''; // Clear previous results
+                                if (data.length > 0) {
+                                    data.forEach(product => {
+                                        const item = document.createElement('a');
+                                        item.href = '#';
+                                        item.classList.add('list-group-item', 'list-group-item-action');
+                                        item.textContent = `${product.name} (${product.barcode || 'N/A'}) - Price: ${product.price}`;
+                                        item.dataset.productId = product.id;
+                                        item.addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            fetchProductForDuplication(this.dataset.productId);
+                                        });
+                                        productSearchResultsDiv.appendChild(item);
+                                    });
+                                } else {
+                                    productSearchResultsDiv.innerHTML = `<p class="text-muted p-3">{{ __("products.no_products_found") }}</p>`;
                                 }
                             })
-                            .catch(error => console.error("Error checking barcode:", error));
-                    });
-                }
-            }
-            
-            // وظيفة للتبديل بين أقسام العملاء والموردين
-            function toggleClientSections(value) {
-                const customerSection = document.getElementById('customer_section');
-                const supplierSection = document.getElementById('supplier_section');
-                
-                if (value === 'customer') {
-                    customerSection.style.display = 'block';
-                    supplierSection.style.display = 'none';
-                } else if (value === 'supplier') {
-                    customerSection.style.display = 'none';
-                    supplierSection.style.display = 'block';
+                            .catch(error => console.error('Error searching products:', error));
+                    }, 300); // Debounce search
                 } else {
-                    customerSection.style.display = 'none';
-                    supplierSection.style.display = 'none';
+                    productSearchResultsDiv.innerHTML = '';
                 }
-            }
-        </script>
-    @endsection
+            });
+        }
+    }
 
+    function fetchProductForDuplication(productId) {
+        fetch(`{{ url('products') }}/${productId}/duplicate`) // Using url() helper for flexibility
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.product) {
+                    populateFormWithProductData(data.product, data.mobile_details);
+                    if(duplicateModalInstance) {
+                        duplicateModalEl.addEventListener('hidden.bs.modal', function () {
+                            // Focus an element on the main form after modal is fully hidden
+                            const nameInput = document.getElementById('name');
+                            if (nameInput) nameInput.focus();
+                        }, { once: true }); // Ensure this listener runs only once
+                        duplicateModalInstance.hide();
+                    }
+                    toastr.info('{{ __("products.form_populated_for_duplication") }}', '{{ __("products.review_and_save") }}');
+                } else {
+                    toastr.error(data.message || '{{ __("products.error_fetching_product_for_duplication") }}');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching product for duplication:', error);
+                toastr.error('{{ __("products.error_fetching_product_for_duplication") }}');
+            });
+    }
+
+    function populateFormWithProductData(product, mobileDetails) {
+        // Populate main product fields
+        document.getElementById('name').value = product.name + ' (Copy)'; // Add suffix to indicate copy
+        document.getElementById('cost').value = product.cost || 0;
+        document.getElementById('price').value = product.price || 0;
+        document.getElementById('wholesale_price').value = product.wholesale_price || 0;
+        document.getElementById('min_sale_price').value = product.min_sale_price || 0;
+        document.getElementById('description').value = product.description || '';
+
+        if (product.category_id) {
+            document.getElementById('category_id').value = product.category_id;
+        }
+        if (product.brand_id) {
+            document.getElementById('brand_id').value = product.brand_id;
+        }
+
+        document.getElementById('barcode').value = '';
+        if (document.getElementById('generateBarcode')) document.getElementById('generateBarcode').click(); // Attempt to generate new barcode
+        else checkBarcode(); // Or just re-validate if generate button not present
+
+        document.getElementById('image').value = '';
+        const newImagePreviewContainer = document.getElementById('new_image_preview_display_container');
+        const newImagePreview = document.getElementById('new_image_preview_display');
+        if (newImagePreviewContainer && newImagePreview) {
+            newImagePreviewContainer.classList.add('d-none');
+            newImagePreview.src = '#';
+        }
+
+        const warehouseContainer = document.getElementById('warehouse-container');
+        if (warehouseContainer) {
+            // Clear existing and add one empty default entry if needed
+            warehouseContainer.innerHTML = '';
+            const addWarehouseBtn = document.getElementById('add-warehouse');
+            if(product.warehouses && product.warehouses.length > 0){
+                 product.warehouses.forEach((wh_data, index) => {
+                    if(addWarehouseBtn) addWarehouseButton.click(); // Simulate click to add entry
+                    // Then fill the newly added entry - this part is complex as fields are dynamically created
+                    // For simplicity, we are clearing and user re-adds.
+                    // A more advanced implementation would re-populate these.
+                 });
+            } else {
+                 // If no warehouses from source, ensure at least one empty entry is present if that's the default form state
+                 // This might already be handled by the form's default rendering
+            }
+        }
+
+        const isMobileCheckbox = document.getElementById('is_mobile');
+        const deviceDetailsSection = document.getElementById('device_details_section');
+
+        if (product.is_mobile && mobileDetails) {
+            isMobileCheckbox.checked = true;
+
+            document.getElementById('color').value = mobileDetails.color || '';
+            document.getElementById('storage').value = mobileDetails.storage || '';
+            document.getElementById('battery_health').value = mobileDetails.battery_health || 0;
+            document.getElementById('ram').value = mobileDetails.ram || '';
+            document.getElementById('condition').value = mobileDetails.condition || '';
+            document.getElementById('has_box').value = mobileDetails.has_box ? '1' : '0';
+            document.getElementById('cpu').value = mobileDetails.cpu || '';
+            document.getElementById('gpu').value = mobileDetails.gpu || '';
+            document.getElementById('device_description').value = mobileDetails.device_description || '';
+
+            document.getElementById('scan_id').value = '';
+            const newScanIdPreviewContainer = document.getElementById('new_scan_id_preview_display_container');
+            const newScanIdPreview = document.getElementById('new_scan_id_preview_display');
+            if (newScanIdPreviewContainer && newScanIdPreview) {
+                newScanIdPreviewContainer.classList.add('d-none');
+                newScanIdPreview.src = '#';
+            }
+
+            document.getElementById('scan_documents').value = '';
+            const newScanDocsPreviewContainer = document.getElementById('new_scan_documents_preview_display_container');
+            const newScanDocsPreview = document.getElementById('new_scan_documents_preview_display');
+            const newScanDocsFileName = document.getElementById('new_scan_documents_file_name_display');
+            if (newScanDocsPreviewContainer && newScanDocsPreview) {
+                newScanDocsPreviewContainer.classList.add('d-none');
+                newScanDocsPreview.src = '#';
+                if(newScanDocsFileName) newScanDocsFileName.classList.add('d-none');
+            }
+
+        } else {
+            isMobileCheckbox.checked = false;
+        }
+
+        // Trigger change on is_mobile to ensure dependent UI (device_details_section) updates
+        if(isMobileCheckbox) {
+            const event = new Event('change', { bubbles: true });
+            isMobileCheckbox.dispatchEvent(event);
+        }
+    }
+</script>
 @endsection
